@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Sustancias</title>
+    <style>
+        /* Estilo básico para la página */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz: ¿Qué sustancia provoca esta conducta?</h1>
+
+    <p id="conducta"></p>
+
+    <input type="text" id="respuesta" placeholder="Escribe tu respuesta aquí" onkeydown="if(event.key === 'Enter') checkAnswer()">
+    <button onclick="checkAnswer()">Enviar</button>
+
+    <p id="resultado"></p>
+
+    <p id="contador"></p>
+
+    <script>
+        // Definimos las conductas y las sustancias
+        const conductas = {
+            "cortisol": [
+                "Sientes un nudo en el estómago antes de un examen importante.",
+                "Te preocupas por una fecha límite cercana y no puedes relajarte.",
+                "Te despiertas por la noche pensando en problemas que no puedes resolver.",
+                "Sientes que tu cuerpo está tenso por la acumulación de estrés en el trabajo.",
+                "Tienes dificultades para concentrarte debido a la presión constante."
+            ],
+            "adrenalina": [
+                "Tu corazón se acelera al escuchar un ruido fuerte inesperado.",
+                "Sientes una ráfaga de energía cuando estás a punto de competir en un deporte.",
+                "Te preparas para correr tras notar un peligro cercano.",
+                "Te sientes agitado al enfrentarte a una situación peligrosa de repente.",
+                "Experimentas un aumento de energía justo antes de dar una presentación importante."
+            ],
+            "acetilcolina": [
+                "Tu mente se vuelve muy clara mientras te concentras en resolver un problema de matemáticas.",
+                "Recuerdas con precisión los detalles de algo que acabas de aprender.",
+                "Estás muy atento y concentrado mientras lees un texto complicado.",
+                "Te das cuenta de que puedes recordar fácilmente lo que estudiaste ayer.",
+                "Te concentras intensamente en una tarea manual que requiere precisión."
+            ],
+            "dopamina": [
+                "Sientes una gran emoción al comenzar un nuevo videojuego, sin saber si ganarás.",
+                "Te sientes recompensado y feliz cuando logras una meta personal.",
+                "Experimentas una sensación de placer tras recibir buenas noticias.",
+                "Te emocionas al pensar en los planes para el futuro que te has fijado.",
+                "Te motivas profundamente después de recibir elogios por un trabajo bien hecho."
+            ],
+            "feromonas": [
+                "Te sientes atraído por alguien al estar cerca de esa persona sin motivo aparente.",
+                "Sientes una conexión física inexplicable con alguien que acabas de conocer.",
+                "Tienes una fuerte reacción emocional cuando ves a alguien que te atrae mucho.",
+                "Notas que te sientes atraído por alguien en un lugar lleno de gente.",
+                "Te sientes inquieto por la presencia de alguien que no conoces, pero te resulta familiar."
+            ],
+            "serotonina": [
+                "Sientes una profunda tranquilidad mientras disfrutas de una tarde con amigos.",
+                "Te sientes en paz después de haber pasado tiempo en la naturaleza.",
+                "Estás calmado y relajado después de haber hecho algo que te gusta.",
+                "Te invade una sensación de satisfacción tras una conversación significativa.",
+                "Te sientes estable emocionalmente después de haber tenido un día equilibrado."
+            ],
+            "GABA": [
+                "Te tumbas en el sofá después de un largo día y te sientes completamente relajado, pero no te duermes.",
+                "Sientes una paz total tras unos minutos de meditación.",
+                "Estás profundamente relajado después de tomar un descanso en medio de una jornada intensa.",
+                "Te relajas profundamente después de escuchar música tranquila por un rato.",
+                "Te sientes relajado tras un baño caliente después de un día estresante."
+            ],
+            "testosterona": [
+                "Te vuelves más competitivo y agresivo durante un partido de fútbol.",
+                "Sientes una gran confianza al liderar un proyecto importante.",
+                "Te esfuerzas por demostrar tus habilidades cuando alguien te reta.",
+                "Sientes una energía inusualmente alta cuando compites por algo.",
+                "Te sientes decidido a demostrar tu capacidad cuando alguien te desafía."
+            ],
+            "endorfinas": [
+                "Sientes una sensación de euforia después de hacer ejercicio intenso.",
+                "Experimentas una felicidad inexplicable tras una larga caminata.",
+                "Te sientes muy bien tras haber hecho deporte, aunque estés agotado físicamente.",
+                "Te ríes intensamente después de una situación divertida.",
+                "Sientes una oleada de bienestar después de una clase de yoga intensa."
+            ],
+            "oxitocina": [
+                "Te sientes seguro y amado después de recibir un abrazo de alguien cercano.",
+                "Sientes una profunda conexión emocional al pasar tiempo con alguien a quien quieres.",
+                "Te sientes más tranquilo cuando estás en compañía de tu familia.",
+                "Te sientes emocionalmente cercano a alguien después de compartir un momento especial.",
+                "Te sientes conmovido cuando alguien que amas te muestra cariño."
+            ],
+            "melatonina": [
+                "Sientes que tu cuerpo comienza a relajarse y te da sueño a medida que se hace de noche.",
+                "Te sientes preparado para dormir después de un día largo.",
+                "Te relajas por completo cuando te tumbas en la cama por la noche.",
+                "Te sientes cada vez más somnoliento cuando apagas las luces y te acuestas.",
+                "Empiezas a cabecear lentamente mientras lees antes de dormir."
+            ]
+        };
+
+        // Lista de sustancias y contador de preguntas
+        let sustanciasDisponibles = Object.keys(conductas);
+        let preguntasHechas = 0;
+        let puntuacion = 0;
+        const maxPreguntas = sustanciasDisponibles.length; // 11 preguntas en total
+
+        // Función para generar una nueva pregunta
+        function nuevaPregunta() {
+            if (preguntasHechas < maxPreguntas) {
+                // Seleccionar una sustancia aleatoria y eliminarla de las disponibles
+                let randomIndex = Math.floor(Math.random() * sustanciasDisponibles.length);
+                let sustanciaCorrecta = sustanciasDisponibles.splice(randomIndex, 1)[0]; // Elimina la sustancia elegida de la lista
+
+                let conducta = conductas[sustanciaCorrecta][Math.floor(Math.random() * conductas[sustanciaCorrecta].length)];
+
+                // Mostrar la conducta en la página
+                document.getElementById("conducta").innerText = conducta;
+
+                // Guardar sustancia correcta en una variable global
+                window.sustanciaCorrecta = sustanciaCorrecta;
+
+                // Limpiar la respuesta y el resultado anterior
+                document.getElementById("respuesta").value = "";
+                document.getElementById("resultado").innerText = "";
+
+                // Actualizar el contador de preguntas
+                preguntasHechas++;
+                document.getElementById("contador").innerText = `Pregunta ${preguntasHechas}/${maxPreguntas}`;
+            } else {
+                // Terminar el quiz
+                document.getElementById("conducta").innerText = "¡Has completado el quiz!";
+                document.getElementById("respuesta").style.display = "none";
+                document.getElementById("resultado").innerText = `Has acertado ${puntuacion} de ${maxPreguntas} preguntas.`;
+                document.querySelector("button").style.display = "none"; // Ocultar el botón de enviar
+                document.getElementById("contador").style.display = "none"; // Ocultar el contador de preguntas
+            }
+        }
+
+        // Función para medir similitud de cadenas (básico)
+        function similar(str1, str2) {
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+            const longer = Math.max(str1.length, str2.length);
+            const same = [...str1].filter((char, index) => char === str2[index]).length;
+            return same / longer > 0.7; // Consideramos correctas las respuestas con un 70% de similitud
+        }
+
+        // Función para verificar la respuesta
+        function checkAnswer() {
+            let respuestaUsuario = document.getElementById("respuesta").value.trim();
+
+            if (respuestaUsuario.toLowerCase() === window.sustanciaCorrecta.toLowerCase()) {
+                document.getElementById("resultado").innerText = "¡Correcto!";
+                puntuacion++;
+            } else if (similar(respuestaUsuario, window.sustanciaCorrecta)) {
+                document.getElementById("resultado").innerText = "¡Correcto! Nota: La forma correcta de escribir la sustancia es '" + window.sustanciaCorrecta + "'.";
+                puntuacion++;
+            } else {
+                document.getElementById("resultado").innerText = `Incorrecto. La sustancia correcta era ${window.sustanciaCorrecta}.`;
+            }
+
+            // Esperar 4 segundos antes de pasar a la siguiente pregunta
+            setTimeout(nuevaPregunta, 4000);
+        }
+
+        // Inicializar el quiz con la primera pregunta
+        nuevaPregunta();
+    </script>
+</body>
+</html>

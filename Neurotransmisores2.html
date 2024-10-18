@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudio de Neurotransmisores y Hormonas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f8ff;
+            position: relative;
+            min-height: 100vh;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #options-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #study-section, #practice-section {
+            display: none;
+        }
+        #substances-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .substance {
+            background-color: #e0f7fa;
+            border: 2px solid #00838f;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            width: 150px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .substance:hover {
+            background-color: #b2ebf2;
+        }
+        .explanation-popup {
+            position: fixed;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border: 2px solid #00bcd4;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            width: 500px;
+        }
+        .explanation-popup p {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+        .close-popup {
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            color: #00bcd4;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+
+        #practice-area {
+            display: flex;
+            justify-content: space-between;
+        }
+        #substances-list-practice {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+        }
+        #explanations-list {
+            width: 65%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .draggable {
+            cursor: pointer;
+        }
+
+        .active {
+            background-color: #b2ebf2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Estudio de Neurotransmisores y Hormonas</h1>
+    <div id="options-section">
+        <button onclick="startLearning()">Aprender</button>
+        <button onclick="startPracticing()">Practicar</button>
+    </div>
+
+    <!-- Sección de estudio (Aprender) -->
+    <div id="study-section">
+        <h2 id="instruction-text">Haz clic en una sustancia para ver más información</h2>
+        <div id="substances-list"></div>
+    </div>
+
+    <!-- Sección de práctica (Practicar) -->
+    <div id="practice-section">
+        <h2 id="instruction-text-practice">Une la sustancia con su descripción</h2>
+        <div id="practice-area">
+            <div id="substances-list-practice"></div>
+            <div id="explanations-list"></div>
+        </div>
+    </div>
+
+    <!-- Ventana emergente para la explicación -->
+    <div id="explanation-popup" class="explanation-popup">
+        <span class="close-popup" onclick="closeExplanation()">X</span>
+        <p id="explanation-text"></p>
+        <p id="example-text"></p>
+    </div>
+
+    <script>
+        // Datos de neurotransmisores y hormonas con ejemplos
+        const substances = [
+            { 
+                name: "Dopamina", 
+                description: "Relacionada con la recompensa, el placer y la motivación.", 
+                example: "Ejemplo: Sentir satisfacción al lograr una meta personal o al jugar un videojuego." 
+            },
+            { 
+                name: "Serotonina", 
+                description: "Regula el estado de ánimo, el bienestar y la calma.", 
+                example: "Ejemplo: Sentir tranquilidad después de pasar tiempo con amigos o hacer algo que disfrutas." 
+            },
+            { 
+                name: "Acetilcolina", 
+                description: "Involucrado en la activación muscular, memoria y atención.", 
+                example: "Ejemplo: Concentrarse intensamente mientras resuelves un problema matemático o estudias." 
+            },
+            { 
+                name: "GABA", 
+                description: "Neurotransmisor inhibidor que promueve la relajación.", 
+                example: "Ejemplo: Sentirse relajado después de un largo día, pero sin quedarse dormido." 
+            },
+            { 
+                name: "Cortisol", 
+                description: "Hormona del estrés, liberada en situaciones de tensión.", 
+                example: "Ejemplo: Sentir un nudo en el estómago antes de un examen importante." 
+            },
+            { 
+                name: "Adrenalina", 
+                description: "Activa la respuesta de 'lucha o huida', aumentando la energía.", 
+                example: "Ejemplo: El corazón se acelera tras escuchar un ruido inesperado o al prepararte para una competición." 
+            },
+            { 
+                name: "Testosterona", 
+                description: "Relacionada con la competitividad, energía física y agresividad.", 
+                example: "Ejemplo: Sentir una fuerte competitividad durante un partido o cuando alguien te reta." 
+            },
+            { 
+                name: "Endorfinas", 
+                description: "Actúan como analgésicos naturales, reduciendo el dolor.", 
+                example: "Ejemplo: Sentir una euforia tras hacer ejercicio intenso o una larga caminata." 
+            },
+            { 
+                name: "Oxitocina", 
+                description: "Hormona relacionada con el amor, la confianza y los lazos afectivos.", 
+                example: "Ejemplo: Sentir calma y seguridad tras un abrazo o al pasar tiempo con alguien querido." 
+            },
+            { 
+                name: "Melatonina", 
+                description: "Regula el ciclo de sueño-vigilia, ayudando a la relajación y el descanso.", 
+                example: "Ejemplo: Sentirse somnoliento por la noche mientras el cuerpo se prepara para dormir." 
+            },
+            { 
+                name: "Feromonas", 
+                description: "Sustancias químicas que influyen en la atracción sexual y la comunicación entre individuos.", 
+                example: "Ejemplo: Sentir una atracción inexplicable hacia una persona cuando estás cerca de ella." 
+            }
+        ];
+
+        // Función para mezclar array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Elementos HTML
+        const substancesList = document.getElementById("substances-list");
+        const explanationPopup = document.getElementById("explanation-popup");
+        const explanationText = document.getElementById("explanation-text");
+        const exampleText = document.getElementById("example-text");
+
+        const practiceSubstancesList = document.getElementById("substances-list-practice");
+        const practiceExplanationsList = document.getElementById("explanations-list");
+
+        // Variables para unir sustancias y descripciones
+        let selectedSubstance = null;
+        let selectedDescription = null;
+
+        // Función para cambiar a modo "Aprender"
+        function startLearning() {
+            closeExplanation();  // Cerrar cualquier ventana emergente al cambiar a aprender
+            document.getElementById("practice-section").style.display = "none";
+            document.getElementById("study-section").style.display = "block";
+        }
+
+        // Función para cambiar a modo "Practicar"
+        function startPracticing() {
+            closeExplanation();  // Cerrar cualquier ventana emergente al cambiar a practicar
+            document.getElementById("study-section").style.display = "none";
+            document.getElementById("practice-section").style.display = "block";
+            loadPracticeSubstances();
+        }
+
+        // Cargar la lista de sustancias para "Aprender"
+        function loadSubstancesForStudy() {
+            substancesList.innerHTML = '';
+            substances.forEach(substance => {
+                const item = document.createElement("div");
+                item.classList.add("substance");
+                item.innerText = substance.name;
+                item.onclick = () => showExplanation(substance);
+                substancesList.appendChild(item);
+            });
+        }
+
+        // Cargar las sustancias y descripciones para "Practicar"
+        function loadPracticeSubstances() {
+            practiceSubstancesList.innerHTML = '';
+            practiceExplanationsList.innerHTML = '';
+
+            // Ordenar sustancias en su orden original
+            substances.forEach(substance => {
+                const substanceItem = document.createElement("div");
+                substanceItem.classList.add("substance", "draggable");
+                substanceItem.innerText = substance.name;
+                substanceItem.onclick = () => selectSubstance(substanceItem, substance);
+                practiceSubstancesList.appendChild(substanceItem);
+            });
+
+            // Mezclar las explicaciones aleatoriamente
+            const shuffledSubstances = [...substances];
+            shuffleArray(shuffledSubstances);
+
+            // Cargar explicaciones desordenadas
+            shuffledSubstances.forEach(substance => {
+                const explanationItem = document.createElement("div");
+                explanationItem.classList.add("substance", "draggable");
+                explanationItem.innerText = substance.description;
+                explanationItem.onclick = () => selectDescription(explanationItem, substance);
+                practiceExplanationsList.appendChild(explanationItem);
+            });
+        }
+
+        // Seleccionar sustancia
+        function selectSubstance(element, substance) {
+            if (selectedSubstance === substance) {
+                selectedSubstance = null;
+                element.classList.remove("active");
+            } else {
+                if (!selectedSubstance) {
+                    selectedSubstance = substance;
+                    clearActiveSubstances();
+                    element.classList.add("active");
+                }
+            }
+            checkMatch();
+        }
+
+        // Seleccionar descripción
+        function selectDescription(element, substance) {
+            if (selectedDescription === substance) {
+                selectedDescription = null;
+                element.classList.remove("active");
+            } else {
+                if (!selectedDescription) {
+                    selectedDescription = substance;
+                    clearActiveDescriptions();
+                    element.classList.add("active");
+                }
+            }
+            checkMatch();
+        }
+
+        // Limpiar selección de sustancias activas
+        function clearActiveSubstances() {
+            const items = document.querySelectorAll("#substances-list-practice .substance");
+            items.forEach(item => {
+                item.classList.remove("active");
+            });
+        }
+
+        // Limpiar selección de descripciones activas
+        function clearActiveDescriptions() {
+            const items = document.querySelectorAll("#explanations-list .substance");
+            items.forEach(item => {
+                item.classList.remove("active");
+            });
+        }
+
+        // Verificar si hay una coincidencia entre sustancia y descripción
+        function checkMatch() {
+            if (selectedSubstance && selectedDescription) {
+                if (selectedSubstance.name === selectedDescription.name) {
+                    alert("¡Correcto!");
+                    resetSelections();
+                } else {
+                    alert("Incorrecto, vuelve a intentarlo.");
+                    resetSelections();
+                }
+            }
+        }
+
+        // Restablecer las selecciones
+        function resetSelections() {
+            selectedSubstance = null;
+            selectedDescription = null;
+            clearActiveSubstances();
+            clearActiveDescriptions();
+        }
+
+        // Mostrar la explicación y ejemplo en la ventana emergente
+        function showExplanation(substance) {
+            explanationText.innerText = `${substance.name}: ${substance.description}`;
+            exampleText.innerText = substance.example;
+            explanationPopup.style.display = "block";
+        }
+
+        // Cerrar la ventana emergente
+        function closeExplanation() {
+            explanationPopup.style.display = "none";
+        }
+
+        // Cargar las sustancias al iniciar
+        loadSubstancesForStudy();
+    </script>
+
+</body>
+</html>
