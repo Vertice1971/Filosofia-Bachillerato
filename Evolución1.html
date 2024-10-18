@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Evolución</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        #introduccion, #simulacion {
+            display: none;
+        }
+        #introduccion.active, #simulacion.active {
+            display: block;
+        }
+        .boton {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        ul {
+            max-height: 400px;
+            overflow-y: auto;
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sección de Introducción -->
+    <div id="introduccion" class="active">
+        <h1>Simulador de Evolución</h1>
+        <p>
+            Durante miles de años, la atmósfera del planeta ha sido rica en oxígeno, permitiendo que los humanos prosperen. Sin embargo, un accidente ha liberado grandes cantidades de dióxido de carbono (CO2) en el aire, lo que ha reducido drásticamente los niveles de oxígeno. Esta situación plantea un grave riesgo para los seres humanos, ya que no pueden metabolizar el CO2 y se intoxican con él. 
+        </p>
+        <p>
+            Sin embargo, se ha identificado una secuencia de ADN que permite a algunos organismos metabolizar el CO2 y sobrevivir en este nuevo entorno. Esta simulación te permitirá observar cómo esta mutación podría afectar a la especie en los próximos años.
+        </p>
+        <button class="boton" onclick="iniciarSimulacion()">Comenzar Simulación</button>
+    </div>
+
+    <!-- Sección de Simulación -->
+    <div id="simulacion">
+        <label for="sliderNoVentajoso">Porcentaje de éxito para organismos sin la secuencia ventajosa (60-80%):</label>
+        <input type="range" id="sliderNoVentajoso" name="sliderNoVentajoso" min="60" max="80" value="70" oninput="this.nextElementSibling.value = this.value">
+        <output>70</output>%<br>
+
+        <label for="sliderVentajoso">Porcentaje de éxito para organismos con la secuencia ventajosa (100-150%):</label>
+        <input type="range" id="sliderVentajoso" name="sliderVentajoso" min="100" max="150" value="120" oninput="this.nextElementSibling.value = this.value">
+        <output>120</output>%<br><br>
+
+        <button class="boton" onclick="pedirSecuenciaVentajosa()">Empezar Simulación</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        let secuenciaVentajosa = "";
+        let generacionActual = [];
+        let tasaCrecimiento = 1;
+        let aumentoGeneracional = 0;
+        let numeroGeneracion = 1;
+
+        // Función para iniciar la simulación desde la introducción
+        function iniciarSimulacion() {
+            document.getElementById('introduccion').classList.remove('active');
+            document.getElementById('simulacion').classList.add('active');
+        }
+
+        // Función para pedir la secuencia ventajosa al usuario
+        function pedirSecuenciaVentajosa() {
+            while (true) {
+                secuenciaVentajosa = prompt("Establece el código genético que permite metabolizar el CO2 (dos letras y un número en cualquier orden):");
+
+                if (secuenciaVentajosa === null) {
+                    alert("Simulación cancelada.");
+                    return;
+                }
+
+                secuenciaVentajosa = secuenciaVentajosa.trim().toUpperCase();
+
+                const regex = /^(?=(?:.*[A-Z]){2})(?=(?:.*\d){1})[A-Z0-9]{3}$/;
+                if (regex.test(secuenciaVentajosa)) {
+                    break;
+                } else {
+                    alert("Secuencia no válida. Introduce dos letras y un número en cualquier orden (por ejemplo, A1B).");
+                }
+            }
+
+            const porcentajeNoVentajoso = parseFloat(document.getElementById("sliderNoVentajoso").value);
+            const porcentajeVentajoso = parseFloat(document.getElementById("sliderVentajoso").value);
+            tasaCrecimiento = porcentajeVentajoso / porcentajeNoVentajoso;
+            generarSecuencias();
+        }
+
+        // Función para obtener todas las posiciones protegidas de la secuencia ventajosa
+        function obtenerPosicionesProtegidas(organismo, secuenciaVentajosa) {
+            let posicionesProtegidas = [];
+            let posicion = organismo.indexOf(secuenciaVentajosa);
+            while (posicion !== -1) {
+                for (let i = 0; i < secuenciaVentajosa.length; i++) {
+                    posicionesProtegidas.push(posicion + i);
+                }
+                posicion = organismo.indexOf(secuenciaVentajosa, posicion + 1);
+            }
+            return posicionesProtegidas;
+        }
+
+        // Función para generar una secuencia aleatoria de 40 caracteres
+        function generarSecuencia() {
+            const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return Array.from({ length: 40 }, () => caracteres.charAt(Math.floor(Math.random() * caracteres.length))).join('');
+        }
+
+        // Función para generar la primera generación con 3000 secuencias
+        function generarSecuencias() {
+            const totalSecuencias = 3000;
+            generacionActual = [];
+            let organismosConMutacion = [];
+
+            for (let i = 0; i < totalSecuencias; i++) {
+                let secuencia = generarSecuencia();
+                generacionActual.push(secuencia);
+                if (secuencia.includes(secuenciaVentajosa)) {
+                    organismosConMutacion.push(i); 
+                }
+            }
+
+            mostrarResultado(generacionActual, organismosConMutacion, "Generación " + numeroGeneracion);
+        }
+
+        // Función para mostrar el resultado
+        function mostrarResultado(secuencias, organismosConMutacion, generacion) {
+            const resultadoDiv = document.getElementById("resultado");
+            let contenido = `<h2>${generacion} - Secuencias Generadas</h2><ul>`;
+
+            secuencias.forEach((secuencia, index) => {
+                let secuenciaMarcada = secuencia.replace(secuenciaVentajosa, `<span class="highlight">${secuenciaVentajosa}</span>`);
+                contenido += `<li>Organismo ${index + 1}: ${secuenciaMarcada}</li>`;
+            });
+
+            contenido += `</ul>`;
+            contenido += `<h3>Total de organismos con la secuencia genética exitosa en la ${generacion}: ${organismosConMutacion.length}</h3>`;
+
+            if (organismosConMutacion.length > 0) {
+                contenido += `<h4>Organismos con la secuencia '${secuenciaVentajosa}' (capaces de metabolizar CO2):</h4>`;
+                contenido += `Organismo ${organismosConMutacion.map(org => org + 1).join(', Organismo ')}`;
+            } else {
+                contenido += `<h4>Ningún organismo tiene la secuencia '${secuenciaVentajosa}'.</h4>`;
+            }
+
+            contenido += `<br><button class="boton" onclick="siguienteGeneracion()">Siguiente Generación</button>`;
+            resultadoDiv.innerHTML = contenido;
+        }
+
+        // Función para generar la siguiente generación
+        function siguienteGeneracion() {
+            let nuevaGeneracion = [];
+            let organismosConMutacion = [];
+
+            const numVentajosos = generacionActual.filter(org => org.includes(secuenciaVentajosa)).length;
+            aumentoGeneracional = Math.floor(numVentajosos * (tasaCrecimiento - 1));
+
+            let listaProvisional = [...generacionActual];
+
+            for (let i = 0; i < aumentoGeneracional; i++) {
+                const randomIndex = Math.floor(Math.random() * listaProvisional.length);
+                const randomVentajoso = generacionActual.find(org => org.includes(secuenciaVentajosa));
+
+                if (randomVentajoso) {
+                    listaProvisional[randomIndex] = randomVentajoso;
+                }
+            }
+
+            for (let i = 0; i < listaProvisional.length; i += 2) {
+                if (i + 1 < listaProvisional.length) {
+                    let organismo1 = listaProvisional[i];
+                    let organismo2 = listaProvisional[i + 1];
+
+                    let mitad1 = Math.floor(organismo1.length / 2);
+                    let mitad2 = Math.floor(organismo2.length / 2);
+
+                    let nuevoOrganismo1 = organismo1.slice(0, mitad1) + organismo2.slice(mitad2);
+                    let nuevoOrganismo2 = organismo2.slice(0, mitad2) + organismo1.slice(mitad1);
+
+                    nuevoOrganismo1 = mutarOrganismo(nuevoOrganismo1);
+                    nuevoOrganismo2 = mutarOrganismo(nuevoOrganismo2);
+
+                    nuevaGeneracion.push(nuevoOrganismo1, nuevoOrganismo2);
+
+                    if (nuevoOrganismo1.includes(secuenciaVentajosa)) {
+                        organismosConMutacion.push(nuevaGeneracion.length - 2);
+                    }
+                    if (nuevoOrganismo2.includes(secuenciaVentajosa)) {
+                        organismosConMutacion.push(nuevaGeneracion.length - 1);
+                    }
+                } else {
+                    let organismo = listaProvisional[i];
+                    organismo = mutarOrganismo(organismo);
+                    nuevaGeneracion.push(organismo);
+                    
+                    if (organismo.includes(secuenciaVentajosa)) {
+                        organismosConMutacion.push(nuevaGeneracion.length - 1);
+                    }
+                }
+            }
+
+            generacionActual = nuevaGeneracion;
+            mostrarResultado(generacionActual, organismosConMutacion, "Generación " + (numeroGeneracion + 1));
+            numeroGeneracion++;
+        }
+
+        // Función para mutar un organismo, sin afectar la secuencia ventajosa
+        function mutarOrganismo(organismo) {
+            const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const posiciones = organismo.length;
+
+            let mutado = organismo.split(""); 
+
+            let posicionesProtegidas = obtenerPosicionesProtegidas(organismo, secuenciaVentajosa);
+
+            let posiblesIndices = Array.from({ length: posiciones }, (_, i) => i).filter(i => !posicionesProtegidas.includes(i));
+
+            let totalMutaciones = Math.floor(posiciones * 0.20);
+            let indicesMutados = posiblesIndices.sort(() => 0.5 - Math.random()).slice(0, totalMutaciones);
+
+            indicesMutados.forEach(index => {
+                mutado[index] = caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            });
+
+            return mutado.join("");
+        }
+    </script>
+
+</body>
+</html>
