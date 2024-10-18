@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gattaca: A la carta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        .question {
+            display: none;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gattaca: A la carta</h1>
+    <p>Este programa te permitirá seleccionar características genéticas basadas en fragmentos de ADN.</p>
+    <p>Sabrás qué característica estás eligiendo a medida que avanzas.</p>
+
+    <div id="questions">
+        <!-- Preguntas se mostrarán aquí -->
+    </div>
+
+    <div id="results" style="display:none;">
+        <h2>Características seleccionadas:</h2>
+        <ul id="traits">
+            <!-- Características seleccionadas se mostrarán aquí -->
+        </ul>
+    </div>
+
+    <script>
+        // Lista de opciones genéticas
+        const geneticOptions = [
+            [["SRY", "XX"], ["Sexo masculino", "Sexo femenino"]],  // Pregunta de sexo
+            [["rs1042725_T", "rs1042725_C"], ["Altura elevada", "Altura baja"]],
+            [["rs6265_G", "rs6265_A"], ["Mayor capacidad de memoria", "Capacidad de memoria limitada"]],
+            [["rs1815739_C", "rs1815739_T"], ["Mayor resistencia física", "Mayor capacidad de velocidad"]],
+            [["rs3736228_T", "rs3736228_C"], ["Densidad ósea alta", "Densidad ósea baja"]],
+            [["rs12913832_A", "rs12913832_G"], ["Ojos azules", "Ojos marrones"]],
+            [["rs4680_G", "rs4680_A"], ["Mayor manejo del estrés", "Menor manejo del estrés"]],
+            [["rs7412_T", "rs7412_C"], ["Mayor riesgo de Alzheimer", "Menor riesgo de Alzheimer"]],
+            [["rs10246939_A", "rs10246939_G"], ["Predisposición a obesidad", "Predisposición a peso saludable"]],
+            [["rs738409_G", "rs738409_C"], ["Mayor riesgo de hígado graso", "Menor riesgo de hígado graso"]],
+            [["rs9939609_A", "rs9939609_T"], ["Mayor apetito", "Menor apetito"]],
+            [["rs1800497_A", "rs1800497_G"], ["Mayor riesgo de adicción", "Menor riesgo de adicción"]],
+            [["rs1799971_G", "rs1799971_A"], ["Mayor tolerancia al dolor", "Menor tolerancia al dolor"]],
+            [["rs1801133_C", "rs1801133_T"], ["Mayor riesgo de problemas cardíacos", "Menor riesgo de problemas cardíacos"]],
+            [["rs602662_T", "rs602662_C"], ["Mayor riesgo de cáncer de próstata", "Menor riesgo de cáncer de próstata"]],
+            [["rs1799945_C", "rs1799945_G"], ["Mayor riesgo de hemocromatosis", "Menor riesgo de hemocromatosis"]],
+            [["rs1805015_G", "rs1805015_A"], ["Mayor riesgo de asma", "Menor riesgo de asma"]],
+            [["rs3753344_G", "rs3753344_T"], ["Mayor riesgo de artritis", "Menor riesgo de artritis"]],
+            [["rs1234567_A", "rs1234567_T"], ["Mayor empatía", "Menor empatía"]],
+            [["rs7654321_C", "rs7654321_G"], ["Mayor tendencia a la introversión", "Mayor tendencia a la extroversión"]]
+        ];
+
+        let userChoices = [];
+
+        // Función para mostrar preguntas
+        function presentQuestion() {
+            const questionsDiv = document.getElementById("questions");
+            questionsDiv.innerHTML = "";  // Limpiar cualquier contenido previo
+
+            // Pregunta de sexo primero
+            const sexoPregunta = geneticOptions[0];
+            const restantesPreguntas = geneticOptions.slice(1); // Resto de preguntas
+            restantesPreguntas.sort(() => Math.random() - 0.5); // Barajar preguntas
+
+            // Insertar la pregunta de sexo primero
+            const orderedQuestions = [sexoPregunta, ...restantesPreguntas];
+
+            // Mostrar preguntas
+            orderedQuestions.forEach((option, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.classList.add("question");
+                questionDiv.id = `question-${index}`;
+                questionDiv.innerHTML = `
+                    <h3>Rasgo ${index + 1}: ${option[1][0]} vs ${option[1][1]}</h3>
+                    <p>1. Fragmento de ADN: ${option[0][0]}</p>
+                    <p>2. Fragmento de ADN: ${option[0][1]}</p>
+                    <button onclick="chooseTrait(${index}, 1)">Elige 1</button>
+                    <button onclick="chooseTrait(${index}, 2)">Elige 2</button>
+                `;
+                questionsDiv.appendChild(questionDiv);
+            });
+
+            // Mostrar la primera pregunta
+            document.getElementById("question-0").style.display = "block";
+        }
+
+        // Función para manejar la elección del usuario
+        function chooseTrait(questionIndex, choice) {
+            const selectedOption = geneticOptions[questionIndex][1][choice - 1];
+            userChoices.push(selectedOption);
+
+            // Ocultar la pregunta actual
+            document.getElementById(`question-${questionIndex}`).style.display = "none";
+
+            // Mostrar la siguiente pregunta o resultados
+            if (questionIndex + 1 < geneticOptions.length) {
+                document.getElementById(`question-${questionIndex + 1}`).style.display = "block";
+            } else {
+                revealChoices();
+            }
+        }
+
+        // Función para revelar las características seleccionadas
+        function revealChoices() {
+            const resultsDiv = document.getElementById("results");
+            const traitsList = document.getElementById("traits");
+            traitsList.innerHTML = "";  // Limpiar contenido previo
+
+            userChoices.forEach((trait, index) => {
+                const listItem = document.createElement("li");
+                listItem.innerText = `Rasgo ${index + 1}: ${trait}`;
+                traitsList.appendChild(listItem);
+            });
+
+            // Ocultar las preguntas y mostrar los resultados
+            document.getElementById("questions").style.display = "none";
+            document.querySelector("h1").style.display = "none";
+            document.querySelectorAll("p").forEach(p => p.style.display = "none");
+
+            // Mostrar los resultados
+            resultsDiv.style.display = "block";
+        }
+
+        // Inicializar el programa
+        presentQuestion();
+    </script>
+</body>
+</html>
