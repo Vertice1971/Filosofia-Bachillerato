@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Naturaleza humana, naturaleza animal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .question {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .question label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .options label {
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 1em;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+        .unanswered {
+            color: orange;
+        }
+        button {
+            display: inline-block;
+            margin: 20px 10px;
+            padding: 10px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #retry-btn {
+            background-color: #f44336;
+        }
+        #retry-btn:hover {
+            background-color: #da190b;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quiz: Naturaleza humana, naturaleza animal</h1>
+
+    <div id="quiz-container">
+        <!-- Las preguntas se insertarán aquí dinámicamente -->
+    </div>
+
+    <div style="text-align: center;">
+        <button id="submit-btn">Enviar respuestas</button>
+        <button id="retry-btn">Intentar de nuevo</button>
+    </div>
+
+    <div id="result" class="result"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <script>
+        const nuevasPreguntas = [
+            ["El sexto 'dedo' del oso panda es una adaptación imperfecta que le ayuda a agarrar mejor el bambú.", true],
+            ["El ojo humano está diseñado perfectamente para la visión, con fotorreceptores expuestos directamente a la luz.", false],
+            ["El apéndice humano en la actualidad no desempeña una función vital importante.", true],
+            ["La cola del pavo real aumenta la movilidad del ave y facilita su escape de depredadores.", false],
+            ["Las dolencias de espalda en los humanos son resultado de la adaptación incompleta al bipedismo.", true],
+            ["La tráquea y el esófago humanos están completamente separados para evitar el riesgo de atragantamiento.", false],
+            ["Las muelas del juicio a menudo no tienen espacio para salir correctamente debido a la evolución de la mandíbula humana.", true],
+            ["El proceso evolutivo busca siempre crear soluciones perfectas en los organismos.", false],
+            ["El ojo de los calamares es más eficiente que el ojo humano, ya que sus fotorreceptores están expuestos directamente a la luz.", true],
+            ["Si los humanos fueran producto de un diseño divino perfecto, no tendrían órganos redundantes como el apéndice.", true],
+            ["La selección natural actúa siempre buscando la perfección en las estructuras biológicas.", false],
+            ["El aumento del índice de encefalización en los humanos es una prueba de su inteligencia superior a otras especies.", true],
+            ["El índice de encefalización de los humanos es el más alto, lo que no implica que tengamos el cerebro más grande en términos absolutos.", true],
+            ["El cerebro humano consume solo el 8% de la energía corporal en reposo, similar a otros simios.", false],
+            ["El desarrollo de un cerebro grande en los humanos ha permitido redirigir energía de los músculos a las neuronas.", true],
+            ["El ojo humano tiene un diseño evolutivo ineficiente, con los fotorreceptores detrás de una capa de fibras nerviosas.", true],
+            ["El apéndice humano es un órgano esencial para la digestión en la dieta actual.", false],
+            ["La cola del pavo real es un ejemplo de selección sexual que compromete la movilidad del ave.", true],
+            ["La evolución siempre genera estructuras nuevas, sin reutilizar sistemas previos.", false],
+            ["La forma en 'S' de la columna vertebral humana contribuye a problemas de espalda.", true],
+            ["El índice de encefalización mide la proporción exacta entre el tamaño del cerebro y el cuerpo.", false],
+            ["El desarrollo del cerebro en los homínidos ocurrió junto con la evolución del bipedismo.", true],
+            ["La pérdida del estro en los homínidos no tuvo ningún impacto evolutivo en la formación de relaciones sociales.", false],
+            ["La proximidad entre la tráquea y el esófago humanos aumenta el riesgo de atragantamiento.", true],
+            ["Las muelas del juicio eran útiles en los ancestros para masticar alimentos duros.", true],
+            ["La encefalización en los humanos se debe únicamente al aumento del tamaño del cuerpo.", false],
+            ["El índice de encefalización de los lémures es superior al de los humanos.", true],
+            ["El cerebro humano necesita aproximadamente el 25% de la energía corporal en reposo.", true],
+            ["El aumento del tamaño del cerebro humano no implicó ninguna desventaja evolutiva.", false],
+            ["La selección natural produce siempre la estructura biológica más eficiente.", false],
+            ["La pérdida del estro en los homínidos favoreció la formación de parejas monógamas.", true],
+            ["El ojo humano tiene un diseño superior al de cualquier otra especie animal.", false],
+            ["El índice de encefalización es un factor clave para medir la inteligencia relativa entre especies.", true],
+            ["El proceso evolutivo se basa en modificaciones sobre estructuras previas, no en creaciones perfectas.", true],
+            ["El apéndice humano es un ejemplo de órgano vestigial en la evolución.", true],
+            ["Las ballenas y los elefantes tienen un índice de encefalización superior al de los humanos.", false],
+            ["El desarrollo del cerebro grande en humanos fue posible gracias a la redistribución de energía desde los músculos.", true],
+            ["El cerebro de los humanos primitivos consumía menos energía que el de los chimpancés actuales.", false],
+            ["El agujero de ozono es un ejemplo de cómo cambios ambientales pueden afectar la evolución.", true],
+            ["Los humanos son los únicos primates con un índice de encefalización significativo.", false],
+            ["La cola del pavo real es una prueba de que la selección sexual puede generar características perjudiciales para la supervivencia.", true],
+            ["La neotenia es la retención de características juveniles en la edad adulta y es importante para entender la evolución humana.", true],
+            ["La gestación humana debería durar veintidós meses en lugar de los nueve actuales, según comparaciones con otros primates.", true],
+            ["El cerebro de un recién nacido humano es aproximadamente la mitad del tamaño de un cerebro adulto.", false],
+            ["La pelvis femenina limita el tamaño del cerebro del bebé al nacer debido a las demandas del bipedismo.", true],
+            ["La neotenia no afecta al desarrollo del momento en que aparecen los molares en los humanos.", false],
+            ["El Homo habilis tenía un patrón de crecimiento más simiesco que el Homo erectus.", true],
+            ["El niño de Turkana era un Homo habilis con un patrón de erupción dental similar al de los Australopithecus.", false],
+            ["La neotenia ha permitido a los humanos tener un período de infancia más prolongado para el aprendizaje.", true],
+            ["El tamaño del cerebro de un recién nacido humano triplica su tamaño durante una etapa temprana de vida.", true],
+            ["La prolongada infancia humana no tiene ningún impacto en la evolución de habilidades cognitivas y sociales.", false],
+            ["El Homo erectus muestra patrones de crecimiento dental más cercanos a los simios que a los humanos modernos.", false],
+            ["Los Australopithecus tenían un patrón de erupción dental más tardío que los Homo erectus.", false],
+            ["El desarrollo cognitivo de los humanos se ve favorecido por el prolongado período de dependencia de los padres.", true],
+            ["La neotenia se limita únicamente a características físicas y no influye en aspectos cognitivos.", false],
+            ["El patrón de crecimiento simiesco implica la aparición temprana de los molares en comparación con los humanos.", true],
+            ["La selección natural favoreció nacimientos más tempranos para evitar complicaciones durante el parto.", true],
+            ["Los simios recién nacidos tienen un cerebro que representa un tercio del tamaño de un cerebro adulto.", false],
+            ["El fenómeno de la neotenia no es exclusivo de los humanos y también se observa en otros mamíferos.", true],
+            ["El Homo habilis muestra un patrón de crecimiento más humano, con erupción tardía de los molares.", false],
+            ["La neotenia ha permitido a los humanos desarrollar habilidades cognitivas avanzadas gracias al aprendizaje prolongado.", true],
+            ["Los niños pueden diferenciar alrededor de cuarenta consonantes a partir de las cuatro semanas de edad.", true],
+            ["La habilidad de los niños para diferenciar consonantes a las que no han sido expuestos mejora significativamente después de los seis años.", false],
+            ["El periodo crítico es fundamental para el desarrollo de capacidades cognitivas, incluido el lenguaje.", true],
+            ["Según Chomsky, la gramática es una capacidad adquirida únicamente a través de la exposición cultural.", false],
+            ["El hemisferio izquierdo del cerebro se especializa en el procesamiento del lenguaje, análisis y lógica.", true],
+            ["El caso de Genie demostró una actividad cerebral igual en ambos hemisferios durante las pruebas de lenguaje.", false],
+            ["El lenguaje es tanto innato como adquirido, dependiendo de la predisposición cerebral y la exposición cultural.", true],
+            ["Los artefactos son elementos ideales de la cultura, como la creencia en Alá o el respeto a la propiedad.", false],
+            ["Las sanciones formales son castigos conocidos de antemano por la sociedad, como multas o prisión.", true],
+            ["Las costumbres son comportamientos obligatorios en toda sociedad, con sanciones formales si no se cumplen.", false],
+            ["La presión social es una forma de sanción informal para hacer cumplir las costumbres de una sociedad.", true],
+            ["Los conocimientos se diferencian de las creencias por estar demostrados y aceptados como válidos por toda la sociedad.", true],
+            ["Los valores son opiniones y juicios sobre lo que es importante para la sociedad.", true],
+            ["La luz roja en un semáforo es un ejemplo de conocimiento cultural, ya que representa un hecho comprobable.", false],
+            ["Las emociones básicas son sorpresa, tristeza, asco, ira, miedo y alegría.", true],
+            ["El amor es una emoción básica que no tiene ninguna función evolutiva para los seres humanos.", false],
+            ["Descartes creía que los animales eran autómatas sin emociones ni conciencia.", true],
+            ["Voltaire apoyaba la idea de que los animales eran máquinas insensibles y carentes de sentimientos.", false],
+            ["El loro Alex aprendió a decir 'Lo siento' en el contexto adecuado, pero no mostraba arrepentimiento sincero.", true],
+            ["Los pulpos han demostrado habilidades para resolver problemas y abrir contenedores en situaciones de laboratorio.", true],
+            ["La antropomorfización es la tendencia a atribuir características humanas a los animales.", true],
+            ["El biocentrismo moral sostiene que los intereses humanos son moralmente más importantes que los intereses animales.", false],
+            ["El Proyecto Gran Simio busca reconocer derechos específicos para chimpancés, gorilas y orangutanes.", true],
+            ["El biocentrismo moral fuerte rechaza cualquier distinción en el respeto moral entre diferentes especies.", true],
+            ["El antropocentrismo moral fuerte defiende que los animales merecen el mismo respeto moral que los humanos.", false],
+            ["El respeto moral hacia los animales implica necesariamente otorgarles los mismos derechos que a los humanos.", false],
+            ["Los cuervos son conocidos por su inteligencia, capacidad de usar herramientas y recordar rostros humanos.", true],
+            ["La experimentación con animales debe implicar siempre sufrimiento para ser válida científicamente.", false],
+            ["El Proyecto Gran Simio ha sido criticado por razones religiosas y por priorizar la protección animal sobre la humana.", true],
+            ["Los delfines y los bonobos han demostrado habilidades para resolver problemas y aprender lenguajes simbólicos.", true],
+            ["La perspectiva moral antropocéntrica débil afirma que algunos seres vivos merecen más respeto moral que otros.", true]
+        ];
+
+        let preguntasSeleccionadas = [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generarQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+            preguntasSeleccionadas = shuffle([...nuevasPreguntas]).slice(0, 20);
+
+            preguntasSeleccionadas.forEach((pregunta, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+
+                const label = document.createElement('label');
+                label.textContent = `${index + 1}. ${pregunta[0]}`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options');
+
+                const trueInput = document.createElement('input');
+                trueInput.type = 'radio';
+                trueInput.name = `pregunta${index}`;
+                trueInput.value = 'true';
+                trueInput.id = `pregunta${index}_true`;
+
+                const trueLabel = document.createElement('label');
+                trueLabel.setAttribute('for', `pregunta${index}_true`);
+                trueLabel.textContent = 'Verdadero';
+
+                const falseInput = document.createElement('input');
+                falseInput.type = 'radio';
+                falseInput.name = `pregunta${index}`;
+                falseInput.value = 'false';
+                falseInput.id = `pregunta${index}_false`;
+
+                const falseLabel = document.createElement('label');
+                falseLabel.setAttribute('for', `pregunta${index}_false`);
+                falseLabel.textContent = 'Falso';
+
+                optionsDiv.appendChild(trueInput);
+                optionsDiv.appendChild(trueLabel);
+                optionsDiv.appendChild(falseInput);
+                optionsDiv.appendChild(falseLabel);
+
+                questionDiv.appendChild(label);
+                questionDiv.appendChild(optionsDiv);
+
+                quizContainer.appendChild(questionDiv);
+            });
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            const feedbackDiv = document.getElementById('feedback');
+            let aciertos = 0;
+            let feedback = '';
+
+            preguntasSeleccionadas.forEach((pregunta, index) => {
+                const respuesta = document.querySelector(`input[name="pregunta${index}"]:checked`);
+                const preguntaTexto = pregunta[0];
+                const respuestaCorrecta = pregunta[1];
+
+                if (respuesta) {
+                    const esCorrecto = (respuesta.value === 'true') === respuestaCorrecta;
+                    const respuestaCorrectaTexto = respuestaCorrecta ? 'Verdadera' : 'Falsa';
+                    if (esCorrecto) {
+                        aciertos++;
+                        feedback += `<p class="correct">${index + 1}. ${preguntaTexto} - Tu respuesta ha sido correcta, esta frase es <strong>${respuestaCorrectaTexto}</strong>.</p>`;
+                    } else {
+                        feedback += `<p class="incorrect">${index + 1}. ${preguntaTexto} - Tu respuesta ha sido incorrecta, esta frase es <strong>${respuestaCorrectaTexto}</strong>.</p>`;
+                    }
+                } else {
+                    feedback += `<p class="unanswered">${index + 1}. ${preguntaTexto} - Sin respuesta</p>`;
+                }
+            });
+
+            resultDiv.textContent = `Has acertado ${aciertos} de ${preguntasSeleccionadas.length} preguntas.`;
+            feedbackDiv.innerHTML = feedback;
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('retry-btn').addEventListener('click', function() {
+            generarQuiz();
+            document.getElementById('result').textContent = '';
+            document.getElementById('feedback').innerHTML = '';
+            window.scrollTo(0, 0);
+        });
+
+        // Inicializa el quiz al cargar la página
+        generarQuiz();
+    </script>
+
+</body>
+</html>
