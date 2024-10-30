@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Stroop</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Estilos mejorados para el texto de presentación */
+        #instructions {
+            text-align: center;
+            max-width: 600px;
+            font-size: 1.2em;
+            margin: 20px 0;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: 'Georgia', serif;
+        }
+        #instructions h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #instructions p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        /* Estilos mejorados para los resultados finales */
+        #feedback {
+            display: none;
+            text-align: center;
+            max-width: 600px;
+            font-size: 1.2em;
+            margin: 20px 0;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: 'Georgia', serif;
+        }
+        #feedback h2 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #feedback p {
+            font-size: 1.1em;
+            line-height: 1.5;
+            color: #555;
+            margin: 10px 0;
+        }
+        .reiniciar-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .reiniciar-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* El resto del CSS permanece igual */
+        #exercise {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        #colorWord {
+            font-size: 4em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .color-button {
+            width: 120px;
+            height: 75px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 0.3s, border-color 0.3s;
+        }
+        .color-button:hover {
+            opacity: 0.8;
+        }
+        .color-button:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        button.iniciar-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button.iniciar-button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            #colorWord {
+                font-size: 2.5em;
+            }
+            .color-button {
+                width: 100px;
+                height: 68px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div id="instructions">
+            <h1>Test de Stroop</h1>
+            <p>
+                Pulsa "Iniciar" para comenzar el ejercicio. Se mostrará una palabra escrita con un color de tinta específico.
+                Elige el color de la tinta entre las opciones de botones. Hay treinta palabras, al finalizar descubrirás el resultado.
+            </p>
+            <button class="iniciar-button" onclick="startExercise()">Iniciar</button>
+        </div>
+
+        <div id="exercise" style="display:none;">
+            <div id="colorWord">Palabra</div>
+            <div class="button-container">
+                <button class="color-button" id="button1" onclick="checkAnswer(this)" aria-label="Color 1"></button>
+                <button class="color-button" id="button2" onclick="checkAnswer(this)" aria-label="Color 2"></button>
+                <button class="color-button" id="button3" onclick="checkAnswer(this)" aria-label="Color 3"></button>
+                <button class="color-button" id="button4" onclick="checkAnswer(this)" aria-label="Color 4"></button>
+            </div>
+        </div>
+
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        const colorMap = {
+            "rojo": "red",
+            "verde": "green",
+            "azul": "blue",
+            "amarillo": "yellow",
+            "naranja": "orange",
+            "morado": "purple",
+            "marron": "#8B4513",
+            "rosa": "pink",
+            "gris": "gray",
+            "blanco": "white",
+            "negro": "black"
+        };
+
+        const words = ["Rojo", "Verde", "Azul", "Amarillo", "Naranja", "Morado", "Marrón", "Rosa", "Gris", "Blanco", "Negro"];
+        const colorNames = ["rojo", "verde", "azul", "amarillo", "naranja", "morado", "marron", "rosa", "gris", "blanco", "negro"];
+
+        let correctColorName, testStartTime;
+        let roundCount = 0;
+        const maxRounds = 30;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let lastWord = null;
+        let lastColor = null;
+
+        function removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startExercise() {
+            document.getElementById("instructions").style.display = "none";
+            document.getElementById("feedback").style.display = "none";
+            document.getElementById("exercise").style.display = "flex";
+            roundCount = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            testStartTime = new Date().getTime();
+            showWord();
+        }
+
+        function showWord() {
+            if (roundCount >= maxRounds) {
+                endExercise();
+                return;
+            }
+
+            // Seleccionar una palabra aleatoria diferente a la anterior
+            let word, wordLower;
+            do {
+                word = words[Math.floor(Math.random() * words.length)];
+                wordLower = removeAccents(word);
+            } while (wordLower === lastWord); // Repetir hasta obtener una palabra diferente
+
+            lastWord = wordLower; // Actualizar la última palabra seleccionada
+            const ownColorName = wordLower;
+
+            // Seleccionar un color de tinta diferente a la propia palabra y a la anterior
+            let correctColorNameSelected;
+            do {
+                const availableColorsForWord = colorNames.filter(color => color !== ownColorName);
+                correctColorNameSelected = availableColorsForWord[Math.floor(Math.random() * availableColorsForWord.length)];
+            } while (correctColorNameSelected === lastColor); // Repetir hasta obtener un color diferente
+
+            correctColorName = correctColorNameSelected; // Guardar el nombre del color correcto
+            lastColor = correctColorNameSelected; // Actualizar el último color seleccionado
+
+            const assignedColor = colorMap[correctColorNameSelected];
+
+            // Actualizar el contenido y el color de la palabra
+            const colorWordElement = document.getElementById("colorWord");
+            colorWordElement.textContent = word;
+            colorWordElement.style.color = assignedColor;
+
+            // Generar opciones de botones
+            const buttonOptions = generateButtonOptions(correctColorNameSelected, ownColorName);
+            shuffle(buttonOptions); // Mezclar las opciones de botones
+
+            // Asignar colores y etiquetas a los botones
+            buttonOptions.forEach((colorName, index) => {
+                const button = document.getElementById(`button${index + 1}`);
+                button.style.backgroundColor = colorMap[colorName];
+                button.textContent = "";
+                button.setAttribute('aria-label', capitalizeFirstLetter(colorName));
+                button.dataset.color = colorName;
+            });
+
+            roundCount++;
+        }
+
+        function generateButtonOptions(correctColorName, ownColorName) {
+            let options = [correctColorName, ownColorName];
+            const availableIncorrectColors = colorNames.filter(color => color !== correctColorName && color !== ownColorName);
+            shuffle(availableIncorrectColors);
+            options.push(availableIncorrectColors[0], availableIncorrectColors[1]);
+            return options;
+        }
+
+        function checkAnswer(button) {
+            const selectedColorName = button.dataset.color;
+            const isCorrect = selectedColorName === correctColorName;
+
+            if (isCorrect) correctAnswers++;
+            else incorrectAnswers++;
+
+            showWord();
+        }
+
+        function endExercise() {
+            const testEndTime = new Date().getTime();
+            const totalTimeSeconds = ((testEndTime - testStartTime) / 1000).toFixed(2);
+
+            document.getElementById("exercise").style.display = "none";
+            const feedbackElement = document.getElementById("feedback");
+            feedbackElement.style.display = "block";
+            feedbackElement.innerHTML = `
+                <h2>Has finalizado el test de Stroop</h2>
+                <p>Tiempo total: <strong>${totalTimeSeconds} segundos</strong></p>
+                <p>Aciertos: <strong>${correctAnswers}</strong></p>
+                <p>Errores: <strong>${incorrectAnswers}</strong></p>
+                <button class="reiniciar-button" onclick="startExercise()">Reiniciar</button>
+            `;
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>
