@@ -17,3 +17,5 @@ Cultura1 - Elementos de la cultura
 Generador situaciones Normas Parque Tierra - Genera interrogantes para examinar en público los resultados del Proyecto Final del tema 1, "Normas para el Parque Tierra"
 
 Palabras a cada hemisferio - Juega con la velocidad de percepción subliminal y también con la diferencia perceptiva derivada de la lateralizacion de los hemisferios
+
+Stroop 1 y 2 - Comprobamos las interferencias entre ambos hemisferios
