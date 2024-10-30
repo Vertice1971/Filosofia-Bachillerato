@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palabras a cada hemisferio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos generales */
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+        }
+
+        /* Estilo del título */
+        #title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        /* Estilo de la cruz */
+        .cross {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-top: -5vh;
+            display: none;
+        }
+
+        .cross::before, .cross::after {
+            content: '';
+            position: absolute;
+            background-color: #2c3e50;
+            border-radius: 5px;
+        }
+
+        .cross::before {
+            width: 200px;
+            height: 10px;
+            top: 45px;
+            left: -50px;
+        }
+
+        .cross::after {
+            width: 10px;
+            height: 200px;
+            top: -50px;
+            left: 45px;
+        }
+
+        /* Estilo de los botones */
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 25px;
+            background-color: #3498db;
+            color: #fff;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #resetButton {
+            display: none;
+            margin-top: 50px;
+        }
+
+        /* Estilo de las palabras */
+        #leftText, #rightText {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #2c3e50;
+            display: none;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #leftText {
+            left: 10%;
+        }
+
+        #rightText {
+            right: 10%;
+        }
+
+        /* Estilos para el control deslizante y el contenedor de iteraciones */
+        #sliderContainer, #iterationsContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 300px;
+            height: 5px;
+            background: #bdc3c7;
+            border-radius: 5px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #2980b9;
+        }
+
+        input[type="text"] {
+            width: 50px;
+            padding: 5px;
+            font-size: 1em;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+
+        #sliderValue {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Título -->
+    <h1 id="title">Palabras a cada hemisferio</h1>
+
+    <div class="cross"></div>
+
+    <!-- Control deslizante -->
+    <div id="sliderContainer">
+        <label for="displayTimeSlider">Tiempo de visualización</label>
+        <input type="range" id="displayTimeSlider" min="5" max="1000" value="500" step="5">
+        <div id="sliderValue">500 milisegundos</div>
+    </div>
+
+    <!-- Entrada de iteraciones -->
+    <div id="iterationsContainer">
+        <label for="iterationsInput">Número de iteraciones (1 a 4)</label>
+        <input type="text" id="iterationsInput" maxlength="1" pattern="[1-4]" required>
+    </div>
+
+    <button id="startButton" disabled>Iniciar</button>
+    <button id="resetButton">Reiniciar</button>
+
+    <div id="leftText">Esencia</div>
+    <div id="rightText">Existencia</div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const displayTimeSlider = document.getElementById('displayTimeSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const leftText = document.getElementById('leftText');
+        const rightText = document.getElementById('rightText');
+        const iterationsInput = document.getElementById('iterationsInput');
+        const cross = document.querySelector('.cross');
+        const title = document.getElementById('title');
+
+        // Actualizar el valor mostrado al mover el control deslizante
+        displayTimeSlider.addEventListener('input', () => {
+            sliderValue.textContent = `${displayTimeSlider.value} milisegundos`;
+        });
+
+        // Validación para activar el botón de inicio solo si la entrada es 1, 2, 3 o 4
+        iterationsInput.addEventListener('input', () => {
+            const value = iterationsInput.value;
+            startButton.disabled = !(value === '1' || value === '2' || value === '3' || value === '4');
+        });
+
+        // Función para iniciar la secuencia
+        startButton.addEventListener('click', () => {
+            // Ocultar elementos
+            startButton.style.display = 'none';
+            document.getElementById('sliderContainer').style.display = 'none';
+            document.getElementById('iterationsContainer').style.display = 'none';
+            title.style.display = 'none';
+
+            // Mostrar la cruz
+            cross.style.display = 'block';
+
+            // Tiempo de visualización
+            const displayTime = parseInt(displayTimeSlider.value);
+
+            // Número de iteraciones
+            const iterations = parseInt(iterationsInput.value);
+
+            // Generar un intervalo aleatorio
+            const randomDelay = Math.random() * 2000 + 3000;
+
+            // Iniciar el proceso después del intervalo aleatorio
+            setTimeout(() => {
+                let fontSize = 1.5;
+                for (let i = 0; i < iterations; i++) {
+                    (function(i, fontSize) {
+                        setTimeout(() => {
+                            leftText.style.fontSize = `${fontSize}em`;
+                            rightText.style.fontSize = `${fontSize}em`;
+
+                            // Mostrar palabras con animación
+                            leftText.style.display = 'block';
+                            leftText.style.opacity = '1';
+                            setTimeout(() => {
+                                leftText.style.opacity = '0';
+                                setTimeout(() => {
+                                    leftText.style.display = 'none';
+                                    rightText.style.display = 'block';
+                                    rightText.style.opacity = '1';
+
+                                    setTimeout(() => {
+                                        rightText.style.opacity = '0';
+                                        setTimeout(() => {
+                                            rightText.style.display = 'none';
+
+                                            // Mostrar botón de reinicio si es la última iteración
+                                            if (i === iterations - 1) {
+                                                resetButton.style.display = 'block';
+                                            }
+                                        }, 500);
+
+                                    }, displayTime);
+
+                                }, 500);
+
+                            }, displayTime);
+
+                        }, i * (displayTime * 2 + 1000));
+                    })(i, fontSize);
+
+                    // Aumentar el tamaño de la fuente
+                    fontSize *= 1.5;
+                }
+            }, randomDelay);
+        });
+
+        // Función para reiniciar el programa
+        resetButton.addEventListener('click', () => {
+            // Restablecer elementos
+            title.style.display = 'block';
+            document.getElementById('sliderContainer').style.display = 'flex';
+            document.getElementById('iterationsContainer').style.display = 'flex';
+            startButton.style.display = 'inline-block';
+            resetButton.style.display = 'none';
+            cross.style.display = 'none';
+            leftText.style.display = 'none';
+            rightText.style.display = 'none';
+
+            // Restablecer valores de entrada
+            displayTimeSlider.value = 500;
+            sliderValue.textContent = '500 milisegundos';
+            iterationsInput.value = '';
+            startButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
