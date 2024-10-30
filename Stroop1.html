@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Stroop - Lateralización</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        #instructions {
+            text-align: center;
+            max-width: 600px;
+            font-size: 1.2em;
+        }
+        .container {
+            display: none;
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+        }
+        .color-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 5px 0;
+        }
+        .color-word {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        #timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de instrucciones -->
+    <div id="instructions">
+        <h1>Test de Stroop - Lateralización</h1>
+        <p>
+            En este ejercicio, llamado *Test de Stroop*, observarás palabras que nombran colores, pero sus letras están en un color diferente al que indican.  
+            El hemisferio izquierdo del cerebro tiende a leer literalmente la palabra, mientras que el derecho "lee" el color de la tinta, interfiriendo entre sí. 
+            Tu tarea es identificar el color de la tinta, no leer la palabra.
+        </p>
+        <button onclick="startExercise()">Iniciar</button>
+    </div>
+
+    <!-- Contenedor de palabras de colores -->
+    <div id="colorWordsContainer" class="container">
+        <div class="color-row">
+            <div class="color-word" style="color: blue;">Rojo</div>
+            <div class="color-word" style="color: green;">Azul</div>
+            <div class="color-word" style="color: orange;">Verde</div>
+            <div class="color-word" style="color: purple;">Amarillo</div>
+            <div class="color-word" style="color: red;">Blanco</div>
+            <div class="color-word" style="color: #8B4513;">Gris</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: gray;">Negro</div>
+            <div class="color-word" style="color: white;">Rosa</div>
+            <div class="color-word" style="color: yellow;">Púrpura</div>
+            <div class="color-word" style="color: pink;">Naranja</div>
+            <div class="color-word" style="color: blue;">Verde</div>
+            <div class="color-word" style="color: green;">Rojo</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: orange;">Azul</div>
+            <div class="color-word" style="color: purple;">Amarillo</div>
+            <div class="color-word" style="color: red;">Blanco</div>
+            <div class="color-word" style="color: #8B4513;">Gris</div>
+            <div class="color-word" style="color: white;">Negro</div>
+            <div class="color-word" style="color: yellow;">Rosa</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: gray;">Púrpura</div>
+            <div class="color-word" style="color: pink;">Naranja</div>
+            <div class="color-word" style="color: blue;">Verde</div>
+            <div class="color-word" style="color: green;">Rojo</div>
+            <div class="color-word" style="color: orange;">Blanco</div>
+            <div class="color-word" style="color: purple;">Amarillo</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: red;">Gris</div>
+            <div class="color-word" style="color: #8B4513;">Negro</div>
+            <div class="color-word" style="color: white;">Rosa</div>
+            <div class="color-word" style="color: yellow;">Azul</div>
+            <div class="color-word" style="color: gray;">Rojo</div>
+            <div class="color-word" style="color: pink;">Naranja</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: blue;">Blanco</div>
+            <div class="color-word" style="color: green;">Gris</div>
+            <div class="color-word" style="color: orange;">Púrpura</div>
+            <div class="color-word" style="color: purple;">Azul</div>
+            <div class="color-word" style="color: red;">Verde</div>
+            <div class="color-word" style="color: #8B4513;">Amarillo</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: white;">Rojo</div>
+            <div class="color-word" style="color: yellow;">Gris</div>
+            <div class="color-word" style="color: gray;">Naranja</div>
+            <div class="color-word" style="color: pink;">Blanco</div>
+            <div class="color-word" style="color: blue;">Rosa</div>
+            <div class="color-word" style="color: green;">Negro</div>
+        </div>
+        <div class="color-row">
+            <div class="color-word" style="color: orange;">Amarillo</div>
+            <div class="color-word" style="color: purple;">Azul</div>
+            <div class="color-word" style="color: red;">Verde</div>
+            <div class="color-word" style="color: #8B4513;">Gris</div>
+            <div class="color-word" style="color: white;">Púrpura</div>
+            <div class="color-word" style="color: yellow;">Naranja</div>
+        </div>
+    </div>
+
+    <!-- Cronómetro -->
+    <div id="timer">00:00</div>
+
+    <script>
+        let timerInterval;
+
+        function startExercise() {
+            // Oculta las instrucciones y muestra las palabras de colores
+            document.getElementById("instructions").style.display = "none";
+            document.getElementById("colorWordsContainer").style.display = "block";
+
+            // Inicia el cronómetro
+            startTimer();
+        }
+
+        function startTimer() {
+            let minutes = 0;
+            let seconds = 0;
+            const timerElement = document.getElementById("timer");
+
+            timerInterval = setInterval(() => {
+                seconds++;
+                if (seconds === 60) {
+                    minutes++;
+                    seconds = 0;
+                }
+                timerElement.textContent = 
+                    (minutes < 10 ? "0" : "") + minutes + ":" + 
+                    (seconds < 10 ? "0" : "") + seconds;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
