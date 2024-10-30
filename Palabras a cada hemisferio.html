@@ -197,19 +197,46 @@
         const cross = document.querySelector('.cross');
         const title = document.getElementById('title');
 
-        // Actualizar el valor mostrado al mover el control deslizante
+        // Configuración de la Web Audio API para generar el pitido
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playBeep() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine'; // Tipo de onda
+            oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // Frecuencia en Hz
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Volumen
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2); // Duración del pitido
+        }
+
+        // Actualizar el valor del tiempo de visualización
         displayTimeSlider.addEventListener('input', () => {
             sliderValue.textContent = `${displayTimeSlider.value} milisegundos`;
         });
 
-        // Validación para activar el botón de inicio solo si la entrada es 1, 2, 3 o 4
+        // Validar entrada de iteraciones
         iterationsInput.addEventListener('input', () => {
             const value = iterationsInput.value;
             startButton.disabled = !(value === '1' || value === '2' || value === '3' || value === '4');
         });
 
+        // Variable para determinar el orden inicial
+        let startWithLeft;
+
         // Función para iniciar la secuencia
         startButton.addEventListener('click', () => {
+            // Despertar el contexto de audio en algunos navegadores
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             // Ocultar elementos
             startButton.style.display = 'none';
             document.getElementById('sliderContainer').style.display = 'none';
@@ -228,6 +255,9 @@
             // Generar un intervalo aleatorio
             const randomDelay = Math.random() * 2000 + 3000;
 
+            // Elegir aleatoriamente si comienza por la palabra de la izquierda o la derecha
+            startWithLeft = Math.random() < 0.5;
+
             // Iniciar el proceso después del intervalo aleatorio
             setTimeout(() => {
                 let fontSize = 1.5;
@@ -237,37 +267,68 @@
                             leftText.style.fontSize = `${fontSize}em`;
                             rightText.style.fontSize = `${fontSize}em`;
 
-                            // Mostrar palabras con animación
-                            leftText.style.display = 'block';
-                            leftText.style.opacity = '1';
-                            setTimeout(() => {
-                                leftText.style.opacity = '0';
+                            if (startWithLeft) {
+                                // Mostrar "Esencia" primero en cada iteración
+                                leftText.style.display = 'block';
+                                leftText.style.opacity = '1';
+                                playBeep();
+
                                 setTimeout(() => {
-                                    leftText.style.display = 'none';
-                                    rightText.style.display = 'block';
-                                    rightText.style.opacity = '1';
-
+                                    leftText.style.opacity = '0';
                                     setTimeout(() => {
-                                        rightText.style.opacity = '0';
+                                        leftText.style.display = 'none';
+
+                                        // Mostrar "Existencia"
+                                        rightText.style.display = 'block';
+                                        rightText.style.opacity = '1';
+                                        playBeep();
+
                                         setTimeout(() => {
-                                            rightText.style.display = 'none';
+                                            rightText.style.opacity = '0';
+                                            setTimeout(() => {
+                                                rightText.style.display = 'none';
 
-                                            // Mostrar botón de reinicio si es la última iteración
-                                            if (i === iterations - 1) {
-                                                resetButton.style.display = 'block';
-                                            }
-                                        }, 500);
+                                                // Mostrar botón de reinicio si es la última iteración
+                                                if (i === iterations - 1) {
+                                                    resetButton.style.display = 'block';
+                                                }
+                                            }, 500);
+                                        }, displayTime);
+                                    }, 500);
+                                }, displayTime);
+                            } else {
+                                // Mostrar "Existencia" primero en cada iteración
+                                rightText.style.display = 'block';
+                                rightText.style.opacity = '1';
+                                playBeep();
 
-                                    }, displayTime);
+                                setTimeout(() => {
+                                    rightText.style.opacity = '0';
+                                    setTimeout(() => {
+                                        rightText.style.display = 'none';
 
-                                }, 500);
+                                        // Mostrar "Esencia"
+                                        leftText.style.display = 'block';
+                                        leftText.style.opacity = '1';
+                                        playBeep();
 
-                            }, displayTime);
+                                        setTimeout(() => {
+                                            leftText.style.opacity = '0';
+                                            setTimeout(() => {
+                                                leftText.style.display = 'none';
 
+                                                // Mostrar botón de reinicio si es la última iteración
+                                                if (i === iterations - 1) {
+                                                    resetButton.style.display = 'block';
+                                                }
+                                            }, 500);
+                                        }, displayTime);
+                                    }, 500);
+                                }, displayTime);
+                            }
                         }, i * (displayTime * 2 + 1000));
                     })(i, fontSize);
 
-                    // Aumentar el tamaño de la fuente
                     fontSize *= 1.5;
                 }
             }, randomDelay);
@@ -284,6 +345,8 @@
             cross.style.display = 'none';
             leftText.style.display = 'none';
             rightText.style.display = 'none';
+            leftText.style.opacity = '0';
+            rightText.style.opacity = '0';
 
             // Restablecer valores de entrada
             displayTimeSlider.value = 500;
