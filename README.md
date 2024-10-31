@@ -18,4 +18,4 @@ Generador situaciones Normas Parque Tierra - Genera interrogantes para examinar 
 
 Palabras a cada hemisferio - Juega con la velocidad de percepción subliminal y también con la diferencia perceptiva derivada de la lateralizacion de los hemisferios
 
-Stroop 1 y 2 - Comprobamos las interferencias entre ambos hemisferios
+Stroop 1 y 2 - Comprobamos las interferencias entre ambos hemisferios. La versión Records mide el tiempo absoluto en hacerlo completo
