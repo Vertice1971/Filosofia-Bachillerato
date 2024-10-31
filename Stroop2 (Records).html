@@ -30,7 +30,6 @@
             max-width: 800px;
         }
 
-        /* Estilos mejorados para el texto de presentación */
         #instructions {
             text-align: center;
             max-width: 600px;
@@ -51,7 +50,6 @@
             line-height: 1.6;
         }
 
-        /* Estilos mejorados para los resultados finales */
         #feedback {
             display: none;
             text-align: center;
@@ -89,7 +87,6 @@
             background-color: #0056b3;
         }
 
-        /* El resto del CSS permanece igual */
         #exercise {
             flex: 1;
             display: flex;
@@ -105,13 +102,7 @@
             font-weight: bold;
             margin-top: 20px;
         }
-        /* Ajuste de tamaño para dispositivos móviles */
-        @media (max-width: 600px) {
-            #colorWord {
-                font-size: 5em;
-            }
-        }
-
+        
         .button-container {
             display: flex;
             justify-content: space-evenly;
@@ -150,14 +141,17 @@
             background-color: #0056b3;
         }
 
-        @media (max-width: 600px) {
-            #colorWord {
-                font-size: 2.5em;
-            }
-            .color-button {
-                width: 100px;
-                height: 68px;
-            }
+        #errorIndicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 6em;
+            color: black;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -183,6 +177,7 @@
         </div>
 
         <div id="feedback"></div>
+        <div id="errorIndicator">✖</div>
     </div>
 
     <script>
@@ -206,7 +201,6 @@
         let correctColorName, testStartTime;
         let roundCount = 0;
         const maxRounds = 30;
-        let correctAnswers = 0;
         let incorrectAnswers = 0;
         let lastWord = null;
         let lastColor = null;
@@ -228,7 +222,6 @@
             document.getElementById("feedback").style.display = "none";
             document.getElementById("exercise").style.display = "flex";
             roundCount = 0;
-            correctAnswers = 0;
             incorrectAnswers = 0;
             testStartTime = new Date().getTime();
             showWord();
@@ -240,44 +233,40 @@
                 return;
             }
 
-            // Seleccionar una palabra aleatoria diferente a la anterior
             let word, wordLower;
             do {
                 word = words[Math.floor(Math.random() * words.length)];
                 wordLower = removeAccents(word);
-            } while (wordLower === lastWord); // Repetir hasta obtener una palabra diferente
+            } while (wordLower === lastWord);
 
-            lastWord = wordLower; // Actualizar la última palabra seleccionada
+            lastWord = wordLower;
             const ownColorName = wordLower;
 
-            // Seleccionar un color de tinta diferente a la propia palabra y a la anterior
             let correctColorNameSelected;
             do {
                 const availableColorsForWord = colorNames.filter(color => color !== ownColorName);
                 correctColorNameSelected = availableColorsForWord[Math.floor(Math.random() * availableColorsForWord.length)];
-            } while (correctColorNameSelected === lastColor); // Repetir hasta obtener un color diferente
+            } while (correctColorNameSelected === lastColor);
 
-            correctColorName = correctColorNameSelected; // Guardar el nombre del color correcto
-            lastColor = correctColorNameSelected; // Actualizar el último color seleccionado
+            correctColorName = correctColorNameSelected;
+            lastColor = correctColorNameSelected;
 
             const assignedColor = colorMap[correctColorNameSelected];
 
-            // Actualizar el contenido y el color de la palabra
             const colorWordElement = document.getElementById("colorWord");
             colorWordElement.textContent = word;
             colorWordElement.style.color = assignedColor;
 
-            // Generar opciones de botones
             const buttonOptions = generateButtonOptions(correctColorNameSelected, ownColorName);
-            shuffle(buttonOptions); // Mezclar las opciones de botones
+            shuffle(buttonOptions);
 
-            // Asignar colores y etiquetas a los botones
             buttonOptions.forEach((colorName, index) => {
                 const button = document.getElementById(`button${index + 1}`);
                 button.style.backgroundColor = colorMap[colorName];
                 button.textContent = "";
                 button.setAttribute('aria-label', capitalizeFirstLetter(colorName));
                 button.dataset.color = colorName;
+                button.disabled = false;
             });
 
             roundCount++;
@@ -295,10 +284,48 @@
             const selectedColorName = button.dataset.color;
             const isCorrect = selectedColorName === correctColorName;
 
-            if (isCorrect) correctAnswers++;
-            else incorrectAnswers++;
+            if (isCorrect) {
+                showWord();
+            } else {
+                incorrectAnswers++;
+                showErrorIndicator();
+            }
+        }
 
-            showWord();
+        function showErrorIndicator() {
+            const errorIndicator = document.getElementById("errorIndicator");
+            errorIndicator.style.display = "flex";
+
+            const buttons = document.querySelectorAll('.color-button');
+            buttons.forEach(button => button.disabled = true);
+
+            playBuzzSound();
+
+            setTimeout(() => {
+                errorIndicator.style.display = "none";
+                buttons.forEach(button => button.disabled = false);
+            }, 300);
+        }
+
+        function playBuzzSound() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(200, context.currentTime);
+
+                gainNode.gain.setValueAtTime(0.1, context.currentTime);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.2);
+            } catch (error) {
+                console.error("Error al reproducir el sonido:", error);
+            }
         }
 
         function endExercise() {
@@ -311,7 +338,6 @@
             feedbackElement.innerHTML = `
                 <h2>Has finalizado el test de Stroop</h2>
                 <p>Tiempo total: <strong>${totalTimeSeconds} segundos</strong></p>
-                <p>Aciertos: <strong>${correctAnswers}</strong></p>
                 <p>Errores: <strong>${incorrectAnswers}</strong></p>
                 <button class="reiniciar-button" onclick="startExercise()">Reiniciar</button>
             `;
