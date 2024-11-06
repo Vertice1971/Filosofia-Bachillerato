@@ -11,3 +11,4 @@ Programas Didácticos para Filosofía de Primero de Bachillerato
 - Neurotransmisores2 - Estudio de Neurotransmisores
 - Palabras a cada hemisferio - Juega con la velocidad de percepción subliminal y también con la diferencia perceptiva derivada de la lateralización de los hemisferios
 - Stroop 1 y 2 - Comprobamos las interferencias entre ambos hemisferios. La versión Records mide el tiempo absoluto en hacerlo completo
+- Condicionamiento Clásico - Práctica y examen generando un JSON para su evaluación. Versiones para ordenador y teléfono móvil
