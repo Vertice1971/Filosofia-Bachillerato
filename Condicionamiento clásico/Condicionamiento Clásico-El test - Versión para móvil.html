@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Condicionamiento Clásico</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f9f9f9;
+        }
+        .container { 
+            width: 90%; 
+            max-width: 800px; 
+            margin: auto; 
+            padding: 20px; 
+            background-color: #fff; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .btn { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            cursor: pointer; 
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover { 
+            background-color: #0056b3; 
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+        }
+        .table th, .table td { 
+            border: 1px solid #000; 
+            padding: 10px; 
+            text-align: center; 
+            vertical-align: middle;
+        }
+        .phase-label { 
+            font-weight: bold; 
+            background-color: #e9ecef;
+        }
+        .ficha { 
+            display: inline-block; 
+            padding: 10px 15px; 
+            margin: 5px; 
+            border: 1px solid #000; 
+            cursor: pointer; 
+            font-size: 16px; 
+            background-color: #ffc107;
+            border-radius: 5px;
+            user-select: none;
+        }
+        .ficha.selected {
+            background-color: #28a745;
+            color: #fff;
+        }
+        #timer { 
+            position: fixed; 
+            top: 10px; 
+            right: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: red; 
+        }
+        #fichas { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .table th, .table td { 
+                font-size: 14px; 
+                padding: 8px; 
+            }
+            .ficha { 
+                font-size: 14px; 
+                padding: 8px 12px; 
+            }
+            #timer { 
+                font-size: 16px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="portada" class="container">
+    <h1>Examen de Condicionamiento Clásico</h1>
+    <p>Pulsa el botón para comenzar el examen. Se cargarán tres condicionamientos al azar. Tienes un minuto para cada uno.</p>
+    <button class="btn" onclick="iniciarExamen()">Comenzar Examen</button>
+</div>
+
+<div id="timer"></div>
+
+<div id="actividad" class="container" style="display: none;">
+    <h2 id="descripcion"></h2>
+    <table class="table" id="tabla-condicionamiento">
+        <!-- Las filas de la tabla serán generadas dinámicamente -->
+    </table>
+    <div id="fichas"></div>
+    <button class="btn" onclick="validar()">Siguiente</button>
+    <button class="btn" onclick="reiniciarCeldas()">Reiniciar Celdas</button>
+</div>
+
+<script>
+    const condicionamientos = [
+        {
+            "id": 1,
+            "descripcion": "Queremos lograr que un perro salive cuando escucha una campana.",
+            "fichas_respuesta": ["comida", "campana", "salivación"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "comida", "pre_en": "", "pre_ec": "", "pre_ri": "salivación", "pre_rc": "" },
+                "fase2": { "cond_ei": "comida", "cond_en": "campana", "cond_ec": "", "cond_ri": "salivación", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "campana", "post_ri": "", "post_rc": "salivación" }
+            }
+        },
+        {
+            "id": 2,
+            "descripcion": "Queremos lograr que un perro aumente su frecuencia cardíaca cuando escucha el himno nacional francés.",
+            "fichas_respuesta": ["perrita en celo", "himno nacional francés", "aumento de frecuencia cardíaca"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "perrita en celo", "pre_en": "", "pre_ec": "", "pre_ri": "aumento de frecuencia cardíaca", "pre_rc": "" },
+                "fase2": { "cond_ei": "perrita en celo", "cond_en": "himno nacional francés", "cond_ec": "", "cond_ri": "aumento de frecuencia cardíaca", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "himno nacional francés", "post_ri": "", "post_rc": "aumento de frecuencia cardíaca" }
+            }
+        },
+        {
+            "id": 3,
+            "descripcion": "Queremos lograr que una persona sienta náuseas cuando ve escenas de violencia.",
+            "fichas_respuesta": ["tóxico", "escenas de violencia", "náuseas"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "tóxico", "pre_en": "", "pre_ec": "", "pre_ri": "náuseas", "pre_rc": "" },
+                "fase2": { "cond_ei": "tóxico", "cond_en": "escenas de violencia", "cond_ec": "", "cond_ri": "náuseas", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "escenas de violencia", "post_ri": "", "post_rc": "náuseas" }
+            }
+        },
+        {
+            "id": 4,
+            "descripcion": "Queremos lograr que un niño llore cada vez que ve una bata blanca.",
+            "fichas_respuesta": ["pinchazo", "bata blanca", "llanto"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "pinchazo", "pre_en": "", "pre_ec": "", "pre_ri": "llanto", "pre_rc": "" },
+                "fase2": { "cond_ei": "pinchazo", "cond_en": "bata blanca", "cond_ec": "", "cond_ri": "llanto", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "bata blanca", "post_ri": "", "post_rc": "llanto" }
+            }
+        },
+        {
+            "id": 5,
+            "descripcion": "Queremos lograr que una persona sienta desagrado al ver un cigarrillo.",
+            "fichas_respuesta": ["descargas eléctricas", "cigarrillo", "desagrado"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "descargas eléctricas", "pre_en": "", "pre_ec": "", "pre_ri": "desagrado", "pre_rc": "" },
+                "fase2": { "cond_ei": "descargas eléctricas", "cond_en": "cigarrillo", "cond_ec": "", "cond_ri": "desagrado", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "cigarrillo", "post_ri": "", "post_rc": "desagrado" }
+            }
+        },
+        {
+            "id": 6,
+            "descripcion": "Nuestro gato cada vez que ve un anuncio de aspiradoras en la tele se asusta.",
+            "fichas_respuesta": ["ruido de la aspiradora", "imagen de la aspiradora", "asustarse"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ruido de la aspiradora", "pre_en": "", "pre_ec": "", "pre_ri": "asustarse", "pre_rc": "" },
+                "fase2": { "cond_ei": "ruido de la aspiradora", "cond_en": "imagen de la aspiradora", "cond_ec": "", "cond_ri": "asustarse", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "imagen de la aspiradora", "post_ri": "", "post_rc": "asustarse" }
+            }
+        },
+        {
+            "id": 7,
+            "descripcion": "Queremos lograr que unos niños sientan alivio de dolor de cabeza al oler rosas.",
+            "fichas_respuesta": ["ibuprofeno", "olor de rosas", "alivio del dolor de cabeza"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ibuprofeno", "pre_en": "", "pre_ec": "", "pre_ri": "alivio del dolor de cabeza", "pre_rc": "" },
+                "fase2": { "cond_ei": "ibuprofeno", "cond_en": "olor de rosas", "cond_ec": "", "cond_ri": "alivio del dolor de cabeza", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "olor de rosas", "post_ri": "", "post_rc": "alivio del dolor de cabeza" }
+            }
+        },
+        {
+            "id": 8,
+            "descripcion": "Hay personas que solo con oír cómo se abre la lata de un refresco sienten una especie de frescor.",
+            "fichas_respuesta": ["sabor del refresco", "sonido de la lata abriéndose", "frescor"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "sabor del refresco", "pre_en": "", "pre_ec": "", "pre_ri": "frescor", "pre_rc": "" },
+                "fase2": { "cond_ei": "sabor del refresco", "cond_en": "sonido de la lata abriéndose", "cond_ec": "", "cond_ri": "frescor", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "sonido de la lata abriéndose", "post_ri": "", "post_rc": "frescor" }
+            }
+        },
+        {
+            "id": 9,
+            "descripcion": "Queremos lograr que un perro se esconda al escuchar un sonido fuerte de petardos.",
+            "fichas_respuesta": ["ruido fuerte", "petardos", "esconderse"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ruido fuerte", "pre_en": "", "pre_ec": "", "pre_ri": "esconderse", "pre_rc": "" },
+                "fase2": { "cond_ei": "ruido fuerte", "cond_en": "petardos", "cond_ec": "", "cond_ri": "esconderse", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "petardos", "post_ri": "", "post_rc": "esconderse" }
+            }
+        },
+        {
+            "id": 10,
+            "descripcion": "Queremos lograr que señoras de mediana edad y con buen poder adquisitivo sientan deseos de llevarse una cafetera a casa.",
+            "fichas_respuesta": ["George Clooney", "cafetera", "atracción"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "George Clooney", "pre_en": "", "pre_ec": "", "pre_ri": "atracción", "pre_rc": "" },
+                "fase2": { "cond_ei": "George Clooney", "cond_en": "cafetera", "cond_ec": "", "cond_ri": "atracción", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "cafetera", "post_ri": "", "post_rc": "atracción" }
+            }
+        }
+    ];
+
+    let examenCondiciones = [];
+    let respuestasCorrectas = {};
+    let condicionActual = 0;
+    let timer;
+    let tiempoRestante = 60;
+    let columnaOrdenActual = []; // Almacena el orden de columnas para el condicionamiento actual
+    let resultadosExamen = []; // Almacena los resultados para el JSON
+
+    // Lista de claves de columnas
+    const columnKeys = ['ei', 'en', 'ec', 'ri', 'rc'];
+
+    // Nombres de las columnas para mostrar en la cabecera
+    const columnNames = {
+        'ei': 'E. I.',
+        'en': 'E. N.',
+        'ec': 'E. C.',
+        'ri': 'R. I.',
+        'rc': 'R. C.'
+    };
+
+    let fichaSeleccionada = null;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function iniciarExamen() {
+        examenCondiciones = seleccionarCondicionamientosAleatorios(condicionamientos, 3);
+        condicionActual = 0;
+        resultadosExamen = []; // Reiniciar resultados
+        mostrarCondicionamiento(examenCondiciones[condicionActual]);
+        document.getElementById("portada").style.display = "none";
+        document.getElementById("actividad").style.display = "block";
+        iniciarTemporizador();
+    }
+
+    function iniciarTemporizador() {
+        tiempoRestante = 60;
+        document.getElementById("timer").textContent = `Tiempo: ${tiempoRestante}s`;
+        timer = setInterval(() => {
+            tiempoRestante--;
+            document.getElementById("timer").textContent = `Tiempo: ${tiempoRestante}s`;
+            if (tiempoRestante <= 0) {
+                clearInterval(timer);
+                guardarResultados(); // Guardar resultados actuales
+                validar(true); // Pasa automáticamente si se agota el tiempo
+            }
+        }, 1000);
+    }
+
+    function seleccionarCondicionamientosAleatorios(arr, n) {
+        let resultado = [];
+        let indicesUsados = new Set();
+        while (resultado.length < n && resultado.length < arr.length) {
+            let indice = Math.floor(Math.random() * arr.length);
+            if (!indicesUsados.has(indice)) {
+                resultado.push(arr[indice]);
+                indicesUsados.add(indice);
+            }
+        }
+        return resultado;
+    }
+
+    function mostrarCondicionamiento(data) {
+        if (!data || !data.descripcion) {
+            console.error("Datos de condicionamiento inválidos:", data);
+            alert("Error al cargar el condicionamiento. Intenta nuevamente.");
+            return;
+        }
+        limpiarTabla();
+        if (fichaSeleccionada) {
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        }
+        document.getElementById("descripcion").textContent = data.descripcion;
+        respuestasCorrectas = prepararRespuestas(data);
+        mostrarFichas(data.fichas_respuesta);
+        generarTabla(data);
+    }
+
+    function limpiarTabla() {
+        const tabla = document.getElementById("tabla-condicionamiento");
+        tabla.innerHTML = ""; // Limpia toda la tabla
+    }
+
+    function prepararRespuestas(data) {
+        return {
+            ...data.condicionamiento.fase1,
+            ...data.condicionamiento.fase2,
+            ...data.condicionamiento.fase3
+        };
+    }
+
+    function mostrarFichas(fichas) {
+        const fichasContainer = document.getElementById("fichas");
+        fichasContainer.innerHTML = "";
+
+        // Mezclar las fichas antes de mostrarlas
+        const fichasMezcladas = shuffleArray([...fichas]);
+
+        fichasMezcladas.forEach(ficha => {
+            const fichaElem = document.createElement("div");
+            fichaElem.classList.add("ficha");
+            fichaElem.textContent = ficha;
+            fichaElem.onclick = seleccionarFicha;
+            fichasContainer.appendChild(fichaElem);
+        });
+    }
+
+    function seleccionarFicha(event) {
+        const fichaElem = event.target;
+        if (fichaSeleccionada === fichaElem) {
+            // Deseleccionar la ficha si se toca nuevamente
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        } else {
+            if (fichaSeleccionada) {
+                fichaSeleccionada.classList.remove('selected');
+            }
+            fichaSeleccionada = fichaElem;
+            fichaSeleccionada.classList.add('selected');
+        }
+    }
+
+    function generarTabla(data) {
+        const tabla = document.getElementById("tabla-condicionamiento");
+
+        // Genera una lista de columnas y las mezcla
+        columnaOrdenActual = shuffleArray([...columnKeys]);
+
+        // Crear la fila de encabezados
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        // Primera celda vacía para los nombres de las fases
+        const emptyHeader = document.createElement("th");
+        emptyHeader.textContent = "";
+        headerRow.appendChild(emptyHeader);
+
+        // Crear y añadir las cabeceras de las columnas en el orden aleatorio
+        columnaOrdenActual.forEach(key => {
+            const th = document.createElement("th");
+            th.textContent = columnNames[key];
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        tabla.appendChild(thead);
+
+        // Crear el cuerpo de la tabla
+        const tbody = document.createElement("tbody");
+
+        // Definir las fases con sus prefijos correspondientes
+        const fases = [
+            { nombre: 'Fase 1', clave: 'pre' },
+            { nombre: 'Fase 2', clave: 'cond' },
+            { nombre: 'Fase 3', clave: 'post' }
+        ];
+
+        fases.forEach(fase => {
+            const fila = document.createElement("tr");
+
+            // Primera celda con el nombre de la fase
+            const faseCell = document.createElement("td");
+            faseCell.classList.add("phase-label");
+            faseCell.textContent = fase.nombre;
+            fila.appendChild(faseCell);
+
+            // Añadir celdas para cada columna según el orden aleatorio
+            columnaOrdenActual.forEach(key => {
+                const celda = document.createElement("td");
+                celda.classList.add("celda");
+                celda.dataset.key = key; // Asigna el tipo de clave para validación
+                celda.dataset.phase = fase.clave; // Añadir fase para validación
+                celda.onclick = colocarFicha; // Añadido para permitir colocar fichas
+                fila.appendChild(celda);
+            });
+
+            tbody.appendChild(fila);
+        });
+
+        tabla.appendChild(tbody);
+    }
+
+    function colocarFicha(event) {
+        const celda = event.target;
+        if (fichaSeleccionada) {
+            celda.textContent = fichaSeleccionada.textContent;
+        } else {
+            // Si no hay ficha seleccionada, se vacía la celda
+            celda.textContent = "";
+        }
+    }
+
+    function reiniciarCeldas() {
+        const celdas = document.querySelectorAll('.table td.celda');
+        celdas.forEach(celda => {
+            celda.textContent = "";
+        });
+        if (fichaSeleccionada) {
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        }
+    }
+
+    function guardarResultados() {
+        const celdas = document.querySelectorAll('.table td.celda');
+        let errores = 0;
+
+        celdas.forEach(celda => {
+            const key = celda.dataset.key;
+            const phase = celda.dataset.phase;
+            const fullKey = `${phase}_${key}`;
+            const respuestaEsperada = respuestasCorrectas[fullKey] ? respuestasCorrectas[fullKey].toLowerCase() : "";
+            const respuestaUsuario = celda.textContent.trim().toLowerCase();
+
+            if (respuestaEsperada === "" && respuestaUsuario !== "") {
+                errores++; // Error si debe estar vacío y no lo está
+            } else if (respuestaEsperada !== "" && respuestaUsuario !== respuestaEsperada) {
+                errores++; // Error si no coincide con la respuesta esperada
+            }
+        });
+
+        resultadosExamen.push({
+            "id": examenCondiciones[condicionActual].id,
+            "errores": errores
+        });
+    }
+
+    function validar(autoPasar = false) {
+        clearInterval(timer); // Detiene el temporizador si valida manualmente
+        guardarResultados(); // Guarda los resultados actuales
+
+        if (condicionActual < examenCondiciones.length - 1) {
+            condicionActual++;
+            mostrarCondicionamiento(examenCondiciones[condicionActual]);
+            reiniciarCeldas();
+            iniciarTemporizador();
+        } else {
+            finalizarExamen();
+        }
+    }
+
+    function finalizarExamen() {
+        document.getElementById("actividad").style.display = "none";
+        document.getElementById("timer").style.display = "none";
+        descargarJSON(resultadosExamen, "resultado_examen.json");
+        alert("Examen finalizado. Se ha descargado el archivo de resultados.");
+    }
+
+    function descargarJSON(data, filename) {
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>
