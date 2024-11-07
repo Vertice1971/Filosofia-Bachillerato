@@ -450,6 +450,9 @@
     function finalizarExamen() {
         document.getElementById("actividad").style.display = "none";
         document.getElementById("timer").style.display = "none";
+        // Calcula la suma total de errores
+        const totalErrores = resultadosExamen.reduce((sum, result) => sum + result.errores, 0);
+        resultadosExamen.push({ "total_errores": totalErrores }); // Añade la suma al JSON
         descargarJSON(resultadosExamen, "resultado_examen.json");
         alert("Examen finalizado. Se ha descargado el archivo de resultados.");
     }
