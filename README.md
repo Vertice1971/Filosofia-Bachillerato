@@ -12,6 +12,7 @@ Programas Didácticos para Filosofía de Primero de Bachillerato
 - Neurotransmisores Quiz - Reconocer la química en acción
 - Neurotransmisores2 - Estudio de Neurotransmisores
 - Condicionamiento Clásico - Práctica y examen generando un JSON para su evaluación. Versiones para ordenador y teléfono móvil
+- Freud1 y Freud2: Partes de la personalidad/Represión y Mecanismos de Defensa
 
 
 ENLACES A LA EJECUCIÓN
@@ -80,3 +81,8 @@ El test (versión móvil)
 
 https://vertice1971.github.io/Filosofia-Bachillerato/Condicionamiento%20cl%C3%A1sico/Condicionamiento%20Cl%C3%A1sico-El%20test%20-%20Versi%C3%B3n%20para%20m%C3%B3vil.html
 
+Freud1-móvil
+https://vertice1971.github.io/Filosofia-Bachillerato/Freud1-móvil.html
+
+Freud2
+https://vertice1971.github.io/Filosofia-Bachillerato/Freud2.html
