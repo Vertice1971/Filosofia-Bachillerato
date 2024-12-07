@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freud y la Personalidad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px; /* Aumentado para aprovechar más espacio horizontal */
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            table-layout: fixed; /* Asegura que las columnas tengan un ancho fijo */
+        }
+        .table th, .table td {
+            border: 1px solid #000;
+            padding: 15px; /* Incrementado para mayor espacio interno y altura */
+            text-align: center;
+            vertical-align: middle; /* Alineación vertical al centro */
+            height: 40px; /* Altura fija para las celdas */
+        }
+        .header {
+            font-weight: bold;
+            background-color: #f2f2f2;
+            font-size: 1.2em;
+        }
+        .ficha {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #ffc107;
+            border-radius: 5px;
+            user-select: none;
+        }
+        .dropzone {
+            min-height: 150px; /* Aumentado para más espacio vertical */
+            background-color: #f9f9f9;
+            border: 1px dashed #000;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Responsividad para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 800px;
+            }
+            .table th, .table td {
+                padding: 20px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Freud y la Personalidad</h1>
+    <table class="table">
+        <tr class="header">
+            <th>Id</th>
+            <th>Superego</th>
+            <th>Ego</th>
+        </tr>
+        <tbody id="tabla-casos"></tbody>
+    </table>
+    <div id="fichas"></div>
+    <button id="siguiente" class="hidden">Siguiente</button>
+</div>
+
+<script>
+    const casos = [
+        // Caso 1
+        [
+            { text: "Quieres matar al profesor de Filosofía", target: "id_case1" },
+            { text: "El Código Penal te condenaría a la cárcel", target: "superego_case1" },
+            { text: "Optas por hacerle una caricatura", target: "ego_case1" }
+        ],
+        // Caso 2 y 3
+        [
+            { text: "No tienes ganas de ir a trabajar", target: "id_case2" },
+            { text: "Todo el mundo tiene un iPhone que vale 1500 euros", target: "superego_case2" },
+            { text: "Trabajas lo justo para comprar una imitación", target: "ego_case2" },
+            { text: "Solo piensas en comer Donuts", target: "id_case3" },
+            { text: "En el Instagram se espera que estés en forma", target: "superego_case3" },
+            { text: "Comes seis Donuts y luego los vomitas", target: "ego_case3" }
+        ],
+        // Caso 4 y 5
+        [
+            { text: "Quiero seguir en el sofá", target: "id_case4" },
+            { text: "Todo el mundo está colgando sus aventuras", target: "superego_case4" },
+            { text: "Me apunto a algo por subir la historia", target: "ego_case4" },
+            { text: "Quiero seducir a alguien", target: "id_case5" },
+            { text: "Esa persona no está interesada y “no es no”", target: "superego_case5" },
+            { text: "Le dedicas una canción", target: "ego_case5" }
+        ]
+    ];
+
+    let casoActual = 0;
+
+    const tablaCasos = document.getElementById("tabla-casos");
+    const fichasContainer = document.getElementById("fichas");
+    const siguienteButton = document.getElementById("siguiente");
+
+    // Objeto para guardar la fila elegida para cada sufijo de caso (ej: case2, case3, etc.)
+    const chosenRows = {};
+
+    // Función para desordenar un array
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function mostrarCaso(caso) {
+        tablaCasos.innerHTML = "";
+        fichasContainer.innerHTML = "";
+
+        // Limpiar chosenRows para el nuevo caso
+        for (let key in chosenRows) {
+            delete chosenRows[key];
+        }
+
+        const filas = new Set(caso.map(ficha => ficha.target.split("_")[1]));
+        filas.forEach(fila => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="dropzone" id="id_${fila}"></td>
+                <td class="dropzone" id="superego_${fila}"></td>
+                <td class="dropzone" id="ego_${fila}"></td>
+            `;
+            tablaCasos.appendChild(tr);
+        });
+
+        // Desordenar las fichas antes de mostrarlas
+        shuffleArray(caso);
+
+        caso.forEach(ficha => {
+            const fichaElem = document.createElement("div");
+            fichaElem.classList.add("ficha");
+            fichaElem.textContent = ficha.text;
+            fichaElem.draggable = true;
+            fichaElem.dataset.target = ficha.target;
+
+            fichaElem.addEventListener("dragstart", event => {
+                event.dataTransfer.setData("target", event.target.dataset.target);
+                event.dataTransfer.setData("textContent", event.target.textContent);
+            });
+
+            fichasContainer.appendChild(fichaElem);
+        });
+
+        document.querySelectorAll(".dropzone").forEach(celda => {
+            celda.addEventListener("dragover", event => event.preventDefault());
+
+            celda.addEventListener("drop", event => {
+                const target = event.dataTransfer.getData("target");
+                const text = event.dataTransfer.getData("textContent");
+
+                // Extraemos la columna y el caso (fila)
+                const [columnaFicha, filaFicha] = target.split("_"); 
+                const [columnaCelda, filaCelda] = celda.id.split("_");
+
+                // Verificamos que la columna sea correcta
+                if (columnaFicha !== columnaCelda) {
+                    alert("¡Fallo! Esta ficha no pertenece a esta columna.");
+                    return;
+                }
+
+                // Si aún no se ha elegido fila para este sufijo, se puede fijar ahora
+                if (!chosenRows[filaFicha]) {
+                    chosenRows[filaFicha] = filaCelda; 
+                }
+
+                // Si ya existe una fila elegida, verificar que coincida
+                if (chosenRows[filaFicha] !== filaCelda) {
+                    alert("¡Fallo! Esta ficha debe ir en la misma fila que el resto de su caso.");
+                    return;
+                }
+
+                // Verificar si la celda ya está ocupada
+                if (celda.textContent !== "") {
+                    const confirmar = confirm("Esta celda ya está ocupada. ¿Deseas reemplazarla?");
+                    if (!confirmar) {
+                        return;
+                    }
+                }
+
+                // Si todo está correcto, colocar la ficha
+                celda.textContent = text;
+            });
+        });
+    }
+
+    siguienteButton.addEventListener("click", () => {
+        casoActual++;
+        if (casoActual < casos.length) {
+            mostrarCaso(casos[casoActual]);
+        } else {
+            alert("¡Has completado todos los casos!");
+            siguienteButton.classList.add("hidden");
+        }
+    });
+
+    // Mostrar el primer caso inicialmente
+    mostrarCaso(casos[casoActual]);
+    siguienteButton.classList.remove("hidden");
+</script>
+</body>
+</html>

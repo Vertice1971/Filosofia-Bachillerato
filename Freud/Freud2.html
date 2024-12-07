@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Freud. Mecanismos de Defensa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f8ff;
+            position: relative;
+            min-height: 100vh;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #options-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #study-section, #practice-section {
+            display: none;
+        }
+        #mechanisms-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .mechanism {
+            background-color: #e0f7fa;
+            border: 2px solid #00838f;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .mechanism:hover {
+            background-color: #b2ebf2;
+        }
+        .explanation-popup {
+            position: fixed;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border: 2px solid #00bcd4;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            width: 500px;
+        }
+        .explanation-popup p {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+        .close-popup {
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            color: #00bcd4;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+
+        #practice-area {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        #mechanisms-list-practice {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #examples-list {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .draggable {
+            cursor: pointer;
+        }
+
+        .active {
+            background-color: #b2ebf2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Freud. Mecanismos de Defensa</h1>
+    <div id="options-section">
+        <button onclick="startLearning()">Aprender</button>
+        <button onclick="startPracticing()">Practicar</button>
+    </div>
+
+    <!-- Sección de estudio (Aprender) -->
+    <div id="study-section">
+        <h2 id="instruction-text">Haz clic en un mecanismo para ver más información</h2>
+        <div id="mechanisms-list"></div>
+    </div>
+
+    <!-- Sección de práctica (Practicar) -->
+    <div id="practice-section">
+        <h2 id="instruction-text-practice">Une el mecanismo con su ejemplo</h2>
+        <div id="practice-area">
+            <div id="mechanisms-list-practice"></div>
+            <div id="examples-list"></div>
+        </div>
+    </div>
+
+    <!-- Ventana emergente para la explicación -->
+    <div id="explanation-popup" class="explanation-popup">
+        <span class="close-popup" onclick="closeExplanation()">X</span>
+        <p id="explanation-text"></p>
+        <p id="example-text"></p>
+    </div>
+
+    <script>
+        // Datos de los mecanismos de defensa para la teoría (Aprender)
+        const mechanisms = [
+            { 
+                name: "Racionalización", 
+                description: "Buscar un argumento que aparentemente justifique la ventaja de no conseguir el deseo.",
+                example: "Ejemplo: Un estudiante que suspende un examen dice: 'No aprobar está bien, así no pareceré un empollón.'"
+            },
+            { 
+                name: "Proyección", 
+                description: "Atribuir emociones o deseos inaceptables propios a otras personas.",
+                example: "Ejemplo: Acusar a otros de querer robar algo que estoy viendo."
+            },
+            { 
+                name: "Identificación", 
+                description: "Adoptar características de alguien admirado para mejorar la autoestima.",
+                example: "Ejemplo: Vestirse y actuar como un cantante famoso para sentirse más seguro."
+            },
+            { 
+                name: "Represión-Negación", 
+                description: "Bloquear pensamientos dolorosos o negar realidades difíciles de aceptar.",
+                example: "Ejemplo: Olvidar un evento traumático o negar una enfermedad grave."
+            },
+            { 
+                name: "Transferencia (Desplazamiento)", 
+                description: "Redirigir un deseo insatisfecho hacia un objeto ante el que sí puedo conseguirlo.",
+                example: "Ejemplo: Enojarse con la familia después de un mal día en el trabajo."
+            },
+            { 
+                name: "Fantasear", 
+                description: "Escapar de una situación frustrante creando escenarios ideales en la mente.",
+                example: "Ejemplo: Imaginarse dando una presentación perfecta cuando se teme hablar en público."
+            },
+            { 
+                name: "Compensación", 
+                description: "Destacar en otras áreas para compensar un deseo no conseguido.",
+                example: "Ejemplo: Alguien que no es muy buen estudiante se dedica a la música para sobresalir."
+            },
+            { 
+                name: "Regresión", 
+                description: "Volver a estados vitales anteriores ante situaciones frustrantes.",
+                example: "Ejemplo: Un cincuentón se compra un descapotable y se viste con ropas juveniles."
+            },
+            { 
+                name: "Sublimación", 
+                description: "Transformar impulsos inaceptables en actividades constructivas o artísticas.",
+                example: "Ejemplo: Como no puedo pegarte, te hago una caricatura."
+            }
+        ];
+
+        // Ejemplos específicos para la práctica (Emparejamiento)
+        const practiceExamples = [
+            { name: "Racionalización", example: "No conseguí el trabajo, pero de todas formas era demasiado lejos para mí." },
+            { name: "Proyección", example: "No quiero que mi novia vista así. Cualquiera que la vea va a querer hacerle algo." },
+            { name: "Identificación", example: "Esa victoria de la Selección borra todos nuestros problemas." },
+            { name: "Represión-Negación", example: "Mi hijo no fuma, la ropa huele porque sus amigos lo hacen." },
+            { name: "Transferencia (Desplazamiento)", example: "Discutir con la pareja y luego gritarle al perro por ladrar." },
+            { name: "Fantasear", example: "Se rieron de mí y yo les tenía que haber dicho..." },
+            { name: "Compensación", example: "No puedo ser un padre más cariñoso pero puedo comprarte la Play." },
+            { name: "Regresión", example: "Desde que se quedó viuda solo escucha música de cuando eran novios." },
+            { name: "Sublimación", example: "Bach compuso la Cantata BWV 150 con una melodía muy difícil para fastidiar a un músico al que odiaba." }
+        ];
+
+        // Función para mezclar array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Funciones de Aprender
+        function startLearning() {
+            const mechanismsList = document.getElementById("mechanisms-list");
+            mechanismsList.innerHTML = '';
+            mechanisms.forEach(mechanism => {
+                const item = document.createElement("div");
+                item.classList.add("mechanism");
+                item.innerText = mechanism.name;
+                item.onclick = () => {
+                    const explanationPopup = document.getElementById("explanation-popup");
+                    document.getElementById("explanation-text").innerText = `${mechanism.name}: ${mechanism.description}`;
+                    document.getElementById("example-text").innerText = mechanism.example;
+                    explanationPopup.style.display = "block";
+                };
+                mechanismsList.appendChild(item);
+            });
+            document.getElementById("practice-section").style.display = "none";
+            document.getElementById("study-section").style.display = "block";
+        }
+
+        function closeExplanation() {
+            document.getElementById("explanation-popup").style.display = "none";
+        }
+
+        // Funciones de Practicar
+        function startPracticing() {
+            const practiceMechanismsList = document.getElementById("mechanisms-list-practice");
+            const practiceExamplesList = document.getElementById("examples-list");
+            practiceMechanismsList.innerHTML = '';
+            practiceExamplesList.innerHTML = '';
+
+            mechanisms.forEach(mechanism => {
+                const mechanismItem = document.createElement("div");
+                mechanismItem.classList.add("mechanism", "draggable");
+                mechanismItem.innerText = mechanism.name;
+                mechanismItem.onclick = () => selectMechanism(mechanismItem, mechanism);
+                practiceMechanismsList.appendChild(mechanismItem);
+            });
+
+            const shuffledExamples = [...practiceExamples];
+            shuffleArray(shuffledExamples);
+            shuffledExamples.forEach(item => {
+                const exampleItem = document.createElement("div");
+                exampleItem.classList.add("mechanism", "draggable");
+                exampleItem.innerText = item.example;
+                exampleItem.onclick = () => selectExample(exampleItem, item);
+                practiceExamplesList.appendChild(exampleItem);
+            });
+
+            document.getElementById("study-section").style.display = "none";
+            document.getElementById("practice-section").style.display = "block";
+        }
+
+        let selectedMechanism = null;
+        let selectedExample = null;
+
+        function selectMechanism(element, mechanism) {
+            selectedMechanism = mechanism;
+            clearActiveClass();
+            element.classList.add("active");
+            checkMatch();
+        }
+
+        function selectExample(element, item) {
+            selectedExample = item;
+            clearActiveClass();
+            element.classList.add("active");
+            checkMatch();
+        }
+
+        function clearActiveClass() {
+            document.querySelectorAll(".mechanism").forEach(el => el.classList.remove("active"));
+        }
+
+        function checkMatch() {
+            if (selectedMechanism && selectedExample) {
+                if (selectedMechanism.name === selectedExample.name) {
+                    alert("¡Correcto!");
+                    selectedMechanism = null;
+                    selectedExample = null;
+                } else {
+                    alert("Incorrecto. Inténtalo de nuevo.");
+                }
+            }
+        }
+
+        startLearning();
+    </script>
+
+</body>
+</html>

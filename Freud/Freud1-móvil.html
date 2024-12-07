@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freud y la Personalidad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px; 
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            table-layout: fixed;
+        }
+        .table th, .table td {
+            border: 1px solid #000;
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+            height: 40px;
+            position: relative;
+        }
+        .header {
+            font-weight: bold;
+            background-color: #f2f2f2;
+            font-size: 1.2em;
+        }
+        .ficha {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #ffc107;
+            border-radius: 5px;
+            user-select: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .ficha.selected {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .dropzone {
+            min-height: 150px;
+            background-color: #f9f9f9;
+            border: 1px dashed #000;
+            cursor: pointer;
+        }
+        .dropzone::after {
+            content: "Haz clic para colocar una ficha";
+            color: #999;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .dropzone.ocupado::after {
+            content: "";
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .container {
+                max-width: 800px;
+            }
+            .table th, .table td {
+                padding: 20px;
+                height: 120px;
+            }
+            .ficha {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Freud y la Personalidad</h1>
+    <table class="table">
+        <tr class="header">
+            <th>Id</th>
+            <th>Superego</th>
+            <th>Ego</th>
+        </tr>
+        <tbody id="tabla-casos"></tbody>
+    </table>
+    <div id="fichas"></div>
+    <button id="siguiente" class="hidden">Siguiente</button>
+</div>
+
+<script>
+    const casos = [
+        [
+            { text: "Quieres matar al profesor de Filosofía", target: "id_case1" },
+            { text: "El Código Penal te condenaría a la cárcel", target: "superego_case1" },
+            { text: "Optas por hacerle una caricatura", target: "ego_case1" }
+        ],
+        [
+            { text: "No tienes ganas de ir a trabajar", target: "id_case2" },
+            { text: "Todo el mundo tiene un iPhone que vale 1500 euros", target: "superego_case2" },
+            { text: "Trabajas lo justo para comprar una imitación", target: "ego_case2" },
+            { text: "Solo piensas en comer Donuts", target: "id_case3" },
+            { text: "En el Instagram se espera que estés en forma", target: "superego_case3" },
+            { text: "Comes seis Donuts y luego los vomitas", target: "ego_case3" }
+        ],
+        [
+            { text: "Quiero seguir en el sofá", target: "id_case4" },
+            { text: "Todo el mundo está colgando sus aventuras", target: "superego_case4" },
+            { text: "Me apunto a algo por subir la historia", target: "ego_case4" },
+            { text: "Quiero seducir a alguien", target: "id_case5" },
+            { text: "Esa persona no está interesada y “no es no”", target: "superego_case5" },
+            { text: "Le dedicas una canción", target: "ego_case5" }
+        ]
+    ];
+
+    let casoActual = 0;
+    let fichaSeleccionada = null;
+    let totalErrores = 0; 
+
+    const tablaCasos = document.getElementById("tabla-casos");
+    const fichasContainer = document.getElementById("fichas");
+    const siguienteButton = document.getElementById("siguiente");
+
+    const chosenRows = {};
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function mostrarCaso(caso) {
+        tablaCasos.innerHTML = "";
+        fichasContainer.innerHTML = "";
+
+        for (let key in chosenRows) {
+            delete chosenRows[key];
+        }
+
+        const filas = new Set(caso.map(ficha => ficha.target.split("_")[1]));
+        filas.forEach(fila => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="dropzone vacio" id="id_${fila}" data-target="id_${fila}" onclick="manejarClickCelda(event)"></td>
+                <td class="dropzone vacio" id="superego_${fila}" data-target="superego_${fila}" onclick="manejarClickCelda(event)"></td>
+                <td class="dropzone vacio" id="ego_${fila}" data-target="ego_${fila}" onclick="manejarClickCelda(event)"></td>
+            `;
+            tablaCasos.appendChild(tr);
+        });
+
+        shuffleArray(caso);
+
+        caso.forEach(ficha => {
+            const fichaElem = document.createElement("div");
+            fichaElem.classList.add("ficha");
+            fichaElem.textContent = ficha.text;
+            fichaElem.dataset.target = ficha.target;
+            fichaElem.addEventListener("click", seleccionarFicha);
+            fichasContainer.appendChild(fichaElem);
+        });
+
+        siguienteButton.classList.remove("hidden");
+    }
+
+    function seleccionarFicha(event) {
+        const fichaElem = event.target;
+
+        if (fichaSeleccionada === fichaElem) {
+            fichaElem.classList.remove("selected");
+            fichaSeleccionada = null;
+        } else {
+            if (fichaSeleccionada) {
+                fichaSeleccionada.classList.remove("selected");
+            }
+            fichaSeleccionada = fichaElem;
+            fichaSeleccionada.classList.add("selected");
+        }
+    }
+
+    function manejarClickCelda(event) {
+        const celda = event.target;
+        if (!celda.classList.contains('dropzone')) return;
+
+        if (fichaSeleccionada) {
+            const target = fichaSeleccionada.dataset.target;
+            const text = fichaSeleccionada.textContent;
+
+            const [columnaFicha, filaFicha] = target.split("_");
+            const [columnaCelda, filaCelda] = celda.id.split("_");
+
+            if (columnaFicha !== columnaCelda) {
+                alert("¡Fallo! Esta ficha no pertenece a esta columna.");
+                return;
+            }
+
+            if (columnaFicha === "id") {
+                if (chosenRows[filaFicha] && chosenRows[filaFicha] !== filaCelda) {
+                    alert("Este caso ya se ha colocado en otra fila. Por favor, pon el id en la misma fila.");
+                    return;
+                }
+                chosenRows[filaFicha] = filaCelda;
+            } else {
+                if (!chosenRows[filaFicha]) {
+                    alert("Primero coloca la ficha 'id' en la celda correspondiente antes de continuar.");
+                    return;
+                }
+                if (chosenRows[filaFicha] !== filaCelda) {
+                    alert("¡Fallo! Esta ficha debe ir en la misma fila que el resto de su caso.");
+                    return;
+                }
+            }
+
+            if (celda.textContent !== "") {
+                const confirmar = confirm("Esta celda ya está ocupada. ¿Deseas reemplazarla?");
+                if (!confirmar) {
+                    return;
+                }
+                const fichaAnteriorTexto = celda.textContent;
+                const fichaAnteriorTarget = celda.id; 
+                const nuevaFicha = document.createElement("div");
+                nuevaFicha.classList.add("ficha");
+                nuevaFicha.textContent = fichaAnteriorTexto;
+                nuevaFicha.dataset.target = fichaAnteriorTarget;
+                nuevaFicha.addEventListener("click", seleccionarFicha);
+                fichasContainer.appendChild(nuevaFicha);
+            }
+
+            celda.textContent = text;
+            celda.classList.remove('vacio');
+            celda.classList.add('ocupado');
+
+            fichaSeleccionada.remove();
+            fichaSeleccionada = null;
+        } else {
+            if (celda.textContent !== "") {
+                const confirmar = confirm("¿Deseas eliminar esta ficha?");
+                if (confirmar) {
+                    const texto = celda.textContent;
+                    const target = celda.id;
+                    const nuevaFicha = document.createElement("div");
+                    nuevaFicha.classList.add("ficha");
+                    nuevaFicha.textContent = texto;
+                    nuevaFicha.dataset.target = target;
+                    nuevaFicha.addEventListener("click", seleccionarFicha);
+                    fichasContainer.appendChild(nuevaFicha);
+
+                    celda.textContent = "";
+                    celda.classList.remove('ocupado');
+                    celda.classList.add('vacio');
+                }
+            }
+        }
+    }
+
+    siguienteButton.addEventListener("click", () => {
+        let errores = 0;
+        const caso = casos[casoActual];
+        caso.forEach(ficha => {
+            const celda = document.getElementById(ficha.target);
+            if (celda.textContent !== ficha.text) {
+                errores++;
+            }
+        });
+
+        totalErrores += errores;
+        alert(`En este caso tuviste ${errores} error(es). Errores acumulados: ${totalErrores}`);
+
+        casoActual++;
+        if (casoActual < casos.length) {
+            mostrarCaso(casos[casoActual]);
+        } else {
+            alert(`¡Has completado todos los casos!\nErrores totales acumulados: ${totalErrores}`);
+            siguienteButton.classList.add("hidden");
+        }
+    });
+
+    mostrarCaso(casos[casoActual]);
+    siguienteButton.classList.remove("hidden");
+</script>
+</body>
+</html>
