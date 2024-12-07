@@ -82,7 +82,7 @@ El test (versión móvil)
 https://vertice1971.github.io/Filosofia-Bachillerato/Condicionamiento%20cl%C3%A1sico/Condicionamiento%20Cl%C3%A1sico-El%20test%20-%20Versi%C3%B3n%20para%20m%C3%B3vil.html
 
 Freud1-móvil
-https://vertice1971.github.io/Filosofia-Bachillerato/Freud1-móvil.html
+https://vertice1971.github.io/Filosofia-Bachillerato/Freud/Freud1-móvil.html
 
 Freud2
-https://vertice1971.github.io/Filosofia-Bachillerato/Freud2.html
+https://vertice1971.github.io/Filosofia-Bachillerato/Freud/Freud2.html
