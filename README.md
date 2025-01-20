@@ -87,7 +87,9 @@ https://vertice1971.github.io/Filosofia-Bachillerato/Freud/Freud1-móvil.html
 Freud2
 https://vertice1971.github.io/Filosofia-Bachillerato/Freud/Freud2.html
 
-Epistemología1 - Mapa mental
+Epistemología - Mapa mental
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología1.html
+https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología2.html
+https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología3.html
 
 
