@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corrientes Epistemológicas - Mapa Mental Interactivo</title>
+  <style>
+    /* Estilos Generales */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(to right, #f7fafc, #ffffff);
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #4f81c7;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.3rem;
+      width: 100%;
+      position: relative; /* Para posicionar el botón relativo al header */
+    }
+
+    /* Estilos para el botón de reinicio */
+    #resetButton {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background-color: #ff4d4d;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s, transform 0.2s;
+      z-index: 10; /* Asegura que el botón esté por encima de otros elementos */
+    }
+
+    #resetButton:hover {
+      background-color: #e60000;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* Posición relativa para colocar el SVG absolutamente sobre el contenido */
+      position: relative;
+      flex: 1;
+      gap: 1rem;
+      padding: 1rem;
+      max-width: 1400px; /* Aumentado para acomodar más ramas */
+      width: 100%;
+    }
+
+    /* SVG para las líneas */
+    .lines {
+      position: absolute;    /* Para que se superponga al contenido */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* Evita interferir con clics/arrastrar */
+      z-index: 0;           /* Colocar por debajo de los elementos */
+    }
+
+    /* Niveles del mapa */
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .level-1 {
+      margin-bottom: 1.5rem;
+    }
+
+    .level-2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .branch {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      min-width: 200px; /* Aumentado para mayor espacio */
+    }
+
+    .level-3 {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .drop-zone {
+      width: 180px; /* Aumentado para acomodar textos más largos */
+      height: 60px;
+      border: 2px dashed #4f81c7;
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.85rem;
+      background-color: #fafafa;
+      transition: background-color 0.3s;
+      padding: 0.5rem;
+      word-wrap: break-word;
+      z-index: 1; /* Asegura que la caja quede por encima de las líneas */
+    }
+    .drop-zone:hover {
+      background-color: #eff6fc;
+    }
+
+    /* Opciones */
+    .options {
+      background-color: #f4f4f4;
+      padding: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+    }
+
+    .draggable {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 0.6rem 1rem;
+      cursor: grab;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+      font-size: 0.9rem;
+      max-width: 160px; /* Aumentado para textos más largos */
+      word-wrap: break-word;
+    }
+    .draggable:hover {
+      transform: scale(1.05);
+    }
+    .draggable:active {
+      cursor: grabbing;
+    }
+
+    /* Botón de verificación */
+    .feedback-container {
+      margin: 0.8rem 0;
+      text-align: center;
+    }
+
+    .btn-check {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      background-color: #4f81c7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-check:hover {
+      background-color: #3f70b0;
+    }
+
+    /* Responsividad adicional */
+    @media (max-width: 768px) {
+      .drop-zone {
+        width: 140px;
+        height: 50px;
+        font-size: 0.8rem;
+      }
+      .draggable {
+        max-width: 130px;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .level {
+        gap: 0.5rem;
+      }
+      .branch {
+        min-width: 160px;
+      }
+      #resetButton {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Corrientes Epistemológicas
+    <!-- Botón de Reinicio -->
+    <button id="resetButton" title="Reiniciar">&#8635;</button>
+  </header>
+
+  <div class="container">
+    <!-- SVG que contendrá nuestras líneas -->
+    <svg class="lines" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <!-- Nivel 1 -->
+    <div class="level level-1">
+      <!-- Zona de Caída PRINCIPAL (vacía, con el data-correct) -->
+      <div class="drop-zone" data-correct="Corrientes Epistemológicas"></div>
+    </div>
+
+    <!-- Nivel 2 -->
+    <div class="level level-2">
+      <!-- Rama 1: 1. Escepticismo -->
+      <div class="branch">
+        <!-- Zona de Caída vacía; solo data-correct -->
+        <div class="drop-zone" data-correct="1. Escepticismo"></div>
+        <div class="level level-3">
+          <!-- Subzonas vacías, con data-group -->
+          <div class="drop-zone" data-group="escepticismo"></div>
+          <div class="drop-zone" data-group="escepticismo"></div>
+        </div>
+      </div>
+
+      <!-- Rama 2: 2. Relativismo -->
+      <div class="branch">
+        <div class="drop-zone" data-correct="2. Relativismo"></div>
+        <div class="level level-3">
+          <div class="drop-zone" data-group="relativismo"></div>
+          <div class="drop-zone" data-group="relativismo"></div>
+        </div>
+      </div>
+
+      <!-- Rama 3: 3. Universalismo -->
+      <div class="branch">
+        <div class="drop-zone" data-correct="3. Universalismo"></div>
+        <div class="level level-3">
+          <div class="drop-zone" data-group="universalismo"></div>
+          <div class="drop-zone" data-group="universalismo"></div>
+        </div>
+      </div>
+
+      <!-- Rama 4: 4. Pragmatismo -->
+      <div class="branch">
+        <div class="drop-zone" data-correct="4. Pragmatismo"></div>
+        <div class="level level-3">
+          <div class="drop-zone" data-group="pragmatismo"></div>
+          <div class="drop-zone" data-group="pragmatismo"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones -->
+    <div class="options">
+      <!-- Nodo Principal -->
+      <div class="draggable" draggable="true" data-value="Corrientes Epistemológicas">
+        Corrientes Epistemológicas
+      </div>
+
+      <!-- Escepticismo -->
+      <div class="draggable" draggable="true" data-value="1. Escepticismo">1. Escepticismo</div>
+      <div class="draggable" draggable="true" data-value="Imposibilidad de conocimiento fiable." data-group="escepticismo">
+        Imposibilidad de conocimiento fiable.
+      </div>
+      <div class="draggable" draggable="true" data-value="Gorgias y Pirrón de Elis." data-group="escepticismo">
+        Gorgias y Pirrón de Elis.
+      </div>
+
+      <!-- Relativismo -->
+      <div class="draggable" draggable="true" data-value="2. Relativismo">2. Relativismo</div>
+      <div class="draggable" draggable="true" data-value="La verdad es subjetiva y relativa." data-group="relativismo">
+        La verdad es subjetiva y relativa.
+      </div>
+      <div class="draggable" draggable="true" data-value="Protágoras." data-group="relativismo">
+        Protágoras.
+      </div>
+
+      <!-- Universalismo -->
+      <div class="draggable" draggable="true" data-value="3. Universalismo">3. Universalismo</div>
+      <div class="draggable" draggable="true" data-value="Dogmatismo. Existen verdades universales." data-group="universalismo">
+        Dogmatismo. Existen verdades universales.
+      </div>
+      <div class="draggable" draggable="true" data-value="Platón y las Ideas Universales." data-group="universalismo">
+        Platón y las Ideas Universales.
+      </div>
+
+      <!-- Pragmatismo -->
+      <div class="draggable" draggable="true" data-value="4. Pragmatismo">4. Pragmatismo</div>
+      <div class="draggable" draggable="true" data-value="Validez basada en su utilidad." data-group="pragmatismo">
+        Validez basada en su utilidad.
+      </div>
+      <div class="draggable" draggable="true" data-value="Cosmología geocéntrica antes de Copérnico." data-group="pragmatismo">
+        Cosmología geocéntrica antes de Copérnico.
+      </div>
+    </div>
+
+    <!-- Botón de verificación -->
+    <div class="feedback-container">
+      <div id="feedback"></div>
+      <button class="btn-check" id="checkButton">Comprobar respuestas</button>
+    </div>
+  </div>
+
+  <script>
+    /* -- Función para mezclar las fichas -- */
+    function shuffleOptions() {
+      const optionsContainer = document.querySelector('.options');
+      const draggables = Array.from(optionsContainer.children);
+      for (let i = draggables.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [draggables[i], draggables[j]] = [draggables[j], draggables[i]];
+      }
+      draggables.forEach(draggable => optionsContainer.appendChild(draggable));
+    }
+
+    /* -- Lógica arrastrar/soltar -- */
+    const draggables = document.querySelectorAll('.draggable');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const feedback = document.getElementById('feedback');
+    const checkButton = document.getElementById('checkButton');
+    const resetButton = document.getElementById('resetButton');
+
+    draggables.forEach(draggable => {
+      draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
+      draggable.addEventListener('dragend', () => {
+        draggable.classList.remove('dragging');
+        // Redibujar líneas tras soltar
+        drawConnections();
+      });
+    });
+
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const dragged = document.querySelector('.dragging');
+        if (dragged) {
+          const draggedValue = dragged.dataset.value;
+
+          // Asignar la ficha a la zona
+          zone.textContent = dragged.textContent;
+          zone.dataset.draggedValue = draggedValue;
+          zone.dataset.draggedGroup = dragged.dataset.group || '';
+
+          drawConnections(); // Redibujar al colocar una tarjeta
+        }
+      });
+    });
+
+    /* -- Función para verificar las respuestas -- */
+    function checkAnswers() {
+      let errors = 0;
+      const usedValues = {};
+
+      // Primera pasada: contar uso de valores para detectar duplicaciones
+      dropZones.forEach(zone => {
+        const draggedValue = zone.dataset.draggedValue || '';
+        if (draggedValue) {
+          if (usedValues[draggedValue]) {
+            usedValues[draggedValue]++;
+          } else {
+            usedValues[draggedValue] = 1;
+          }
+        }
+      });
+
+      // Segunda pasada: verificar cada zona
+      dropZones.forEach(zone => {
+        const correctValue = zone.dataset.correct;
+        const draggedValue = zone.dataset.draggedValue || '';
+        const group = zone.dataset.group;
+        const draggedGroup = zone.dataset.draggedGroup || '';
+
+        if (!draggedValue) {
+          // Zona vacía
+          errors++;
+        } else {
+          // Verificar duplicación (solo si el valor se usa más de una vez)
+          if (usedValues[draggedValue] > 1) {
+            errors++;
+            // Reducir el contador para evitar contar múltiples veces el mismo error
+            usedValues[draggedValue] = 1;
+          }
+
+          // Verificar si la ficha está correctamente colocada
+          if (correctValue && draggedValue !== correctValue) {
+            errors++;
+          }
+          if (group && group !== draggedGroup) {
+            errors++;
+          }
+        }
+      });
+
+      feedback.textContent = `Número de errores: ${errors}`;
+    }
+
+    checkButton.addEventListener('click', checkAnswers);
+
+    /* -- Lógica para dibujar líneas con curvas (paths) -- */
+    function drawConnections() {
+      const svg = document.querySelector('.lines');
+      const container = document.querySelector('.container');
+      // Limpiamos las líneas anteriores
+      svg.innerHTML = '';
+
+      // Obtenemos el rectángulo del contenedor para usar coordenadas relativas
+      const containerRect = container.getBoundingClientRect();
+
+      // 1. Conectar desde el nodo en .level-1 a cada padre de .level-2
+      const level1 = document.querySelector('.level-1');
+      if (level1) {
+        const parentZone = level1.querySelector('.drop-zone');
+        if (parentZone) {
+          const level2 = document.querySelector('.level-2');
+          if (level2) {
+            // Todos los nodos padre en level-2 (los .drop-zone directos de cada .branch)
+            const branches = level2.querySelectorAll('.branch > .drop-zone');
+            connectParentToChildren(parentZone, branches, svg, containerRect);
+          }
+        }
+      }
+
+      // 2. Conectar cada nodo padre en .level-2 con sus hijos en .level-3
+      const branches = document.querySelectorAll('.branch');
+      branches.forEach(branch => {
+        const parentZone = branch.querySelector(':scope > .drop-zone'); // nodo padre de esa rama
+        const childrenZones = branch.querySelectorAll('.level-3 .drop-zone');
+        if (parentZone && childrenZones.length > 0) {
+          connectParentToChildren(parentZone, childrenZones, svg, containerRect);
+        }
+      });
+    }
+
+    // Función para conectar un nodo "padre" a varios "hijos" con líneas curvas
+    function connectParentToChildren(parentZone, childZones, svg, containerRect) {
+      // Coordenadas del padre (centro inferior)
+      const pRect = parentZone.getBoundingClientRect();
+      const pX = pRect.x - containerRect.x + pRect.width / 2;
+      const pY = pRect.y - containerRect.y + pRect.height;
+
+      childZones.forEach(child => {
+        const cRect = child.getBoundingClientRect();
+        // Coordenadas del hijo (centro superior)
+        const cX = cRect.x - containerRect.x + cRect.width / 2;
+        const cY = cRect.y - containerRect.y;
+
+        // Creamos la curva con un path en SVG (Bezier cúbica)
+        createCurvePath(svg, pX, pY, cX, cY);
+      });
+    }
+
+    // Crea un camino en curva (cúbica) entre dos puntos
+    function createCurvePath(svg, startX, startY, endX, endY) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+      // Definimos puntos de control para lograr una curva suave
+      // En este caso, subimos la curva a la mitad vertical entre startY y endY
+      const c1X = startX;
+      const c1Y = (startY + endY) / 2;
+      const c2X = endX;
+      const c2Y = (startY + endY) / 2;
+
+      const d = `M ${startX},${startY} C ${c1X},${c1Y} ${c2X},${c2Y} ${endX},${endY}`;
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', '#aaa');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('fill', 'none');
+
+      svg.appendChild(path);
+    }
+
+    // Función para reiniciar el juego
+    function resetGame() {
+      // Limpiar todas las zonas de soltar
+      dropZones.forEach(zone => {
+        zone.textContent = '';
+        delete zone.dataset.draggedValue;
+        delete zone.dataset.draggedGroup;
+      });
+
+      // Limpiar feedback
+      feedback.textContent = '';
+
+      // Mezclar las opciones nuevamente
+      shuffleOptions();
+
+      // Redibujar conexiones (no habrá conexiones al inicio)
+      drawConnections();
+    }
+
+    // Asignar la función de reinicio al botón
+    resetButton.addEventListener('click', resetGame);
+
+    /* -- Redibujar las líneas al cargar y al cambiar el tamaño de la ventana -- */
+    window.addEventListener('load', () => {
+      shuffleOptions();      // Mezclar fichas al cargar
+      drawConnections();    // Dibujar líneas tras mezclar
+    });
+    window.addEventListener('resize', drawConnections);
+  </script>
+</body>
+</html>
