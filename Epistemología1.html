@@ -309,37 +309,53 @@
         e.preventDefault();
         const dragged = document.querySelector('.dragging');
         if (dragged) {
+          const draggedValue = dragged.dataset.value;
+          
+          // Asignar la ficha a la zona
           zone.textContent = dragged.textContent;
-          zone.dataset.draggedValue = dragged.dataset.value;
+          zone.dataset.draggedValue = draggedValue;
           zone.dataset.draggedGroup = dragged.dataset.group || '';
+          
+          drawConnections(); // Redibujar al colocar una tarjeta
         }
-        drawConnections(); // Redibujar al colocar una tarjeta
       });
     });
 
     function checkAnswers() {
       let errors = 0;
+      const usedValues = {};
+
       dropZones.forEach(zone => {
         const correctValue = zone.dataset.correct;
         const draggedValue = zone.dataset.draggedValue || '';
         const group = zone.dataset.group;
         const draggedGroup = zone.dataset.draggedGroup || '';
 
-        // Verificar si el valor arrastrado coincide con el valor correcto
-        if (correctValue && draggedValue !== correctValue) {
-          errors++;
-        }
-        // Verificar si el grupo coincide (si aplica)
-        if (group && group !== draggedGroup) {
-          errors++;
+        if (!draggedValue) {
+          errors++; // Zona vacía
+        } else {
+          if (usedValues[draggedValue]) {
+            errors++; // Uso duplicado de la ficha
+          } else {
+            usedValues[draggedValue] = true;
+
+            // Verificar si la ficha está correctamente colocada
+            if (correctValue && draggedValue !== correctValue) {
+              errors++;
+            }
+            if (group && group !== draggedGroup) {
+              errors++;
+            }
+          }
         }
       });
+
       feedback.textContent = `Número de errores: ${errors}`;
     }
 
     checkButton.addEventListener('click', checkAnswers);
 
-    /* -- LÓGICA PARA DIBUJAR LÍNEAS CON CURVAS (paths) -- */
+    /* -- Lógica para dibujar líneas con curvas (paths) -- */
     function drawConnections() {
       const svg = document.querySelector('.lines');
       const container = document.querySelector('.container');
