@@ -131,6 +131,7 @@
       padding: 0.5rem;
       word-wrap: break-word;
       z-index: 1; /* Asegura que la caja quede por encima de las líneas */
+      cursor: pointer; /* Indica que es interactivo */
     }
     .drop-zone:hover {
       background-color: #eff6fc;
@@ -152,10 +153,10 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       padding: 0.6rem 1rem;
-      cursor: grab;
+      cursor: pointer; /* Cambiado de grab a pointer */
       text-align: center;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s;
       font-size: 0.9rem;
       max-width: 160px; /* Aumentado para textos más largos */
       word-wrap: break-word;
@@ -163,8 +164,10 @@
     .draggable:hover {
       transform: scale(1.05);
     }
-    .draggable:active {
-      cursor: grabbing;
+    .draggable.selected {
+      background-color: #d0ebff; /* Color de fondo para la ficha seleccionada */
+      border-color: #4f81c7; /* Cambia el color del borde */
+      box-shadow: 0 0 10px rgba(79, 129, 199, 0.6); /* Sombra para resaltar */
     }
 
     /* Botón de verificación */
@@ -273,43 +276,43 @@
     <!-- Opciones -->
     <div class="options">
       <!-- Nodo Principal -->
-      <div class="draggable" draggable="true" data-value="Corrientes Epistemológicas">
+      <div class="draggable" data-value="Corrientes Epistemológicas">
         Corrientes Epistemológicas
       </div>
 
       <!-- Escepticismo -->
-      <div class="draggable" draggable="true" data-value="1. Escepticismo">1. Escepticismo</div>
-      <div class="draggable" draggable="true" data-value="Imposibilidad de conocimiento fiable." data-group="escepticismo">
+      <div class="draggable" data-value="1. Escepticismo">1. Escepticismo</div>
+      <div class="draggable" data-value="Imposibilidad de conocimiento fiable." data-group="escepticismo">
         Imposibilidad de conocimiento fiable.
       </div>
-      <div class="draggable" draggable="true" data-value="Gorgias y Pirrón de Elis." data-group="escepticismo">
+      <div class="draggable" data-value="Gorgias y Pirrón de Elis." data-group="escepticismo">
         Gorgias y Pirrón de Elis.
       </div>
 
       <!-- Relativismo -->
-      <div class="draggable" draggable="true" data-value="2. Relativismo">2. Relativismo</div>
-      <div class="draggable" draggable="true" data-value="La verdad es subjetiva y relativa." data-group="relativismo">
+      <div class="draggable" data-value="2. Relativismo">2. Relativismo</div>
+      <div class="draggable" data-value="La verdad es subjetiva y relativa." data-group="relativismo">
         La verdad es subjetiva y relativa.
       </div>
-      <div class="draggable" draggable="true" data-value="Protágoras." data-group="relativismo">
+      <div class="draggable" data-value="Protágoras." data-group="relativismo">
         Protágoras.
       </div>
 
       <!-- Universalismo -->
-      <div class="draggable" draggable="true" data-value="3. Universalismo">3. Universalismo</div>
-      <div class="draggable" draggable="true" data-value="Dogmatismo. Existen verdades universales." data-group="universalismo">
+      <div class="draggable" data-value="3. Universalismo">3. Universalismo</div>
+      <div class="draggable" data-value="Dogmatismo. Existen verdades universales." data-group="universalismo">
         Dogmatismo. Existen verdades universales.
       </div>
-      <div class="draggable" draggable="true" data-value="Platón y las Ideas Universales." data-group="universalismo">
+      <div class="draggable" data-value="Platón y las Ideas Universales." data-group="universalismo">
         Platón y las Ideas Universales.
       </div>
 
       <!-- Pragmatismo -->
-      <div class="draggable" draggable="true" data-value="4. Pragmatismo">4. Pragmatismo</div>
-      <div class="draggable" draggable="true" data-value="Validez basada en su utilidad." data-group="pragmatismo">
+      <div class="draggable" data-value="4. Pragmatismo">4. Pragmatismo</div>
+      <div class="draggable" data-value="Validez basada en su utilidad." data-group="pragmatismo">
         Validez basada en su utilidad.
       </div>
-      <div class="draggable" draggable="true" data-value="Cosmología geocéntrica antes de Copérnico." data-group="pragmatismo">
+      <div class="draggable" data-value="Cosmología geocéntrica antes de Copérnico." data-group="pragmatismo">
         Cosmología geocéntrica antes de Copérnico.
       </div>
     </div>
@@ -333,41 +336,54 @@
       draggables.forEach(draggable => optionsContainer.appendChild(draggable));
     }
 
-    /* -- Lógica arrastrar/soltar -- */
-    const draggables = document.querySelectorAll('.draggable');
+    /* -- Variables para la selección por clic -- */
+    let selectedFicha = null;
+
+    const fichas = document.querySelectorAll('.draggable');
     const dropZones = document.querySelectorAll('.drop-zone');
     const feedback = document.getElementById('feedback');
     const checkButton = document.getElementById('checkButton');
     const resetButton = document.getElementById('resetButton');
 
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging');
-        // Redibujar líneas tras soltar
-        drawConnections();
-      });
-    });
-
-    dropZones.forEach(zone => {
-      zone.addEventListener('dragover', e => e.preventDefault());
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        const dragged = document.querySelector('.dragging');
-        if (dragged) {
-          const draggedValue = dragged.dataset.value;
-
-          // Asignar la ficha a la zona
-          zone.textContent = dragged.textContent;
-          zone.dataset.draggedValue = draggedValue;
-          zone.dataset.draggedGroup = dragged.dataset.group || '';
-
-          drawConnections(); // Redibujar al colocar una tarjeta
+    /* -- Event Listeners para las fichas (Opciones) -- */
+    fichas.forEach(ficha => {
+      ficha.addEventListener('click', () => {
+        // Si la ficha ya está seleccionada, deseleccionarla
+        if (ficha === selectedFicha) {
+          ficha.classList.remove('selected');
+          selectedFicha = null;
+        } else {
+          // Deseleccionar cualquier ficha previamente seleccionada
+          if (selectedFicha) {
+            selectedFicha.classList.remove('selected');
+          }
+          // Seleccionar la ficha actual
+          ficha.classList.add('selected');
+          selectedFicha = ficha;
         }
       });
     });
 
-    /* -- Función para verificar las respuestas -- */
+    /* -- Event Listeners para las zonas de soltar -- */
+    dropZones.forEach(zone => {
+      zone.addEventListener('click', () => {
+        if (selectedFicha) {
+          // Asignar la ficha a la zona
+          zone.textContent = selectedFicha.textContent;
+          zone.dataset.draggedValue = selectedFicha.dataset.value;
+          zone.dataset.draggedGroup = selectedFicha.dataset.group || '';
+
+          // Redibujar las conexiones después de asignar
+          drawConnections();
+
+          // Opcional: Deseleccionar la ficha después de asignar
+          selectedFicha.classList.remove('selected');
+          selectedFicha = null;
+        }
+      });
+    });
+
+    /* -- Función para comprobar las respuestas -- */
     function checkAnswers() {
       let errors = 0;
       const usedValues = {};
@@ -428,11 +444,11 @@
       const containerRect = container.getBoundingClientRect();
 
       // 1. Conectar desde el nodo en .level-1 a cada padre de .level-2
-      const level1 = document.querySelector('.level-1');
+      const level1 = document.querySelector('.level.level-1');
       if (level1) {
         const parentZone = level1.querySelector('.drop-zone');
         if (parentZone) {
-          const level2 = document.querySelector('.level-2');
+          const level2 = document.querySelector('.level.level-2');
           if (level2) {
             // Todos los nodos padre en level-2 (los .drop-zone directos de cada .branch)
             const branches = level2.querySelectorAll('.branch > .drop-zone');
@@ -501,6 +517,12 @@
 
       // Limpiar feedback
       feedback.textContent = '';
+
+      // Deseleccionar cualquier ficha seleccionada
+      if (selectedFicha) {
+        selectedFicha.classList.remove('selected');
+        selectedFicha = null;
+      }
 
       // Mezclar las opciones nuevamente
       shuffleOptions();

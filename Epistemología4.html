@@ -5,13 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Escepticismo y Duda Cartesiana - Versión Código Actualizado</title>
   <style>
-    /* ==================== [CSS ORIGINAL adaptado mínimamente] ==================== */
+    /* ==================== [CSS MODIFICADO] ==================== */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f8f9fa;
       color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
 
     header {
@@ -20,6 +24,8 @@
       padding: 1rem;
       text-align: center;
       position: relative;
+      width: 100%;
+      font-size: 1.3rem;
     }
 
     /* Botón de Reinicio */
@@ -49,61 +55,127 @@
       align-items: center;
       padding: 2rem;
       gap: 2rem;
-      position: relative; /* Para el SVG absolutely */
+      position: relative; /* Para el SVG absolutamente */
       min-height: 80vh;
+      max-width: 1400px; /* Aumentado para acomodar más ramas */
+      width: 100%;
+    }
+
+    /* SVG para las líneas */
+    .lines {
+      position: absolute;    /* Para que se superponga al contenido */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* Evita interferir con clics/arrastrar */
+      z-index: -1;           /* Colocar por debajo de los elementos */
+    }
+
+    /* Niveles del mapa */
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .level-1 {
+      margin-bottom: 1.5rem;
+    }
+
+    .level-2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .branch {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+      min-width: 200px; /* Aumentado para mayor espacio */
+    }
+
+    .level-3 {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     .drop-zone {
+      width: 180px; /* Aumentado para acomodar textos más largos */
+      height: 60px;
       border: 2px dashed #4f81c7;
       border-radius: 8px;
       padding: 1rem;
       text-align: center;
       min-width: 150px;
       min-height: 50px;
-      cursor: pointer;
+      cursor: pointer; /* Indica que es interactivo */
       background-color: #f8f9fa;
       transition: background-color 0.3s;
+      word-wrap: break-word;
+      position: relative;
     }
     .drop-zone:hover {
       background-color: #e3f2fd;
     }
 
+    /* Opciones */
     .options {
+      background-color: #f4f4f4;
+      padding: 0.8rem;
       display: flex;
-      gap: 1rem;
       flex-wrap: wrap;
       justify-content: center;
-    }
-    .draggable {
-      background-color: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      cursor: grab;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .draggable:active {
-      transform: scale(1.1);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      gap: 1rem;
+      width: 100%;
     }
 
-    .lines {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+    .draggable {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      cursor: pointer; /* Cambiado de grab a pointer */
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+      font-size: 0.9rem;
+      max-width: 160px; /* Aumentado para textos más largos */
+      word-wrap: break-word;
+    }
+    .draggable:hover {
+      transform: scale(1.05);
+    }
+    .draggable.selected {
+      background-color: #d0ebff; /* Color de fondo para la ficha seleccionada */
+      border-color: #4f81c7; /* Cambia el color del borde */
+      box-shadow: 0 0 10px rgba(79, 129, 199, 0.6); /* Sombra para resaltar */
+    }
+
+    /* Botón de verificación */
+    .feedback-container {
+      margin: 0.8rem 0;
+      text-align: center;
     }
 
     .btn-check {
       background-color: #4f81c7;
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.3s;
+    }
+    .btn-check:hover {
+      background-color: #3f70b0;
     }
 
     #feedback {
@@ -114,34 +186,30 @@
 
     /* Responsividad */
     @media (max-width: 768px) {
-      .options {
-        flex-direction: column;
-        align-items: center;
-      }
       .drop-zone {
-        min-width: 120px;
+        width: 140px;
+        height: 50px;
+        font-size: 0.8rem;
       }
-    }
-
-    /* Layout niveles */
-    .level {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 2rem;
-      width: 100%;
-    }
-    .branch {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-    .level-3 {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
+      .draggable {
+        max-width: 130px;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .level {
+        gap: 0.5rem;
+      }
+      .branch {
+        min-width: 160px;
+      }
+      #resetButton {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+      }
+      .level-3 {
+        gap: 1rem;
+      }
     }
   </style>
 </head>
@@ -167,6 +235,7 @@
     <div class="level level-2">
       <!-- Rama Dudas -->
       <div class="branch">
+        <!-- Zona de Caída vacía; solo data-correct -->
         <div class="drop-zone" data-correct="Dudas" tabindex="0"></div>
         <div class="level level-3">
           <!-- Sub-rama A -->
@@ -204,50 +273,47 @@
       </div>
     </div>
 
-    <!-- OPCIONES (Fichas Arrastrables) -->
-    <div class="options" aria-label="Opciones para arrastrar">
+    <!-- OPCIONES (Fichas Clicables) -->
+    <div class="options" aria-label="Opciones para seleccionar">
       <!-- Nodo Principal -->
-      <div class="draggable"
-           draggable="true"
-           data-value="Escepticismo y Duda Cartesiana"
-           tabindex="0">
+      <div class="draggable" data-value="Escepticismo y Duda Cartesiana" tabindex="0">
         Escepticismo y Duda Cartesiana
       </div>
 
       <!-- Rama Dudas -->
-      <div class="draggable" draggable="true" data-value="Dudas" tabindex="0">
+      <div class="draggable" data-value="Dudas" tabindex="0">
         Dudas
       </div>
 
       <!-- Duda A -->
-      <div class="draggable" draggable="true" data-value="A)Duda de los sentidos" tabindex="0">
+      <div class="draggable" data-value="A)Duda de los sentidos" data-group="A-sentidos" tabindex="0">
         A)Duda de los sentidos
       </div>
-      <div class="draggable" draggable="true" data-value="En_ocasiones_enganan" data-group="A-sentidos" tabindex="0">
+      <div class="draggable" data-value="En ocasiones engañan" data-group="A-sentidos" tabindex="0">
         En ocasiones engañan
       </div>
 
       <!-- Duda B -->
-      <div class="draggable" draggable="true" data-value="B)Duda del sueño" tabindex="0">
+      <div class="draggable" data-value="B)Duda del sueño" data-group="B-sueno" tabindex="0">
         B)Duda del sueño
       </div>
-      <div class="draggable" draggable="true" data-value="Hay_ocasiones_que_no_sabes_si_lo_son" data-group="B-sueno" tabindex="0">
+      <div class="draggable" data-value="Hay ocasiones en que no sabes si lo son" data-group="B-sueno" tabindex="0">
         Hay ocasiones en que no sabes si lo son
       </div>
 
       <!-- Duda C -->
-      <div class="draggable" draggable="true" data-value="C)Hipótesis del genio maligno" tabindex="0">
+      <div class="draggable" data-value="C)Hipótesis del genio maligno" data-group="C-genio" tabindex="0">
         C)Hipótesis del genio maligno
       </div>
-      <div class="draggable" draggable="true" data-value="Un_ser_superior_puede_controlarme" data-group="C-genio" tabindex="0">
+      <div class="draggable" data-value="Un ser superior puede controlarme e impedir que lo note" data-group="C-genio" tabindex="0">
         Un ser superior puede controlarme e impedir que lo note
       </div>
 
       <!-- Solución -->
-      <div class="draggable" draggable="true" data-value="Solución" tabindex="0">
+      <div class="draggable" data-value="Solución" data-group="solucion" tabindex="0">
         Solución
       </div>
-      <div class="draggable" draggable="true" data-value="Cogito_ergo_sum" data-group="solucion" tabindex="0">
+      <div class="draggable" data-value="Cogito ergo sum" data-group="solucion" tabindex="0">
         Cogito ergo sum
       </div>
     </div>
@@ -259,103 +325,9 @@
     </div>
   </div>
 
-  <!-- ==================== [JS ORIGINAL] ==================== -->
+  <!-- ==================== [JS MODIFICADO] ==================== -->
   <script>
-    // Selecciones principales
-    const draggables = document.querySelectorAll('.draggable');
-    const dropZones = document.querySelectorAll('.drop-zone');
-    const checkButton = document.getElementById('checkButton');
-    const resetButton = document.getElementById('resetButton');
-    const feedback = document.getElementById('feedback');
-    const svg = document.querySelector('.lines');
-    const container = document.querySelector('.container');
-
-    // ========== EVENTOS DE ARRASTRAR Y SOLTAR (ORIGINAL) ==========
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => {
-        draggable.classList.add('dragging');
-      });
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging');
-        drawConnections(); // Redibujar líneas al soltar
-      });
-    });
-
-    dropZones.forEach(zone => {
-      zone.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
-
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        const dragging = document.querySelector('.dragging');
-        if (dragging) {
-          zone.textContent = dragging.textContent;
-          zone.dataset.draggedValue = dragging.dataset.value;
-          zone.dataset.draggedGroup = dragging.dataset.group || '';
-          drawConnections();
-        }
-      });
-    });
-
-    // ========== FUNCIÓN checkAnswers() ORIGINAL ==========
-    function checkAnswers() {
-      let errors = 0;
-      const usedValues = {};
-
-      dropZones.forEach(zone => {
-        const correctValue = zone.dataset.correct;
-        const draggedValue = zone.dataset.draggedValue || '';
-        const group = zone.dataset.group;
-        const draggedGroup = zone.dataset.draggedGroup || '';
-
-        if (!draggedValue) {
-          // Zona vacía
-          errors++;
-        } else {
-          // Verificar duplicación
-          if (usedValues[draggedValue]) {
-            errors++; // Uso duplicado de la misma ficha
-          } else {
-            usedValues[draggedValue] = true;
-
-            // Verificar 'correctValue'
-            if (correctValue && draggedValue !== correctValue) {
-              errors++;
-            }
-            // Verificar 'group'
-            if (group && group !== draggedGroup) {
-              errors++;
-            }
-          }
-        }
-      });
-
-      feedback.textContent = `Número de errores: ${errors}`;
-    }
-    checkButton.addEventListener('click', checkAnswers);
-
-    // ========== FUNCIÓN DE REINICIO (ORIGINAL) ==========
-    function resetGame() {
-      // Limpiar zonas de caída
-      dropZones.forEach(zone => {
-        zone.textContent = '';
-        delete zone.dataset.draggedValue;
-        delete zone.dataset.draggedGroup;
-      });
-
-      // Limpiar feedback
-      feedback.textContent = '';
-
-      // Mezclar fichas
-      shuffleOptions();
-
-      // Eliminar conexiones
-      drawConnections();
-    }
-    resetButton.addEventListener('click', resetGame);
-
-    // ========== FUNCIÓN PARA MEZCLAR FICHAS (ORIGINAL) ==========
+    /* -- Función para mezclar las fichas -- */
     function shuffleOptions() {
       const optionsContainer = document.querySelector('.options');
       const draggablesArr = Array.from(optionsContainer.children);
@@ -366,53 +338,213 @@
       draggablesArr.forEach(dr => optionsContainer.appendChild(dr));
     }
 
-    // ========== DIBUJO DE LÍNEAS SVG (ORIGINAL) ==========
+    /* -- Variables para la selección por clic -- */
+    let selectedFicha = null;
+
+    const fichas = document.querySelectorAll('.draggable');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const feedback = document.getElementById('feedback');
+    const checkButton = document.getElementById('checkButton');
+    const resetButton = document.getElementById('resetButton');
+
+    /* -- Event Listeners para las fichas (Opciones) -- */
+    fichas.forEach(ficha => {
+      ficha.addEventListener('click', () => {
+        // Si la ficha ya está seleccionada, deseleccionarla
+        if (ficha === selectedFicha) {
+          ficha.classList.remove('selected');
+          selectedFicha = null;
+        } else {
+          // Deseleccionar cualquier ficha previamente seleccionada
+          if (selectedFicha) {
+            selectedFicha.classList.remove('selected');
+          }
+          // Seleccionar la ficha actual
+          ficha.classList.add('selected');
+          selectedFicha = ficha;
+        }
+      });
+    });
+
+    /* -- Event Listeners para las zonas de soltar -- */
+    dropZones.forEach(zone => {
+      zone.addEventListener('click', () => {
+        if (selectedFicha) {
+          // Asignar la ficha a la zona
+          zone.textContent = selectedFicha.textContent;
+          zone.dataset.draggedValue = selectedFicha.dataset.value;
+          zone.dataset.draggedGroup = selectedFicha.dataset.group || '';
+
+          // Redibujar las conexiones después de asignar
+          drawConnections();
+
+          // Opcional: Deseleccionar la ficha después de asignar
+          selectedFicha.classList.remove('selected');
+          selectedFicha = null;
+        }
+      });
+    });
+
+    /* -- Función para comprobar las respuestas -- */
+    function checkAnswers() {
+      let errors = 0;
+      const usedValues = {};
+
+      // Contar el uso de cada valor para detectar duplicaciones
+      dropZones.forEach(zone => {
+        const draggedValue = zone.dataset.draggedValue || '';
+        if (draggedValue) {
+          if (usedValues[draggedValue]) {
+            usedValues[draggedValue]++;
+          } else {
+            usedValues[draggedValue] = 1;
+          }
+        }
+      });
+
+      // Verificar cada zona y contar errores sin duplicar
+      dropZones.forEach(zone => {
+        const correctValue = zone.dataset.correct;
+        const draggedValue = zone.dataset.draggedValue || '';
+        const group = zone.dataset.group;
+        const draggedGroup = zone.dataset.draggedGroup || '';
+        let hasError = false; // Bandera para contar un solo error por zona
+
+        if (!draggedValue) {
+          // Zona vacía
+          hasError = true;
+        } else {
+          // Verificar duplicación
+          if (usedValues[draggedValue] > 1) {
+            hasError = true;
+            // Reducir el contador para evitar contar múltiples veces el mismo error
+            usedValues[draggedValue]--;
+          }
+
+          // Verificar si la ficha está correctamente colocada
+          if (correctValue && draggedValue !== correctValue) {
+            hasError = true;
+          }
+
+          // Verificar el grupo
+          if (group && group !== draggedGroup) {
+            hasError = true;
+          }
+        }
+
+        if (hasError) {
+          errors++;
+        }
+      });
+
+      feedback.textContent = `Número de errores: ${errors}`;
+    }
+
+    checkButton.addEventListener('click', checkAnswers);
+
+    /* -- Lógica para dibujar líneas con curvas (paths) -- */
     function drawConnections() {
+      const svg = document.querySelector('.lines');
+      const container = document.querySelector('.container');
+      // Limpiamos las líneas anteriores
       svg.innerHTML = '';
+
+      // Obtenemos el rectángulo del contenedor para usar coordenadas relativas
       const containerRect = container.getBoundingClientRect();
 
-      // Conectar nivel 1 con ramas de nivel 2
-      const level1Zone = document.querySelector('.level-1 .drop-zone');
-      if (level1Zone) {
-        const level2Zones = document.querySelectorAll('.level-2 > .branch > .drop-zone');
-        connectNodes(level1Zone, level2Zones, svg, containerRect);
+      // 1. Conectar desde el nodo en .level-1 a cada padre de .level-2
+      const level1 = document.querySelector('.level.level-1');
+      if (level1) {
+        const parentZone = level1.querySelector('.drop-zone');
+        if (parentZone) {
+          const level2 = document.querySelector('.level.level-2');
+          if (level2) {
+            // Todos los nodos padre en level-2 (los .drop-zone directos de cada .branch)
+            const branches = level2.querySelectorAll('.branch > .drop-zone');
+            connectParentToChildren(parentZone, branches, svg, containerRect);
+          }
+        }
       }
 
-      // Conectar cada rama de nivel 2 con las subzonas de nivel 3
-      const branches = document.querySelectorAll('.level-2 .branch');
+      // 2. Conectar cada nodo padre en .level-2 con sus hijos en .level-3
+      const branches = document.querySelectorAll('.branch');
       branches.forEach(branch => {
-        const parentZone = branch.querySelector(':scope > .drop-zone');
-        const childZones = branch.querySelectorAll('.level-3 .drop-zone');
-        connectNodes(parentZone, childZones, svg, containerRect);
+        const parentZone = branch.querySelector(':scope > .drop-zone'); // nodo padre de esa rama
+        const childrenZones = branch.querySelectorAll('.level-3 .drop-zone');
+        if (parentZone && childrenZones.length > 0) {
+          connectParentToChildren(parentZone, childrenZones, svg, containerRect);
+        }
       });
     }
 
-    // Conecta un nodo padre con múltiples hijos
-    function connectNodes(parentZone, childZones, svgElem, containerRect) {
+    // Función para conectar un nodo "padre" a varios "hijos" con líneas curvas
+    function connectParentToChildren(parentZone, childZones, svg, containerRect) {
+      // Coordenadas del padre (centro inferior)
       const pRect = parentZone.getBoundingClientRect();
       const pX = pRect.left - containerRect.left + pRect.width / 2;
       const pY = pRect.top - containerRect.top + pRect.height;
 
       childZones.forEach(child => {
         const cRect = child.getBoundingClientRect();
+        // Coordenadas del hijo (centro superior)
         const cX = cRect.left - containerRect.left + cRect.width / 2;
         const cY = cRect.top - containerRect.top;
 
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const controlY = (pY + cY) / 2;
-        const d = `M ${pX},${pY} C ${pX},${controlY} ${cX},${controlY} ${cX},${cY}`;
-        path.setAttribute('d', d);
-        path.setAttribute('stroke', '#aaa');
-        path.setAttribute('stroke-width', '2');
-        path.setAttribute('fill', 'none');
-        svgElem.appendChild(path);
+        // Creamos la curva con un path en SVG (Bezier cúbica)
+        createCurvePath(svg, pX, pY, cX, cY);
       });
     }
 
-    // Inicialización
-    window.addEventListener('load', () => {
+    // Crea un camino en curva (cúbica) entre dos puntos
+    function createCurvePath(svg, startX, startY, endX, endY) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+      // Definimos puntos de control para lograr una curva suave
+      const c1X = startX;
+      const c1Y = (startY + endY) / 2;
+      const c2X = endX;
+      const c2Y = (startY + endY) / 2;
+
+      const d = `M ${startX},${startY} C ${c1X},${c1Y} ${c2X},${c2Y} ${endX},${endY}`;
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', '#aaa');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('fill', 'none');
+
+      svg.appendChild(path);
+    }
+
+    // Función para reiniciar el juego
+    function resetGame() {
+      // Limpiar todas las zonas de soltar
+      dropZones.forEach(zone => {
+        zone.textContent = '';
+        delete zone.dataset.draggedValue;
+        delete zone.dataset.draggedGroup;
+      });
+
+      // Limpiar feedback
+      feedback.textContent = '';
+
+      // Deseleccionar cualquier ficha seleccionada
+      if (selectedFicha) {
+        selectedFicha.classList.remove('selected');
+        selectedFicha = null;
+      }
+
+      // Mezclar las opciones nuevamente
       shuffleOptions();
+
+      // Redibujar conexiones (no habrá conexiones al inicio)
       drawConnections();
+    }
+
+    resetButton.addEventListener('click', resetGame);
+
+    /* -- Inicialización al cargar y al redimensionar la ventana -- */
+    window.addEventListener('load', () => {
+      shuffleOptions();      // Mezclar fichas al cargar
+      drawConnections();    // Dibujar líneas tras mezclar
     });
     window.addEventListener('resize', drawConnections);
   </script>
