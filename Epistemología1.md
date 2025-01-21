@@ -7,7 +7,7 @@
 
 Este programa interactivo está diseñado para ayudar al alumnado a repasar una parte fundamental del **tema de Filosofía del Conocimiento**. Utilizando un **mapa mental jerárquico**, el programa permite explorar y clasificar conceptos clave relacionados con las **formas de conocimiento**: **sensible**, **racional** e **intuitivo/holístico**.
 
-A través de una actividad dinámica de "arrastrar y soltar", los usuarios refuerzan su comprensión mediante la asociación de definiciones, características y ejemplos a las categorías correspondientes.
+A través de una actividad dinámica de hacer click en la ficha y en la posición de destino, los usuarios refuerzan su comprensión mediante la asociación de definiciones, características y ejemplos a las categorías correspondientes.
 
 ## Objetivo Didáctico
 
@@ -26,8 +26,8 @@ El programa facilita:
      - Conocimiento intuitivo/holístico.
    - **Nivel 3**: Subramas con zonas específicas para ejemplos y características.
 
-2. **Arrastrar y Soltar**:
-   - Las fichas con conceptos pueden arrastrarse desde una **sección de opciones** y soltarse en las zonas correspondientes del mapa.
+2. **Clic en la ficha y en su lugar de destino**:
+   - Las fichas con conceptos pueden seleccionarse con el ratón y se colocan haciendo clic de nuevo en las  zonas correspondientes del mapa.
 
 3. **Verificación de Respuestas**:
    - Al hacer clic en el botón "Comprobar respuestas", el programa revisa las respuestas y muestra cuántos errores se han cometido.
@@ -37,25 +37,6 @@ El programa facilita:
 
 5. **Líneas de Conexión**:
    - Las zonas de caída están visualmente conectadas mediante líneas curvas que refuerzan la estructura jerárquica del mapa.
-
-## Instrucciones de Uso
-
-1. **Inicio**:
-   - Al abrir el programa en un navegador, aparecerá un **mapa mental vacío** y una **sección de opciones** con fichas.
-
-2. **Arrastrar y Soltar**:
-   - Arrastra las fichas desde la sección de opciones y suéltalas en las zonas correspondientes del mapa mental.
-   - Las fichas representan definiciones, ejemplos y resultados relacionados con las formas de conocimiento.
-
-3. **Comprobación**:
-   - Cuando termines de colocar todas las fichas, haz clic en el botón **"Comprobar respuestas"**.
-   - El programa mostrará el número de errores cometidos en un mensaje de feedback.
-
-4. **Reinicio**:
-   - Si deseas empezar de nuevo, haz clic en el botón de reinicio (↺) ubicado en la esquina superior derecha. Esto mezclará las fichas y limpiará todas las zonas de caída.
-
-5. **Líneas de Conexión**:
-   - Observa las líneas que conectan las zonas de caída. Ayudan a entender la jerarquía y las relaciones entre los conceptos.
 
 ## Requisitos Técnicos
 

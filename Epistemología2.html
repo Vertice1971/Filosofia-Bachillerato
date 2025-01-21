@@ -131,6 +131,7 @@
       padding: 0.3rem;
       word-wrap: break-word;
       z-index: 1; /* Asegura que la caja quede por encima de las líneas */
+      cursor: pointer; /* Indica que es interactivo */
     }
     .drop-zone:hover {
       background-color: #eff6fc;
@@ -152,10 +153,10 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       padding: 0.4rem 0.8rem;
-      cursor: grab;
+      cursor: pointer; /* Cambiado de grab a pointer */
       text-align: center;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s;
       font-size: 0.9rem;
       max-width: 140px;
       word-wrap: break-word;
@@ -163,8 +164,10 @@
     .draggable:hover {
       transform: scale(1.05);
     }
-    .draggable:active {
-      cursor: grabbing;
+    .draggable.selected {
+      background-color: #d0ebff; /* Color de fondo para la ficha seleccionada */
+      border-color: #4f81c7; /* Cambia el color del borde */
+      box-shadow: 0 0 10px rgba(79, 129, 199, 0.6); /* Sombra para resaltar */
     }
 
     /* Botón de verificación */
@@ -253,21 +256,21 @@
     <!-- Opciones -->
     <div class="options">
       <!-- Nodo Principal -->
-      <div class="draggable" draggable="true" data-value="Racionalismo vs Empirismo">Racionalismo vs Empirismo</div>
+      <div class="draggable" data-value="Racionalismo vs Empirismo">Racionalismo vs Empirismo</div>
       
       <!-- Racionalismo -->
-      <div class="draggable" draggable="true" data-value="Racionalismo">1Racionalismo</div>
-      <div class="draggable" draggable="true" data-value="Principal fuente de conocimiento: Razón" data-group="racionalismo">Principal fuente de conocimiento: Razón</div>
-      <div class="draggable" draggable="true" data-value="Produce verdades universales" data-group="racionalismo">Produce verdades universales</div>
-      <div class="draggable" draggable="true" data-value="Ideas innatas: Surgen del interior racional" data-group="racionalismo">Ideas innatas: Surgen del interior racional</div>
-      <div class="draggable" draggable="true" data-value="Desconfía de los sentidos" data-group="racionalismo">Desconfía de los sentidos</div>
+      <div class="draggable" data-value="Racionalismo">1Racionalismo</div>
+      <div class="draggable" data-value="Principal fuente de conocimiento: Razón" data-group="racionalismo">Principal fuente de conocimiento: Razón</div>
+      <div class="draggable" data-value="Produce verdades universales" data-group="racionalismo">Produce verdades universales</div>
+      <div class="draggable" data-value="Ideas innatas: Surgen del interior racional" data-group="racionalismo">Ideas innatas: Surgen del interior racional</div>
+      <div class="draggable" data-value="Desconfía de los sentidos" data-group="racionalismo">Desconfía de los sentidos</div>
       
       <!-- Empirismo -->
-      <div class="draggable" draggable="true" data-value="Empirismo">2Empirismo</div>
-      <div class="draggable" draggable="true" data-value="Principal fuente de conocimiento: Sentidos" data-group="empirismo">Principal fuente de conocimiento: Sentidos</div>
-      <div class="draggable" draggable="true" data-value="“Tabula rasa”: La mente está vacía al nacer" data-group="empirismo">“Tabula rasa”: La mente está vacía al nacer</div>
-      <div class="draggable" draggable="true" data-value="Experiencia sensible" data-group="empirismo">Experiencia sensible</div>
-      <div class="draggable" draggable="true" data-value="Desconfía de la Razón" data-group="empirismo">Desconfía de la Razón</div>
+      <div class="draggable" data-value="Empirismo">2Empirismo</div>
+      <div class="draggable" data-value="Principal fuente de conocimiento: Sentidos" data-group="empirismo">Principal fuente de conocimiento: Sentidos</div>
+      <div class="draggable" data-value="“Tabula rasa”: La mente está vacía al nacer" data-group="empirismo">“Tabula rasa”: La mente está vacía al nacer</div>
+      <div class="draggable" data-value="Experiencia sensible" data-group="empirismo">Experiencia sensible</div>
+      <div class="draggable" data-value="Desconfía de la Razón" data-group="empirismo">Desconfía de la Razón</div>
     </div>
 
     <!-- Botón de verificación -->
@@ -289,40 +292,54 @@
       draggables.forEach(draggable => optionsContainer.appendChild(draggable));
     }
 
-    /* -- Lógica arrastrar/soltar -- */
-    const draggables = document.querySelectorAll('.draggable');
+    /* -- Variables para la selección por clic -- */
+    let selectedFicha = null;
+
+    const fichas = document.querySelectorAll('.draggable');
     const dropZones = document.querySelectorAll('.drop-zone');
     const feedback = document.getElementById('feedback');
     const checkButton = document.getElementById('checkButton');
     const resetButton = document.getElementById('resetButton');
 
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging');
-        // Redibujar líneas tras soltar
-        drawConnections();
-      });
-    });
-
-    dropZones.forEach(zone => {
-      zone.addEventListener('dragover', e => e.preventDefault());
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        const dragged = document.querySelector('.dragging');
-        if (dragged) {
-          const draggedValue = dragged.dataset.value;
-          
-          // Asignar la ficha a la zona
-          zone.textContent = dragged.textContent;
-          zone.dataset.draggedValue = draggedValue;
-          zone.dataset.draggedGroup = dragged.dataset.group || '';
-          
-          drawConnections(); // Redibujar al colocar una tarjeta
+    /* -- Event Listeners para las fichas (Opciones) -- */
+    fichas.forEach(ficha => {
+      ficha.addEventListener('click', () => {
+        // Si la ficha ya está seleccionada, deseleccionarla
+        if (ficha === selectedFicha) {
+          ficha.classList.remove('selected');
+          selectedFicha = null;
+        } else {
+          // Deseleccionar cualquier ficha previamente seleccionada
+          if (selectedFicha) {
+            selectedFicha.classList.remove('selected');
+          }
+          // Seleccionar la ficha actual
+          ficha.classList.add('selected');
+          selectedFicha = ficha;
         }
       });
     });
 
+    /* -- Event Listeners para las zonas de soltar -- */
+    dropZones.forEach(zone => {
+      zone.addEventListener('click', () => {
+        if (selectedFicha) {
+          // Asignar la ficha a la zona
+          zone.textContent = selectedFicha.textContent;
+          zone.dataset.draggedValue = selectedFicha.dataset.value;
+          zone.dataset.draggedGroup = selectedFicha.dataset.group || '';
+
+          // Redibujar las conexiones después de asignar
+          drawConnections();
+
+          // Opcional: Deseleccionar la ficha después de asignar
+          selectedFicha.classList.remove('selected');
+          selectedFicha = null;
+        }
+      });
+    });
+
+    /* -- Función para comprobar las respuestas -- */
     function checkAnswers() {
       let errors = 0;
       const usedValues = {};
@@ -368,11 +385,11 @@
       const containerRect = container.getBoundingClientRect();
 
       // 1. Conectar desde el nodo en .level-1 a cada padre de .level-2
-      const level1 = document.querySelector('.level-1');
+      const level1 = document.querySelector('.level.level-1');
       if (level1) {
         const parentZone = level1.querySelector('.drop-zone');
         if (parentZone) {
-          const level2 = document.querySelector('.level-2');
+          const level2 = document.querySelector('.level.level-2');
           if (level2) {
             // Todos los nodos padre en level-2 (los .drop-zone directos de cada .branch)
             const branches = level2.querySelectorAll('.branch > .drop-zone');
@@ -441,6 +458,12 @@
 
       // Limpiar feedback
       feedback.textContent = '';
+
+      // Deseleccionar cualquier ficha seleccionada
+      if (selectedFicha) {
+        selectedFicha.classList.remove('selected');
+        selectedFicha = null;
+      }
 
       // Mezclar las opciones nuevamente
       shuffleOptions();
