@@ -130,6 +130,7 @@
       padding: 0.3rem;
       word-wrap: break-word;
       z-index: 1; /* Asegura que la caja quede por encima de las líneas */
+      cursor: pointer; /* Indica que es interactivo */
     }
     .drop-zone:hover {
       background-color: #eff6fc;
@@ -151,10 +152,10 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       padding: 0.4rem 0.8rem;
-      cursor: grab;
+      cursor: pointer; /* Cambiado de grab a pointer */
       text-align: center;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s;
       font-size: 0.9rem;
       max-width: 140px;
       word-wrap: break-word;
@@ -162,8 +163,10 @@
     .draggable:hover {
       transform: scale(1.05);
     }
-    .draggable:active {
-      cursor: grabbing;
+    .draggable.selected {
+      background-color: #d0ebff; /* Color de fondo para la ficha seleccionada */
+      border-color: #4f81c7; /* Cambia el color del borde */
+      box-shadow: 0 0 10px rgba(79, 129, 199, 0.6); /* Sombra para resaltar */
     }
 
     /* Botón de verificación */
@@ -254,18 +257,18 @@
 
     <!-- Opciones -->
     <div class="options">
-      <div class="draggable" draggable="true" data-value="Formas de conocimiento">Formas de conocimiento</div>
-      <div class="draggable" draggable="true" data-value="Conocimiento sensible">1.Conocimiento sensible</div>
-      <div class="draggable" draggable="true" data-value="Captado por los sentidos" data-group="sensible">Captado por los sentidos</div>
-      <div class="draggable" draggable="true" data-value="Resultado: representaciones mentales" data-group="sensible">Resultado: representaciones mentales</div>
-      <div class="draggable" draggable="true" data-value="Ejemplo: colores" data-group="sensible">Ejemplo: colores</div>
-      <div class="draggable" draggable="true" data-value="Conocimiento racional">2.Conocimiento racional</div>
-      <div class="draggable" draggable="true" data-value="Basado en razonamientos" data-group="racional">Basado en razonamientos</div>
-      <div class="draggable" draggable="true" data-value="Resultado: conceptos universales y abstractos" data-group="racional">Resultado: conceptos universales y abstractos</div>
-      <div class="draggable" draggable="true" data-value="Ejemplo: si x+2=3 entonces x=1" data-group="racional">Ejemplo: si x+2=3 entonces x=1</div>
-      <div class="draggable" draggable="true" data-value="Conocimiento intuitivo/holístico">3.Conocimiento intuitivo/holístico</div>
-      <div class="draggable" draggable="true" data-value="Captación directa y total de una idea" data-group="holistico">Captación directa y total de una idea</div>
-      <div class="draggable" draggable="true" data-value="Ejemplo: experiencia estética" data-group="holistico">Ejemplo: experiencia estética</div>
+      <div class="draggable" data-value="Formas de conocimiento">Formas de conocimiento</div>
+      <div class="draggable" data-value="Conocimiento sensible">1. Conocimiento sensible</div>
+      <div class="draggable" data-value="Captado por los sentidos" data-group="sensible">Captado por los sentidos</div>
+      <div class="draggable" data-value="Resultado: representaciones mentales" data-group="sensible">Resultado: representaciones mentales</div>
+      <div class="draggable" data-value="Ejemplo: colores" data-group="sensible">Ejemplo: colores</div>
+      <div class="draggable" data-value="Conocimiento racional">2. Conocimiento racional</div>
+      <div class="draggable" data-value="Basado en razonamientos" data-group="racional">Basado en razonamientos</div>
+      <div class="draggable" data-value="Resultado: conceptos universales y abstractos" data-group="racional">Resultado: conceptos universales y abstractos</div>
+      <div class="draggable" data-value="Ejemplo: si x+2=3 entonces x=1" data-group="racional">Ejemplo: si x+2=3 entonces x=1</div>
+      <div class="draggable" data-value="Conocimiento intuitivo/holístico">3. Conocimiento intuitivo/holístico</div>
+      <div class="draggable" data-value="Captación directa y total de una idea" data-group="holistico">Captación directa y total de una idea</div>
+      <div class="draggable" data-value="Ejemplo: experiencia estética" data-group="holistico">Ejemplo: experiencia estética</div>
     </div>
 
     <!-- Botón de verificación -->
@@ -287,40 +290,54 @@
       draggables.forEach(draggable => optionsContainer.appendChild(draggable));
     }
 
-    /* -- Lógica arrastrar/soltar -- */
-    const draggables = document.querySelectorAll('.draggable');
+    /* -- Variables para la selección por clic -- */
+    let selectedFicha = null;
+
+    const fichas = document.querySelectorAll('.draggable');
     const dropZones = document.querySelectorAll('.drop-zone');
     const feedback = document.getElementById('feedback');
     const checkButton = document.getElementById('checkButton');
     const resetButton = document.getElementById('resetButton');
 
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging');
-        // Redibujar líneas tras soltar
-        drawConnections();
-      });
-    });
-
-    dropZones.forEach(zone => {
-      zone.addEventListener('dragover', e => e.preventDefault());
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        const dragged = document.querySelector('.dragging');
-        if (dragged) {
-          const draggedValue = dragged.dataset.value;
-          
-          // Asignar la ficha a la zona
-          zone.textContent = dragged.textContent;
-          zone.dataset.draggedValue = draggedValue;
-          zone.dataset.draggedGroup = dragged.dataset.group || '';
-          
-          drawConnections(); // Redibujar al colocar una tarjeta
+    /* -- Event Listeners para las fichas (Opciones) -- */
+    fichas.forEach(ficha => {
+      ficha.addEventListener('click', () => {
+        // Si la ficha ya está seleccionada, deseleccionarla
+        if (ficha === selectedFicha) {
+          ficha.classList.remove('selected');
+          selectedFicha = null;
+        } else {
+          // Deseleccionar cualquier ficha previamente seleccionada
+          if (selectedFicha) {
+            selectedFicha.classList.remove('selected');
+          }
+          // Seleccionar la ficha actual
+          ficha.classList.add('selected');
+          selectedFicha = ficha;
         }
       });
     });
 
+    /* -- Event Listeners para las zonas de soltar -- */
+    dropZones.forEach(zone => {
+      zone.addEventListener('click', () => {
+        if (selectedFicha) {
+          // Asignar la ficha a la zona
+          zone.textContent = selectedFicha.textContent;
+          zone.dataset.draggedValue = selectedFicha.dataset.value;
+          zone.dataset.draggedGroup = selectedFicha.dataset.group || '';
+
+          // Redibujar las conexiones después de asignar
+          drawConnections();
+
+          // Opcional: Deseleccionar la ficha después de asignar
+          selectedFicha.classList.remove('selected');
+          selectedFicha = null;
+        }
+      });
+    });
+
+    /* -- Función para comprobar las respuestas -- */
     function checkAnswers() {
       let errors = 0;
       const usedValues = {};
@@ -366,11 +383,11 @@
       const containerRect = container.getBoundingClientRect();
 
       // 1. Conectar desde el nodo en .level-1 a cada padre de .level-2
-      const level1 = document.querySelector('.level-1');
+      const level1 = document.querySelector('.level.level-1');
       if (level1) {
         const parentZone = level1.querySelector('.drop-zone');
         if (parentZone) {
-          const level2 = document.querySelector('.level-2');
+          const level2 = document.querySelector('.level.level-2');
           if (level2) {
             // Todos los nodos padre en level-2 (los .drop-zone directos de cada .branch)
             const branches = level2.querySelectorAll('.branch > .drop-zone');
@@ -439,6 +456,12 @@
 
       // Limpiar feedback
       feedback.textContent = '';
+
+      // Deseleccionar cualquier ficha seleccionada
+      if (selectedFicha) {
+        selectedFicha.classList.remove('selected');
+        selectedFicha = null;
+      }
 
       // Mezclar las opciones nuevamente
       shuffleOptions();
