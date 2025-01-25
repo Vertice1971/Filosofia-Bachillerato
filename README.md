@@ -93,4 +93,7 @@ https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología2.html
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología3.html
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología4.html
 
+Tablas de verdad
+https://vertice1971.github.io/Filosofia-Bachillerato/Tablas de verdad.html
+
 
