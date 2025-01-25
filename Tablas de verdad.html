@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Verdad con Negaciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f8ff;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #4682b4;
+            padding: 12px;
+            text-align: center;
+            background-color: white;
+        }
+        th {
+            background-color: #4682b4;
+            color: white;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 400px;
+            border: 2px solid #4682b4;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            background-color: #4682b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #36648b;
+        }
+        .keyboard {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f3ff;
+            border-radius: 8px;
+        }
+        .error {
+            color: #ff4444;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="color: #4682b4;">Calculadora de Tabla de Verdad</h1>
+<p>Ingresa una expresión lógica usando P, Q, R y operadores (∧, ∨, ¬, →, ↔):</p>
+<input type="text" id="expression" placeholder="Ejemplo: (¬P ∧ Q) → ¬R">
+<div class="keyboard">
+    <button onclick="insertSymbol('P')">P</button>
+    <button onclick="insertSymbol('Q')">Q</button>
+    <button onclick="insertSymbol('R')">R</button>
+    <button onclick="insertSymbol(' ∧ ')">∧</button>
+    <button onclick="insertSymbol(' ∨ ')">∨</button>
+    <button onclick="insertSymbol(' ¬ ')">¬</button>
+    <button onclick="insertSymbol(' → ')">→</button>
+    <button onclick="insertSymbol(' ↔ ')">↔</button>
+    <button onclick="insertSymbol('(')">(</button>
+    <button onclick="insertSymbol(')')">)</button>
+    <button onclick="clearExpression()">Borrar</button>
+</div>
+<button onclick="generateTruthTable()" style="background-color: #5cb85c;">Generar Tabla</button>
+
+<h2 style="color: #4682b4; margin-top: 25px;">Tabla de Verdad</h2>
+<div id="tableContainer">
+    <table id="truthTable">
+        <thead>
+            <tr id="headerRow"></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+function insertSymbol(symbol) {
+    const input = document.getElementById('expression');
+    input.focus();
+    input.value += symbol;
+}
+
+function clearExpression() {
+    document.getElementById('expression').value = '';
+    document.getElementById('truthTable').getElementsByTagName('thead')[0].innerHTML = '<tr id="headerRow"></tr>';
+    document.getElementById('truthTable').getElementsByTagName('tbody')[0].innerHTML = '';
+}
+
+function generateTruthTable() {
+    const expression = document.getElementById('expression').value.trim();
+    const tableHeader = document.getElementById('headerRow');
+    const tableBody = document.querySelector('#truthTable tbody');
+    
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    if (!expression) {
+        showError('Por favor ingresa una expresión válida');
+        return;
+    }
+
+    try {
+        // Normalizar expresión (eliminar espacios después de ¬)
+        const normalizedExpr = expression.replace(/¬\s+/g, '¬');
+
+        // Detectar todas las negaciones usadas
+        const allNegations = new Set();
+        const regex = /¬[PQR]/g;
+        let match;
+        
+        // Buscar en expresión principal
+        while ((match = regex.exec(normalizedExpr)) !== null) {
+            allNegations.add(match[0]);
+        }
+
+        // Extraer y analizar subexpresiones
+        const subExpressions = [];
+        let exprCopy = normalizedExpr;
+        while (exprCopy.includes('(')) {
+            const start = exprCopy.indexOf('(');
+            const end = exprCopy.indexOf(')');
+            if (end === -1) throw new Error('Paréntesis no balanceados');
+            
+            const subExpr = exprCopy.substring(start + 1, end).trim();
+            subExpressions.push(subExpr);
+            
+            // Buscar negaciones en subexpresiones
+            while ((match = regex.exec(subExpr)) !== null) {
+                allNegations.add(match[0]);
+            }
+            
+            exprCopy = exprCopy.substring(end + 1);
+        }
+
+        // Configurar encabezados
+        const variables = ['P', 'Q', 'R'];
+        variables.forEach(variable => {
+            const th = document.createElement('th');
+            th.textContent = variable;
+            tableHeader.appendChild(th);
+        });
+
+        // Añadir columnas de negación detectadas
+        const negations = Array.from(allNegations);
+        negations.forEach(neg => {
+            const th = document.createElement('th');
+            th.textContent = neg;
+            tableHeader.appendChild(th);
+        });
+
+        // Añadir subexpresiones
+        subExpressions.forEach((expr, index) => {
+            const th = document.createElement('th');
+            th.textContent = `(${expr})`;
+            tableHeader.appendChild(th);
+        });
+
+        // Añadir columna final
+        const finalTh = document.createElement('th');
+        finalTh.textContent = normalizedExpr;
+        tableHeader.appendChild(finalTh);
+
+        // Generar combinaciones
+        const combinations = generateCombinations(variables);
+
+        // Procesar cada combinación
+        combinations.forEach(comb => {
+            const row = document.createElement('tr');
+
+            // Valores base PQR
+            variables.forEach(variable => {
+                const td = document.createElement('td');
+                td.textContent = comb[variable] ? 'V' : 'F';
+                row.appendChild(td);
+            });
+
+            // Valores de negación
+            negations.forEach(neg => {
+                const variable = neg.charAt(1);
+                const td = document.createElement('td');
+                td.textContent = !comb[variable] ? 'V' : 'F';
+                row.appendChild(td);
+            });
+
+            // Evaluar subexpresiones
+            const subResults = {};
+            subExpressions.forEach((expr, index) => {
+                const result = evaluateExpression(expr, comb);
+                subResults[index] = result;
+                const td = document.createElement('td');
+                td.textContent = result ? 'V' : 'F';
+                row.appendChild(td);
+            });
+
+            // Evaluar expresión final
+            let finalExpr = normalizedExpr;
+            subExpressions.forEach((expr, index) => {
+                finalExpr = finalExpr.replace(`(${expr})`, subResults[index]);
+            });
+            const finalResult = evaluateExpression(finalExpr, comb);
+            
+            const tdFinal = document.createElement('td');
+            tdFinal.textContent = finalResult ? 'V' : 'F';
+            row.appendChild(tdFinal);
+
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        showError(`Error: ${error.message}`);
+    }
+}
+
+function evaluateExpression(expr, vars) {
+    let replaced = expr
+        .replace(/\bP\b/g, vars.P)
+        .replace(/\bQ\b/g, vars.Q)
+        .replace(/\bR\b/g, vars.R)
+        .replace(/∧/g, '&&')
+        .replace(/∨/g, '||')
+        .replace(/¬/g, '!');
+
+    // Manejar implicaciones iterativamente
+    let hasImplication = true;
+    while (hasImplication) {
+        const newReplaced = replaced.replace(/(.*)→(.*)/, (_, left, right) => {
+            return `!(${left.trim()}) || (${right.trim()})`;
+        });
+        hasImplication = newReplaced !== replaced;
+        replaced = newReplaced;
+    }
+
+    // Manejar bicondicionales
+    replaced = replaced.replace(/(.*)↔(.*)/, (_, left, right) => {
+        return `(${left.trim()}) === (${right.trim()})`;
+    });
+
+    try {
+        return eval(replaced);
+    } catch (e) {
+        console.error("Error en expresión:", replaced);
+        throw new Error("Expresión inválida");
+    }
+}
+
+function generateCombinations(vars) {
+    const combinations = [];
+    const numRows = Math.pow(2, vars.length);
+
+    for (let i = numRows - 1; i >= 0; i--) {
+        const combination = {};
+        vars.forEach((variable, index) => {
+            combination[variable] = Boolean(i & (1 << (vars.length - 1 - index)));
+        });
+        combinations.push(combination);
+    }
+
+    return combinations;
+}
+
+function showError(message) {
+    const existingError = document.querySelector('.error');
+    if (existingError) existingError.remove();
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error';
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+}
+</script>
+
+</body>
+</html>
