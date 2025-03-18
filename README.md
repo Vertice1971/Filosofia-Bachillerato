@@ -92,8 +92,12 @@ https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología1.html
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología2.html
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología3.html
 https://vertice1971.github.io/Filosofia-Bachillerato/Epistemología4.html
+Repaso solo memorístico: https://vertice1971.github.io/Filosofia-Bachillerato/Tema3.html
+
 
 Tablas de verdad
-https://vertice1971.github.io/Filosofia-Bachillerato/Tablas de verdad.html
+[https://vertice1971.github.io/Filosofia-Bachillerato/Tablas de verdad.html](https://vertice1971.github.io/Filosofia-Bachillerato/Tablas%20de%20verdad.html)
+
+
 
 
