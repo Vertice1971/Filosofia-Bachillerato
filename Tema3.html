@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- tomcue@iesjuandelacierva.com -->
+  <title>Filosofía del Conocimiento y de la Ciencia. Apoyo memorístico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+      background-color: #f5f8ff; /* Fondo azul pastel */
+    }
+    .question-container {
+      display: none;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option {
+      display: block;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .option:hover {
+      background: #e0ebff;
+      transform: scale(1.05);
+    }
+    .correct {
+      background: #c8e6c9;
+      border-color: green;
+    }
+    .incorrect {
+      background: #ffcdd2;
+      border-color: red;
+    }
+    #start-btn, #restart-btn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #restart-btn {
+      background: #28a745;
+    }
+    /* Posiciona el botón "Siguiente" fijo a la derecha, en zona media/alta */
+    #next-btn {
+      position: fixed;
+      right: 20px;
+      top: 30%;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: none;
+    }
+    #info-container {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Filosofía del Conocimiento y de la Ciencia. Apoyo Memorístico</h1>
+  <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+  <h3>(Recuerda que el examen no se parece en nada a este formato)</h3>
+  <div id="info-container"></div>
+  <button id="start-btn">Comenzar</button>
+  <div id="quiz-container" class="question-container"></div>
+  <button id="next-btn">Siguiente</button>
+  <button id="restart-btn">Reiniciar</button>
+  
+  <script>
+    // Función para barajar un array usando el algoritmo de Fisher–Yates
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // JSON integrado con 40 preguntas únicas sobre Filosofía del Conocimiento y de la Ciencia
+    const data = {
+      "preguntas": [
+        {
+          "texto": "¿Qué estudia la epistemología?",
+          "opciones": {
+            "a": "El comportamiento social.",
+            "b": "El conocimiento y sus fundamentos.",
+            "c": "La historia de la ciencia."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "¿De dónde proviene el término 'epistemología'?",
+          "opciones": {
+            "a": "Del latín 'episteme' y 'logia'.",
+            "b": "De las palabras griegas 'episteme' (conocimiento) y 'logos' (teoría).",
+            "c": "Del árabe 'episto' y 'logía'."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "¿Qué diferencia hace la epistemología entre apariencia y realidad?",
+          "opciones": {
+            "a": "No diferencia, las considera iguales.",
+            "b": "Distingue entre lo que se percibe y la esencia de las cosas.",
+            "c": "Solo analiza la apariencia superficial."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "¿Cuál es la postura del realismo ingenuo?",
+          "opciones": {
+            "a": "Aceptar que la realidad es exactamente como la percibimos.",
+            "b": "Negar la existencia de la realidad.",
+            "c": "Considerar que la realidad es completamente inalcanzable."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "En el proceso de conocer, ¿a qué se refiere el 'resultado'?",
+          "opciones": {
+            "a": "A la experiencia subjetiva del sujeto.",
+            "b": "A la información recabada acerca del objeto.",
+            "c": "A la emoción experimentada."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "El conocimiento sensible se caracteriza por:",
+          "opciones": {
+            "a": "Obtener datos a través del razonamiento abstracto.",
+            "b": "La captación a través de los sentidos.",
+            "c": "La intuición sin base empírica."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "El conocimiento racional se distingue por:",
+          "opciones": {
+            "a": "Generar conceptos universales mediante la razón.",
+            "b": "Basarse en percepciones individuales y cambiantes.",
+            "c": "Utilizar exclusivamente la experiencia sensorial."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El conocimiento intuitivo u holístico se define como:",
+          "opciones": {
+            "a": "Un proceso analítico y gradual.",
+            "b": "Una captación inmediata y global de una idea.",
+            "c": "La suma de conocimientos sensibles y racionales."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Según el racionalismo, la principal fuente del conocimiento es:",
+          "opciones": {
+            "a": "La experiencia a través de los sentidos.",
+            "b": "La razón, con la existencia de ideas innatas.",
+            "c": "La intuición mística."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "El empirismo afirma que el conocimiento se origina:",
+          "opciones": {
+            "a": "Exclusivamente en la experiencia sensorial.",
+            "b": "A partir de ideas preexistentes.",
+            "c": "Por medio de la revelación."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La expresión 'tabula rasa' significa que la mente humana es:",
+          "opciones": {
+            "a": "Una hoja en blanco al nacer.",
+            "b": "Un receptáculo lleno de conocimientos innatos.",
+            "c": "Un libro ya escrito."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El escepticismo postula que:",
+          "opciones": {
+            "a": "Es posible obtener certezas absolutas.",
+            "b": "Toda percepción puede ser dudosa y el conocimiento es incierto.",
+            "c": "La verdad es inmutable."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La duda cartesiana se utiliza para:",
+          "opciones": {
+            "a": "Encontrar una base segura de conocimiento.",
+            "b": "Rechazar toda experiencia empírica.",
+            "c": "Aceptar las percepciones sin cuestionarlas."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La famosa frase 'Cogito, ergo sum' implica que:",
+          "opciones": {
+            "a": "Pensar demuestra la existencia del yo.",
+            "b": "El cuerpo es la prueba de la existencia.",
+            "c": "Los sentidos son la base del conocimiento."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El solipsismo es la creencia de que:",
+          "opciones": {
+            "a": "Solo el propio yo existe y el resto puede ser una ilusión.",
+            "b": "Todos los seres poseen igual conciencia.",
+            "c": "El conocimiento es universal."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Un hecho observable en la ciencia se caracteriza por ser:",
+          "opciones": {
+            "a": "Subjetivo y variable.",
+            "b": "Verificable, objetivo y repetible.",
+            "c": "Una interpretación personal."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "En el ámbito científico, una opinión se define como:",
+          "opciones": {
+            "a": "Una afirmación basada en datos objetivos.",
+            "b": "Una creencia subjetiva basada en experiencias personales.",
+            "c": "Una teoría comprobada."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Una teoría científica se diferencia de una hipótesis porque:",
+          "opciones": {
+            "a": "Es una interpretación respaldada por evidencia y sujeta a revisión.",
+            "b": "Es una suposición sin necesidad de comprobación.",
+            "c": "No requiere datos empíricos."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El método inductivo consiste en:",
+          "opciones": {
+            "a": "Generalizar a partir de observaciones particulares.",
+            "b": "Partir de generalizaciones para llegar a casos concretos.",
+            "c": "Formular hipótesis sin experiencia empírica."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La 'inducción completa' se refiere a:",
+          "opciones": {
+            "a": "Analizar únicamente una muestra representativa.",
+            "b": "Analizar todos los elementos de una clase para generalizar.",
+            "c": "Realizar observaciones sin un criterio global."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Una limitación del método inductivo es que:",
+          "opciones": {
+            "a": "Generaliza a partir de muestras que pueden ser incompletas.",
+            "b": "No permite formular leyes generales.",
+            "c": "Es siempre infalible."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El método hipotético-deductivo se caracteriza por:",
+          "opciones": {
+            "a": "La formulación de hipótesis basadas en observaciones y la deducción de consecuencias.",
+            "b": "El uso exclusivo de datos empíricos sin teoría.",
+            "c": "La intuición sin verificación experimental."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Uno de los pasos esenciales del método hipotético-deductivo es:",
+          "opciones": {
+            "a": "La formulación de una hipótesis.",
+            "b": "La aceptación inmediata de los datos sin análisis.",
+            "c": "La eliminación de la experimentación."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La experimentación en el método científico tiene la función de:",
+          "opciones": {
+            "a": "Validar o refutar las predicciones derivadas de una hipótesis.",
+            "b": "Reemplazar la necesidad de teoría.",
+            "c": "Confirmar automáticamente cualquier idea."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La experiencia sensible permite la formación de representaciones mentales al:",
+          "opciones": {
+            "a": "Captar estímulos a través de los sentidos.",
+            "b": "Utilizar exclusivamente el razonamiento abstracto.",
+            "c": "Basarse en ideas innatas."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El conocimiento racional es considerado universal porque:",
+          "opciones": {
+            "a": "Se basa en percepciones individuales.",
+            "b": "Genera conceptos aplicables a casos similares a través de la razón.",
+            "c": "Se fundamenta en la experiencia sensible."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La intuición en el conocimiento se caracteriza por ser:",
+          "opciones": {
+            "a": "Un proceso lento y analítico.",
+            "b": "Una captación inmediata y global sin un proceso paso a paso.",
+            "c": "Una combinación de sensaciones y recuerdos."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "El racionalismo y el empirismo se diferencian en que:",
+          "opciones": {
+            "a": "El racionalismo prioriza la razón, mientras que el empirismo valora la experiencia.",
+            "b": "Ambos consideran la experiencia como única fuente.",
+            "c": "El empirismo defiende las ideas innatas."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Una consecuencia del escepticismo es que:",
+          "opciones": {
+            "a": "Se pueden afirmar verdades sin cuestionarlas.",
+            "b": "Implica dudar de la correspondencia entre la percepción y la realidad.",
+            "c": "Garantiza certezas absolutas."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La pregunta '¿Cómo sabemos que lo que percibimos es real?' se relaciona con:",
+          "opciones": {
+            "a": "El análisis de la diferencia entre apariencia y realidad.",
+            "b": "La aceptación sin cuestionamientos del sentido común.",
+            "c": "La negación de cualquier experiencia sensible."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Los cuatro elementos básicos del proceso de conocer son:",
+          "opciones": {
+            "a": "Sujeto, objeto, operación y resultado.",
+            "b": "Sentido, intuición, emoción y razón.",
+            "c": "Percepción, juicio, memoria y acción."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La experiencia sensible aporta al conocimiento al:",
+          "opciones": {
+            "a": "Permitir captar propiedades inmediatas y concretas del objeto.",
+            "b": "Formar conceptos abstractos sin observación.",
+            "c": "Eliminar la necesidad de la experimentación."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "En el empirismo, la mente humana al nacer se compara con:",
+          "opciones": {
+            "a": "Una hoja en blanco.",
+            "b": "Un receptáculo lleno de ideas innatas.",
+            "c": "Un libro ya escrito."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El método inductivo se utiliza para:",
+          "opciones": {
+            "a": "Derivar leyes generales a partir de observaciones particulares.",
+            "b": "Aplicar principios generales sin datos concretos.",
+            "c": "Evitar la recopilación de datos empíricos."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Para que una inducción sea válida es necesario que:",
+          "opciones": {
+            "a": "Se realicen pocas observaciones en un único contexto.",
+            "b": "Se efectúen múltiples observaciones sin contradicciones.",
+            "c": "Se base únicamente en la intuición."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "El método hipotético-deductivo integra la observación empírica y:",
+          "opciones": {
+            "a": "La formulación de hipótesis y la deducción de predicciones.",
+            "b": "La aceptación sin análisis de teorías previas.",
+            "c": "La intuición sin necesidad de verificación experimental."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La hipótesis en el método hipotético-deductivo permite:",
+          "opciones": {
+            "a": "Formular predicciones que se puedan comprobar experimentalmente.",
+            "b": "Concluir sin necesidad de datos empíricos.",
+            "c": "Rechazar la experimentación."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Una pregunta fundamental en la filosofía del conocimiento es:",
+          "opciones": {
+            "a": "¿Cómo se pueden obtener verdades universales a partir de percepciones individuales?",
+            "b": "¿Por qué la experiencia es irrelevante en la construcción del conocimiento?",
+            "c": "¿Cómo se alcanza el conocimiento sin recurrir a la razón?"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La epistemología cuestiona la correspondencia entre la percepción y la realidad al:",
+          "opciones": {
+            "a": "Aceptar que lo percibido es idéntico a la esencia de las cosas.",
+            "b": "Plantear que puede haber una diferencia entre la apariencia y la verdadera naturaleza de lo observado.",
+            "c": "Rechazar la importancia de la experiencia sensible."
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La revisión y perfeccionamiento son fundamentales en una teoría científica porque:",
+          "opciones": {
+            "a": "Permiten adaptar la teoría a nuevos datos y corregir errores.",
+            "b": "Indican que la teoría es defectuosa desde su origen.",
+            "c": "Significan que la teoría no es confiable."
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La filosofía del conocimiento contribuye a la crítica del sentido común al:",
+          "opciones": {
+            "a": "Cuestionar y profundizar en las limitaciones del conocimiento cotidiano.",
+            "b": "Afirmar que el sentido común es suficiente para conocer la realidad.",
+            "c": "Rechazar todo conocimiento empírico."
+          },
+          "respuesta": "a"
+        }
+      ]
+    };
+
+    let preguntas = data.preguntas;
+    let preguntasElegidas = [];
+    let preguntaActual = 0;
+    let correctas = 0;
+
+    const quizContainer = document.getElementById('quiz-container');
+    const nextButton = document.getElementById('next-btn');
+    const restartButton = document.getElementById('restart-btn');
+    const startButton = document.getElementById('start-btn');
+    const infoContainer = document.getElementById('info-container');
+
+    // Mostrar información inicial y habilitar el botón de inicio
+    infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas. Podrás elegir cuántas usar.</p>`;
+    startButton.style.display = 'block';
+
+    startButton.addEventListener('click', function() {
+      let numPreguntas = prompt(`El test tiene ${preguntas.length} preguntas. ¿Cuántas deseas jugar?`, preguntas.length);
+      numPreguntas = parseInt(numPreguntas);
+      if (isNaN(numPreguntas) || numPreguntas < 1 || numPreguntas > preguntas.length) {
+        alert('Número no válido. Se jugarán todas las preguntas.');
+        numPreguntas = preguntas.length;
+      }
+      // Seleccionar preguntas aleatorias
+      preguntasElegidas = shuffle([...preguntas]).slice(0, numPreguntas);
+      preguntaActual = 0;
+      correctas = 0;
+      startButton.style.display = 'none';
+      infoContainer.innerHTML = '';
+      mostrarPregunta();
+    });
+
+    function mostrarPregunta() {
+      if (preguntaActual < preguntasElegidas.length) {
+        quizContainer.innerHTML = '';
+        quizContainer.style.display = 'block';
+        nextButton.style.display = 'none';
+
+        let pregunta = preguntasElegidas[preguntaActual];
+        let preguntaTitulo = document.createElement('h2');
+        preguntaTitulo.textContent = pregunta.texto;
+        quizContainer.appendChild(preguntaTitulo);
+
+        // Convertir las opciones en un array y mezclarlas
+        let opcionesArray = Object.entries(pregunta.opciones)
+          .map(([key, texto]) => ({ key, texto }));
+        opcionesArray = shuffle(opcionesArray);
+
+        opcionesArray.forEach(opcionObj => {
+          let opcion = document.createElement('div');
+          opcion.classList.add('option');
+          opcion.textContent = opcionObj.texto;
+          opcion.dataset.valor = opcionObj.key;
+          opcion.addEventListener('click', function() {
+            validarRespuesta(this, pregunta.respuesta);
+          });
+          quizContainer.appendChild(opcion);
+        });
+      } else {
+        quizContainer.innerHTML = `<h2>¡Test finalizado!</h2><p>Has acertado ${correctas} de ${preguntasElegidas.length} preguntas.</p>`;
+        nextButton.style.display = 'none';
+        restartButton.style.display = 'block';
+      }
+    }
+
+    function validarRespuesta(elemento, respuestaCorrecta) {
+      let opciones = document.querySelectorAll('.option');
+      opciones.forEach(op => op.style.pointerEvents = 'none');
+
+      if (elemento.dataset.valor === respuestaCorrecta) {
+        elemento.classList.add('correct');
+        correctas++;
+      } else {
+        elemento.classList.add('incorrect');
+        let correcta = document.querySelector(`.option[data-valor='${respuestaCorrecta}']`);
+        if (correcta) correcta.classList.add('correct');
+      }
+      nextButton.style.display = 'block';
+    }
+
+    nextButton.addEventListener('click', function() {
+      preguntaActual++;
+      mostrarPregunta();
+    });
+
+    restartButton.addEventListener('click', function() {
+      this.style.display = 'none';
+      startButton.style.display = 'none';
+      preguntaActual = 0;
+      correctas = 0;
+      infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas.</p>`;
+      startButton.style.display = 'block';
+      quizContainer.innerHTML = '';
+      quizContainer.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
