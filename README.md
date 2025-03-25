@@ -98,6 +98,10 @@ Repaso solo memorístico: https://vertice1971.github.io/Filosofia-Bachillerato/T
 Tablas de verdad
 [https://vertice1971.github.io/Filosofia-Bachillerato/Tablas de verdad.html](https://vertice1971.github.io/Filosofia-Bachillerato/Tablas%20de%20verdad.html)
 
+Falacias informales
+https://vertice1971.github.io/Filosofia-Bachillerato/Falacias.html
+
+
 
 
 
