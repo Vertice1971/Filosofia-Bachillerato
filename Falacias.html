@@ -104,8 +104,7 @@
       return array;
     }
 
-    // JSON con todas las preguntas de identificación de falacias
-    // Cada pregunta tiene tres opciones: una correcta, otra falacia incorrecta y "No es una falacia".
+    // JSON con todas las preguntas: las 20 originales y las 52 nuevas (total 72)
     const data = {
       "preguntas": [
         {
@@ -283,6 +282,475 @@
           "texto": "Se ha vuelto a agotar en las tiendas el último modelo de Leloxphone, claramente debe ser el mejor teléfono jamás inventado.",
           "opciones": {
             "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        /* ================= NUEVAS PREGUNTAS (52 ejemplos) ================= */
+        {
+          "texto": "Mi primo dice que la sal derrite el hielo, pero es mentira porque dejó de estudiar en 3º de la ESO.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La propuesta de reforma educativa de la ministra de Educación no puede ser válida. Ella sacaba muy malas notas.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No puedes fiarte de lo que dice Ana sobre política: no tiene ni pareja ni amigos.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El argumento de Pablo sobre el reciclaje no vale, porque siempre va vestido como un vagabundo.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La Coca-Cola es mejor que la Pepsi-Cola porque es la más vendida.",
+          "opciones": {
+            "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La religión correcta es el cristianismo porque es la que tiene más seguidores.",
+          "opciones": {
+            "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Este vídeo es cierto porque lo han compartido miles de personas en TikTok.",
+          "opciones": {
+            "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El horóscopo funciona porque todo el mundo lo lee en las revistas.",
+          "opciones": {
+            "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La Coca-Cola es mejor porque es la favorita de Fernando Alonso.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Dios existe porque Marie Curie, la gran científica, creía en Dios.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Este medicamento es bueno porque lo recomendó una influencer famosa.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Esta teoría debe ser cierta porque la dijo un premio Nobel en una entrevista de televisión.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tienes que tomarte la sopa, porque si no lo haces, probarás mi zapatilla.",
+          "opciones": {
+            "a": "Falacia ad baculum",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tu nuevo sueldo es el más justo. Si no lo aceptas, no te renovaremos el contrato.",
+          "opciones": {
+            "a": "Falacia ad baculum",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Más te vale estar de acuerdo con este informe, si no quieres perder el bonus de este mes.",
+          "opciones": {
+            "a": "Falacia ad baculum",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Ese dictador tiene razón, porque quien lo contradice acaba en la cárcel.",
+          "opciones": {
+            "a": "Falacia ad baculum",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Los extraterrestres han visitado la Tierra. No puedes demostrar que no es así.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "Falacia tu quoque",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Se ha intentado muchas veces demostrar que Dios no existe y no lo han conseguido, porque Dios sí que existe.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "Falacia tu quoque",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Las sirenas existen porque nadie ha demostrado que no vivan en lo más profundo del océano.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "Falacia tu quoque",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No creo que hayas hecho los deberes, porque no me lo has demostrado con una foto de cada ejercicio.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "Falacia tu quoque",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No puedes decir que fumar es malo si tú mismo fumas.",
+          "opciones": {
+            "a": "Falacia tu quoque",
+            "b": "Falacia ad ignorantiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Un padre no puede aconsejar a su hijo no beber alcohol si él mismo bebe cada día.",
+          "opciones": {
+            "a": "Falacia tu quoque",
+            "b": "Falacia ad ignorantiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tú no tienes derecho a decirme que estudie si tú no terminaste tu carrera.",
+          "opciones": {
+            "a": "Falacia tu quoque",
+            "b": "Falacia ad ignorantiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "¿Cómo vas a hablarme de ser puntual si siempre llegas tarde los lunes?",
+          "opciones": {
+            "a": "Falacia tu quoque",
+            "b": "Falacia ad ignorantiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tienes que tomarte la sopa porque si no me voy a poner muy triste.",
+          "opciones": {
+            "a": "Falacia ad misericordiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Profe, tiene que cambiarme la nota de este examen y ponerme aprobado porque si no perderé la beca.",
+          "opciones": {
+            "a": "Falacia ad misericordiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Si me suspendes este examen, mi padre se va a enfadar conmigo y ya no me dejará salir más de casa.",
+          "opciones": {
+            "a": "Falacia ad misericordiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tienes que dejarme entrar al cine sin pagar, es mi cumpleaños y todos mis amigos me han dejado plantado.",
+          "opciones": {
+            "a": "Falacia ad misericordiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Las prácticas médicas de los curanderos son mejores porque se han usado durante miles de años.",
+          "opciones": {
+            "a": "Falacia ad antiquitatem",
+            "b": "Falacia ad verecundiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La institución del matrimonio debe ser siempre entre un hombre y una mujer porque así ha sido tradicionalmente.",
+          "opciones": {
+            "a": "Falacia ad antiquitatem",
+            "b": "Falacia ad verecundiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Tenemos que escribir a mano los exámenes porque siempre se ha hecho así.",
+          "opciones": {
+            "a": "Falacia ad antiquitatem",
+            "b": "Falacia ad verecundiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Esta lengua es la más correcta porque es la que se ha enseñado desde hace siglos.",
+          "opciones": {
+            "a": "Falacia ad antiquitatem",
+            "b": "Falacia ad verecundiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Los malos tratos en el hogar son cosa de extranjeros. Los tres casos de este mes eran de hombres extranjeros.",
+          "opciones": {
+            "a": "Falacia de la generalización apresurada",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Los porros conducen a la heroína porque mi vecino empezó fumando porros y ahora se inyecta heroína.",
+          "opciones": {
+            "a": "Falacia de la generalización apresurada",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Conozco a tres adolescentes y todos están enganchados al móvil. Esta generación está perdida.",
+          "opciones": {
+            "a": "Falacia de la generalización apresurada",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El profesorado de este centro no hace nada. El otro día dos profesores llegaron tarde.",
+          "opciones": {
+            "a": "Falacia de la generalización apresurada",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Ver televisión causa que se te estropee la vista. Mi abuelo empezó a ver mal justo después de comprar un televisor.",
+          "opciones": {
+            "a": "Falacia post hoc ergo propter hoc",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Justo cuando mi vecina comenzó a jugar al dominó, su pareja le abandonó. Alguna relación tuvo que haber.",
+          "opciones": {
+            "a": "Falacia post hoc ergo propter hoc",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Me puse esta camiseta de la suerte y ganamos el partido. ¡Está claro que da buena suerte!",
+          "opciones": {
+            "a": "Falacia post hoc ergo propter hoc",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Desde que pusimos esa planta en casa, hemos discutido más. Esa planta trae malas energías.",
+          "opciones": {
+            "a": "Falacia post hoc ergo propter hoc",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Legalizar el cannabis hará que la gente piense que drogarse es bueno y al final la sociedad colapsará porque todo el mundo estará drogado a todas horas.",
+          "opciones": {
+            "a": "Falacia de la pendiente resbaladiza",
+            "b": "Falacia ad consequentiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Si permitimos el uso de teléfonos móviles en las escuelas, pronto el alumnado no prestará atención, fracasará y la sociedad será un desastre.",
+          "opciones": {
+            "a": "Falacia de la pendiente resbaladiza",
+            "b": "Falacia ad consequentiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Si empiezo a faltar a clase un par de días, acabaré abandonando los estudios y viviendo bajo un puente.",
+          "opciones": {
+            "a": "Falacia de la pendiente resbaladiza",
+            "b": "Falacia ad consequentiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Si aceptamos que las personas trabajen desde casa, dentro de unos años ya nadie sabrá relacionarse con sus compañeros.",
+          "opciones": {
+            "a": "Falacia de la pendiente resbaladiza",
+            "b": "Falacia ad consequentiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El cambio climático no es real porque si lo fuera, ya estaríamos en un apocalipsis y los políticos habrían actuado.",
+          "opciones": {
+            "a": "Falacia ad consequentiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Esa persona no es homosexual, porque su padre le mataría si lo fuera.",
+          "opciones": {
+            "a": "Falacia ad consequentiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Debe existir una vida después de la muerte, porque si no, vivir sería inútil.",
+          "opciones": {
+            "a": "Falacia ad consequentiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No creo que haya corrupción en mi partido, porque si la hubiera, me sentiría totalmente traicionado.",
+          "opciones": {
+            "a": "Falacia ad consequentiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Leer libros te hace más inteligente porque la gente inteligente lee libros.",
+          "opciones": {
+            "a": "Falacia de la petición de principio",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Los sueños tienen significados ocultos porque los mensajes importantes se comunican a través de símbolos en nuestros sueños.",
+          "opciones": {
+            "a": "Falacia de la petición de principio",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El fútbol es el deporte más emocionante porque ningún otro deporte tiene la emoción del fútbol.",
+          "opciones": {
+            "a": "Falacia de la petición de principio",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Esta decisión es justa porque al tomarla nos hemos guiado en todo momento por un ideal de justicia.",
+          "opciones": {
+            "a": "Falacia de la petición de principio",
             "b": "Falacia ad hominem",
             "c": "No es una falacia"
           },
