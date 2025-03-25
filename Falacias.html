@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio de Identificación de Falacias</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+      background-color: #f5f8ff; /* Fondo azul pastel */
+    }
+    .question-container {
+      display: none;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option {
+      display: block;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .option:hover {
+      background: #e0ebff;
+      transform: scale(1.05);
+    }
+    .correct {
+      background: #c8e6c9;
+      border-color: green;
+    }
+    .incorrect {
+      background: #ffcdd2;
+      border-color: red;
+    }
+    #start-btn, #restart-btn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #restart-btn {
+      background: #28a745;
+    }
+    /* Posiciona el botón "Siguiente" fijo a la derecha, en zona media/alta */
+    #next-btn {
+      position: fixed;
+      right: 20px;
+      top: 30%;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: none;
+    }
+    /* Estilos para el contador de preguntas */
+    #question-counter {
+      position: fixed;
+      right: 20px;
+      top: 37%;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+    }
+    #info-container {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ejercicio: Identificación de Falacias</h1>
+  <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+  <div id="info-container"></div>
+  <button id="start-btn">Comenzar</button>
+  <div id="quiz-container" class="question-container"></div>
+  <button id="next-btn">Siguiente</button>
+  <!-- Contenedor para el contador de preguntas -->
+  <div id="question-counter"></div>
+  <button id="restart-btn">Reiniciar</button>
+  
+  <script>
+    // Función para barajar un array usando el algoritmo de Fisher–Yates
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // JSON con todas las preguntas de identificación de falacias
+    // Cada pregunta tiene tres opciones: una correcta, otra falacia incorrecta y "No es una falacia".
+    const data = {
+      "preguntas": [
+        {
+          "texto": "Si permitimos que el alumnado use calculadoras en los exámenes, entonces finalmente dejarán de aprender matemáticas básicas, lo que llevará a una disminución general en la inteligencia.",
+          "opciones": {
+            "a": "Falacia de la pendiente resbaladiza",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No deberías escuchar el argumento de Marta sobre el cambio climático porque nunca terminó su grado universitario.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Si el universo no tuviera un propósito, la vida sería algo sin sentido. Por lo tanto, el universo debe tener un propósito.",
+          "opciones": {
+            "a": "Falacia ad consequentiam",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Debes estar de acuerdo con la política de la empresa sobre los horarios de trabajo, son los mejores. O te despiden.",
+          "opciones": {
+            "a": "Falacia ad baculum",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La forma esférica de la Tierra se demuestra mediante observaciones directas desde el espacio y también viajando en línea recta alrededor del planeta.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "No es una falacia",
+            "c": "Falacia ad baculum"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La densidad del aceite es menor que la del agua, lo cual se demuestra al ver que el aceite flota cuando ambos líquidos se combinan.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "No es una falacia",
+            "c": "Falacia de la pendiente resbaladiza"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Debemos seguir usando este libro para nuestro curso porque siempre se ha utilizado en esta universidad durante los últimos 50 años.",
+          "opciones": {
+            "a": "Falacia ad antiquitatem",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "El famoso actor Juan Pérez dice que este suplemento es efectivo para perder peso, así que debe ser cierto.",
+          "opciones": {
+            "a": "Falacia ad verecundiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Desde que se construyó esa nueva torre de telefonía móvil, he tenido dolores de cabeza. La torre debe ser la causa.",
+          "opciones": {
+            "a": "Post hoc ergo propter hoc",
+            "b": "Falacia ad ignorantiam",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Sabemos que Dios existe porque para algo es un Ser Todopoderoso.",
+          "opciones": {
+            "a": "Petición de principio",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "La teoría de la evolución es fácil de demostrar, viendo los fósiles o viendo cómo evolucionan bacterias en una placa de Petri en varias generaciones.",
+          "opciones": {
+            "a": "Generalización apresurada",
+            "b": "No es una falacia",
+            "c": "Falacia ad baculum"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "No existen diferencias significativas en la capacidad intelectual general entre hombres y mujeres, como puede verse en las notas medias de Selectividad.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "No es una falacia",
+            "c": "Falacia ad ignorantiam"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Conocí a dos personas de Zinzalandia y ambas fueron groseras, así que la gente de ese país debe ser maleducada.",
+          "opciones": {
+            "a": "Generalización apresurada",
+            "b": "Falacia ad populum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Debes perdonarme el alquiler este mes. Estoy pasando por una situación muy difícil con mi pareja y me he gastado todo en flores para que no me deje.",
+          "opciones": {
+            "a": "Falacia ad misericordiam",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "No puedes criticarme por no reciclar cuando tú mismo conduces un coche que contamina mucho.",
+          "opciones": {
+            "a": "Tu quoque",
+            "b": "Falacia ad baculum",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Nadie ha podido demostrar que las pirámides de Egipto no las hicieron los extraterrestres, así que seguro que ayudaron a construirlas.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "Generalización apresurada",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        },
+        {
+          "texto": "Eddy Merckx es considerado el mejor ciclista de la historia debido a que es, con mucha diferencia, el que más y mejores victorias tiene en todos los terrenos.",
+          "opciones": {
+            "a": "Falacia ad hominem",
+            "b": "No es una falacia",
+            "c": "Falacia ad baculum"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La temperatura de ebullición del agua varía con la presión atmosférica, como se puede demostrar hirviendo agua a distintas alturas.",
+          "opciones": {
+            "a": "Falacia ad ignorantiam",
+            "b": "No es una falacia",
+            "c": "Falacia ad populum"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "La pena de muerte no previene los delitos. En Estados Unidos no hay diferencia entre las zonas con pena de muerte y las que no tienen ese castigo.",
+          "opciones": {
+            "a": "Generalización apresurada",
+            "b": "No es una falacia",
+            "c": "Falacia ad baculum"
+          },
+          "respuesta": "b"
+        },
+        {
+          "texto": "Se ha vuelto a agotar en las tiendas el último modelo de Leloxphone, claramente debe ser el mejor teléfono jamás inventado.",
+          "opciones": {
+            "a": "Falacia ad populum",
+            "b": "Falacia ad hominem",
+            "c": "No es una falacia"
+          },
+          "respuesta": "a"
+        }
+      ]
+    };
+
+    let preguntas = data.preguntas;
+    let preguntasElegidas = [];
+    let preguntaActual = 0;
+    let correctas = 0;
+
+    const quizContainer = document.getElementById('quiz-container');
+    const nextButton = document.getElementById('next-btn');
+    const restartButton = document.getElementById('restart-btn');
+    const startButton = document.getElementById('start-btn');
+    const infoContainer = document.getElementById('info-container');
+
+    infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas. Podrás elegir cuántas usar.</p>`;
+    startButton.style.display = 'block';
+
+    startButton.addEventListener('click', function() {
+      let numPreguntas = prompt(`El test tiene ${preguntas.length} preguntas. ¿Cuántas deseas jugar?`, preguntas.length);
+      numPreguntas = parseInt(numPreguntas);
+      if (isNaN(numPreguntas) || numPreguntas < 1 || numPreguntas > preguntas.length) {
+        alert('Número no válido. Se jugarán todas las preguntas.');
+        numPreguntas = preguntas.length;
+      }
+      // Seleccionar preguntas aleatorias
+      preguntasElegidas = shuffle([...preguntas]).slice(0, numPreguntas);
+      preguntaActual = 0;
+      correctas = 0;
+      startButton.style.display = 'none';
+      infoContainer.innerHTML = '';
+      mostrarPregunta();
+    });
+
+    function mostrarPregunta() {
+      if (preguntaActual < preguntasElegidas.length) {
+        quizContainer.innerHTML = '';
+        // Actualizar el contador de preguntas
+        document.getElementById('question-counter').textContent = `Pregunta ${preguntaActual + 1} de ${preguntasElegidas.length}`;
+        quizContainer.style.display = 'block';
+        nextButton.style.display = 'none';
+
+        let pregunta = preguntasElegidas[preguntaActual];
+        let preguntaTitulo = document.createElement('h2');
+        preguntaTitulo.textContent = pregunta.texto;
+        quizContainer.appendChild(preguntaTitulo);
+
+        // Convertir las opciones en un array de objetos y mezclarlas
+        let opcionesArray = Object.entries(pregunta.opciones)
+          .map(([key, texto]) => ({ key, texto }));
+        opcionesArray = shuffle(opcionesArray);
+
+        opcionesArray.forEach(opcionObj => {
+          let opcion = document.createElement('div');
+          opcion.classList.add('option');
+          opcion.textContent = opcionObj.texto;
+          opcion.dataset.valor = opcionObj.key;
+          opcion.addEventListener('click', function() {
+            validarRespuesta(this, pregunta.respuesta);
+          });
+          quizContainer.appendChild(opcion);
+        });
+      } else {
+        quizContainer.innerHTML = `<h2>¡Test finalizado!</h2><p>Has acertado ${correctas} de ${preguntasElegidas.length} preguntas.</p>`;
+        nextButton.style.display = 'none';
+        restartButton.style.display = 'block';
+      }
+    }
+
+    function validarRespuesta(elemento, respuestaCorrecta) {
+      let opciones = document.querySelectorAll('.option');
+      opciones.forEach(op => op.style.pointerEvents = 'none');
+
+      if (elemento.dataset.valor === respuestaCorrecta) {
+        elemento.classList.add('correct');
+        correctas++;
+      } else {
+        elemento.classList.add('incorrect');
+        let correcta = document.querySelector(`.option[data-valor='${respuestaCorrecta}']`);
+        if (correcta) correcta.classList.add('correct');
+      }
+      nextButton.style.display = 'block';
+    }
+
+    nextButton.addEventListener('click', function() {
+      preguntaActual++;
+      mostrarPregunta();
+    });
+
+    restartButton.addEventListener('click', function() {
+      this.style.display = 'none';
+      startButton.style.display = 'none';
+      preguntaActual = 0;
+      correctas = 0;
+      infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas.</p>`;
+      document.getElementById('question-counter').textContent = '';
+      startButton.style.display = 'block';
+      quizContainer.innerHTML = '';
+      quizContainer.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
