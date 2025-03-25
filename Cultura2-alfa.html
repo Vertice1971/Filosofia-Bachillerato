@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Elementos de la Cultura. Segunda Parte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Estilos generales */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 10px; 
+            background-color: #f0f0f0;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 { 
+            text-align: center; 
+            font-size: 24px; 
+            margin-bottom: 20px;
+        }
+        .category-block-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+        }
+        .category-block { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            width: 30%; /* Cambiado de 48% a 30% para tres elementos por fila */
+            box-sizing: border-box; 
+            position: relative; 
+            background-color: #fafafa;
+            border-radius: 5px;
+        }
+        .drop-zone { 
+            border: 1px dashed #ccc; 
+            padding: 4px; /* Reducido de 5px a 4px */
+            min-height: 25px; /* Reducido de 30px a 25px */
+            margin-top: 4px; /* Reducido de 5px a 4px */
+            background-color: #f9f9f9; 
+            font-size: 12px; /* Reducido de 14px a 12px */
+            position: relative; 
+            border-radius: 3px;
+        }
+        .drag-item { 
+            margin: 4px; /* Reducido de 5px a 4px */
+            padding: 4px 8px; /* Reducido de 5px 10px a 4px 8px */
+            background-color: #e0e0e0; 
+            cursor: move; 
+            display: inline-block; 
+            font-size: 12px; /* Reducido de 14px a 12px */
+            border-radius: 3px;
+        }
+        .remove-button { 
+            position: absolute; 
+            top: 1px; /* Reducido de 2px a 1px */
+            right: 1px; /* Reducido de 2px a 1px */
+            background-color: red; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 8px; /* Reducido de 10px a 8px */
+            padding: 0px 2px; /* Reducido de 1px 3px a 0px 2px */
+            line-height: 1;
+            border-radius: 50%;
+        }
+        button { 
+            padding: 8px; /* Reducido de 10px a 8px */
+            font-size: 14px; /* Reducido de 16px a 14px */
+            width: 100%; 
+            margin-top: 15px; /* Reducido de 20px a 15px */
+            cursor: pointer; 
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        .success { 
+            color: green; 
+            font-size: 14px; /* Reducido de 16px a 14px */
+            text-align: center; 
+            margin-top: 10px; 
+        }
+        .error { 
+            color: red; 
+            font-size: 14px; /* Reducido de 16px a 14px */
+            text-align: center; 
+            margin-top: 10px; 
+        }
+        .name-entry { 
+            border: 1px solid #ccc; 
+            padding: 8px; /* Reducido de 10px a 8px */
+            margin-bottom: 10px; 
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .hidden { 
+            display: none; 
+        }
+        /* Estilos para el overlay */
+        .locked-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Estilos para resaltar zonas incorrectas o vacías */
+        .drop-zone.incorrect {
+            border-color: red;
+            background-color: #ffe6e6;
+        }
+        .drop-zone.correct {
+            border-color: green;
+            background-color: #e6ffe6;
+        }
+        /* Estilos para el botón dentro del overlay */
+        #overlay-reset-button {
+            padding: 8px 16px; /* Reducido de 10px 20px a 8px 16px */
+            font-size: 14px; /* Reducido de 16px a 14px */
+            margin-top: 15px; /* Reducido de 20px a 15px */
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #overlay-reset-button:hover {
+            background-color: #218838;
+        }
+        /* Estilos para la nueva pregunta y campo de respuesta */
+        #culture-question-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #culture-question-container input {
+            padding: 8px;
+            font-size: 14px;
+            width: 60%;
+            max-width: 300px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        /* Ajustes para pantallas más pequeñas */
+        @media (max-width: 768px) {
+            .category-block { 
+                width: 48%; /* Reducido para pantallas medianas */
+            }
+        }
+        @media (max-width: 480px) {
+            .category-block { 
+                width: 100%; /* Una columna en pantallas pequeñas */
+            }
+            #culture-question-container input {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Elementos de la Cultura. Segunda Parte</h1>
+        <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+
+        <!-- Sección de registro de participantes -->
+        <div id="name-registration">
+            <h2>Registro de Participantes</h2>
+            <div id="name-container"></div>
+            <button id="add-name-button">Añadir Persona</button>
+            <button id="finish-registration-button">Terminar Registro</button>
+            <div id="name-message" class="error"></div>
+        </div>
+
+        <!-- Sección para cargar el JSON -->
+        <div id="json-section" class="hidden">
+            <input type="file" id="json-file-input" accept=".json" />
+        </div>
+        
+        <!-- Sección del juego -->
+        <div id="game-container" class="hidden">
+            <h2 id="culture-name"></h2>
+            <div class="category-block-container" id="categories-container"></div>
+            <div id="items-container"></div>
+            <button id="check-button">Verificar Respuestas</button>
+            <div id="result-message"></div>
+        </div>
+    </div>
+
+    <!-- Overlay para bloquear la interacción cuando está bloqueado -->
+    <div id="locked-overlay" class="locked-overlay">
+        <div>
+            <p>Por favor, reinicia la prueba para intentar de nuevo.</p>
+            <button id="overlay-reset-button">Reiniciar Prueba</button>
+        </div>
+    </div>
+
+    <!-- Sección para la pregunta final -->
+    <div id="final-question-container" class="container hidden">
+        <h2>¿A qué cultura creen ustedes que pertenecen esos elementos?</h2>
+        <div id="culture-question-container">
+            <input type="text" id="culture-name-input" placeholder="Escribe el nombre de la cultura" />
+            <button id="submit-culture-button">Enviar Respuesta</button>
+            <div id="culture-message" class="error"></div>
+        </div>
+        <button id="save-record-button" class="hidden">Guardar registro de actividad para el profesor</button>
+    </div>
+
+    <script>
+        let data = null;
+        let isLocked = false; // Variable para controlar el estado de bloqueo
+        let activityData = []; // Array para almacenar datos de actividad por participante
+
+        // Elementos del DOM
+        const nameContainer = document.getElementById('name-container');
+        const addNameButton = document.getElementById('add-name-button');
+        const finishRegistrationButton = document.getElementById('finish-registration-button');
+        const nameMessageDiv = document.getElementById('name-message');
+        const jsonFileInput = document.getElementById('json-file-input');
+        const jsonSection = document.getElementById('json-section');
+        const gameContainer = document.getElementById('game-container');
+        const cultureNameElement = document.getElementById('culture-name');
+        const categoriesContainer = document.getElementById('categories-container');
+        const itemsContainer = document.getElementById('items-container');
+        const checkButton = document.getElementById('check-button');
+        const resultMessage = document.getElementById('result-message');
+        const lockedOverlay = document.getElementById('locked-overlay'); // Overlay
+        const overlayResetButton = document.getElementById('overlay-reset-button'); // Botón dentro del overlay
+        const finalQuestionContainer = document.getElementById('final-question-container');
+        const cultureNameInput = document.getElementById('culture-name-input');
+        const submitCultureButton = document.getElementById('submit-culture-button');
+        const cultureMessageDiv = document.getElementById('culture-message');
+        const saveRecordButton = document.getElementById('save-record-button');
+
+        // Registro de Nombres
+        function addNameEntry() {
+            const nameEntry = document.createElement('div');
+            nameEntry.className = 'name-entry';
+            nameEntry.innerHTML = `
+                <input type="text" placeholder="Nombre" class="name-input" required />
+                <input type="text" placeholder="Apellido" class="surname-input" required />
+                <input type="text" placeholder="Curso" class="course-input" required />
+            `;
+            nameContainer.appendChild(nameEntry);
+        }
+
+        // Evento para añadir una nueva entrada de nombre
+        addNameButton.addEventListener('click', addNameEntry);
+
+        // Añadir una entrada de nombre por defecto al cargar la página
+        addNameEntry();
+
+        // Evento para terminar el registro de nombres
+        finishRegistrationButton.addEventListener('click', () => {
+            nameMessageDiv.textContent = '';
+            const participants = [];
+
+            const nameEntries = document.querySelectorAll('#name-container .name-entry');
+            let isValid = true;
+
+            nameEntries.forEach((entry, index) => {
+                const name = entry.querySelector('.name-input').value.trim();
+                const surname = entry.querySelector('.surname-input').value.trim();
+                const course = entry.querySelector('.course-input').value.trim();
+
+                if (!name || !surname || !course) {
+                    isValid = false;
+                    nameMessageDiv.textContent = 'Por favor, completa todos los campos de las personas.';
+                } else {
+                    participants.push({ 
+                        id: index + 1, // Asignar un ID único
+                        name, 
+                        surname, 
+                        course,
+                        attempts: 0, // Inicializar contador de intentos
+                        cycles: [] // Inicializar array para aciertos por ciclo
+                    });
+                }
+            });
+
+            if (isValid && participants.length > 0) {
+                // Clonar los participantes en activityData
+                activityData = JSON.parse(JSON.stringify(participants));
+                
+                // Cambiar la visibilidad de las secciones
+                document.getElementById('name-registration').classList.add('hidden');
+                jsonSection.classList.remove('hidden');
+            }
+        });
+
+        // Leer el archivo JSON
+        jsonFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    data = JSON.parse(e.target.result);
+                    initializeGame();
+                } catch (error) {
+                    alert('Error al leer el archivo JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Inicializar el juego
+        function initializeGame() {
+            if (!data) return;
+
+            // Mostrar el nombre de la cultura
+            cultureNameElement.textContent = 'Cultura: ' + data.cultureName;
+            gameContainer.classList.remove('hidden');
+
+            // Limpiar contenedores previos
+            categoriesContainer.innerHTML = '';
+            itemsContainer.innerHTML = '';
+            resultMessage.textContent = '';
+            resultMessage.className = '';
+            isLocked = false; // Desbloquear el juego al iniciar
+            lockedOverlay.style.display = 'none'; // Ocultar el overlay
+
+            // Crear bloques de categorías con zonas de soltado
+            for (const category in data.categories) {
+                const categoryBlock = document.createElement('div');
+                categoryBlock.className = 'category-block';
+                categoryBlock.innerHTML = `<h3>${category}</h3>
+                                           <div class="drop-zone" data-category="${category}" data-count="0"></div>
+                                           <div class="drop-zone" data-category="${category}" data-count="1"></div>`;
+                categoriesContainer.appendChild(categoryBlock);
+            }
+
+            // Crear elementos de arrastre con los ejemplos desordenados
+            const examples = [];
+            for (const category in data.categories) {
+                examples.push(...data.categories[category]);
+            }
+            shuffleArray(examples);
+            examples.forEach(example => {
+                const dragItem = createDragItem(example);
+                itemsContainer.appendChild(dragItem);
+            });
+
+            // Añadir eventos de arrastrar y soltar
+            addDragAndDropEvents();
+        }
+
+        // Función para mezclar un array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Añadir eventos de arrastrar y soltar
+        function addDragAndDropEvents() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', dragOver);
+                zone.addEventListener('drop', drop);
+                zone.addEventListener('dragleave', dragLeave);
+            });
+        }
+
+        function dragStart(event) {
+            if (isLocked) return; // Bloquear si está en estado de bloqueo
+            event.dataTransfer.setData('text', event.target.textContent);
+        }
+
+        function dragOver(event) {
+            if (isLocked) return; // Bloquear si está en estado de bloqueo
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function dragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function drop(event) {
+            if (isLocked) return; // Bloquear si está en estado de bloqueo
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const text = event.dataTransfer.getData('text');
+
+            if (event.currentTarget.querySelector('.item-content')) {
+                alert('Este campo ya tiene un ejemplo. Por favor, elimínalo antes de añadir otro.');
+                return;
+            }
+
+            // Verificar si el elemento ya está colocado en otra zona
+            const existingItem = document.querySelector(`.item-content[data-text="${text}"]`);
+            if (existingItem) {
+                alert('Este elemento ya ha sido colocado en otra zona.');
+                return;
+            }
+
+            // Crear un div con el texto y un botón para eliminar
+            const itemContent = document.createElement('div');
+            itemContent.className = 'item-content';
+            itemContent.textContent = text;
+            itemContent.setAttribute('data-text', text); // Para rastrear el elemento
+
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-button';
+            removeButton.textContent = '×';
+            removeButton.onclick = () => {
+                if (isLocked) return; // Bloquear la eliminación si está en estado de bloqueo
+                itemContent.remove();
+                itemsContainer.appendChild(createDragItem(text)); // Devolver el elemento a la lista original
+            };
+
+            itemContent.appendChild(removeButton);
+            event.currentTarget.appendChild(itemContent);
+        }
+
+        // Crear un elemento de arrastre
+        function createDragItem(text) {
+            const dragItem = document.createElement('div');
+            dragItem.className = 'drag-item';
+            dragItem.textContent = text;
+            dragItem.draggable = true;
+            dragItem.addEventListener('dragstart', dragStart);
+            return dragItem;
+        }
+
+        // Verificar respuestas
+        checkButton.addEventListener('click', () => {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let allCorrect = true;
+            let emptyFields = false;
+
+            dropZones.forEach(zone => {
+                const category = zone.getAttribute('data-category');
+                const itemContent = zone.querySelector('.item-content');
+                const placedItem = itemContent ? itemContent.textContent.trim() : '';
+
+                // Reseteo de clases de estado previo
+                zone.classList.remove('incorrect');
+                zone.classList.remove('correct');
+
+                if (!placedItem) {
+                    allCorrect = false;
+                    emptyFields = true;
+                    zone.classList.add('incorrect');
+                } else if (!data.categories[category].includes(placedItem)) {
+                    allCorrect = false;
+                    zone.classList.add('incorrect');
+                } else {
+                    zone.classList.add('correct');
+                }
+            });
+
+            if (allCorrect) {
+                resultMessage.className = 'success';
+                resultMessage.textContent = '¡Todas las respuestas son correctas!';
+                // Bloquear el juego para evitar más interacciones
+                isLocked = true;
+                // Mostrar la sección de la pregunta final
+                gameContainer.classList.add('hidden');
+                finalQuestionContainer.classList.remove('hidden');
+            } else {
+                if (emptyFields) {
+                    resultMessage.className = 'error';
+                    resultMessage.textContent = 'Hay campos vacíos o respuestas incorrectas. Por favor, completa todos los campos correctamente.';
+                } else {
+                    resultMessage.className = 'error';
+                    resultMessage.textContent = 'Algunas respuestas son incorrectas. Por favor, inténtalo de nuevo.';
+                }
+                // Bloquear el juego
+                isLocked = true;
+                lockedOverlay.style.display = 'flex'; // Mostrar overlay
+
+                // Incrementar intentos por participante
+                activityData.forEach(participant => {
+                    participant.attempts += 1;
+                    participant.cycles.push({
+                        correct: false,
+                        timestamp: new Date().toISOString()
+                    });
+                });
+            }
+
+            // Deslizar la pantalla hacia abajo para ver el mensaje
+            resultMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // Reiniciar la prueba desde el overlay
+        overlayResetButton.addEventListener('click', () => {
+            // Limpiar todas las zonas de soltado
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const itemContent = zone.querySelector('.item-content');
+                if (itemContent) {
+                    const text = itemContent.textContent.slice(0, -1); // Quitar la "×"
+                    itemsContainer.appendChild(createDragItem(text));
+                    itemContent.remove();
+                }
+                zone.classList.remove('incorrect');
+                zone.classList.remove('correct');
+                zone.style.borderColor = '#ccc';
+            });
+
+            // Limpiar el mensaje de resultado
+            resultMessage.textContent = '';
+            resultMessage.className = '';
+
+            // Ocultar el overlay
+            isLocked = false;
+            lockedOverlay.style.display = 'none'; // Ocultar overlay
+        });
+
+        // Enviar respuesta de la cultura
+        submitCultureButton.addEventListener('click', () => {
+            const cultureName = cultureNameInput.value.trim();
+            if (!cultureName) {
+                cultureMessageDiv.textContent = 'Por favor, ingresa el nombre de la cultura.';
+                return;
+            }
+
+            // Guardar el nombre de la cultura en cada participante (puede ser común para todos)
+            activityData.forEach(participant => {
+                participant.assignedCulture = cultureName;
+            });
+
+            // Mostrar el botón para guardar el registro
+            saveRecordButton.classList.remove('hidden');
+            cultureMessageDiv.textContent = '';
+            submitCultureButton.disabled = true;
+            cultureNameInput.disabled = true;
+        });
+
+        // Guardar registro de actividad para el profesor
+        saveRecordButton.addEventListener('click', () => {
+            // Combinar los datos originales con los datos de actividad
+            const combinedData = {
+                originalData: data,
+                participants: activityData,
+                timestamp: new Date().toISOString()
+            };
+
+            // Generar un número aleatorio entre 0 y 100
+            const randomNumber = Math.floor(Math.random() * 101);
+
+            // Crear el nombre del archivo con "Cultura_" seguido del número aleatorio
+            const fileName = `Cultura_${randomNumber}.json`;
+
+            // Convertir el objeto combinado a una cadena JSON con formato
+            const jsonString = JSON.stringify(combinedData, null, 2);
+
+            // Crear un Blob con el contenido JSON
+            const blob = new Blob([jsonString], { type: 'application/json' });
+
+            // Crear una URL para el Blob
+            const url = URL.createObjectURL(blob);
+
+            // Crear un elemento <a> para descargar el archivo
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName; // Asignar el nombre del archivo
+            a.click();
+
+            // Revocar la URL del Blob para liberar memoria
+            URL.revokeObjectURL(url);
+
+            // Mostrar mensaje de éxito
+            cultureMessageDiv.className = 'success';
+            cultureMessageDiv.textContent = 'Registro de actividad guardado exitosamente.';
+            saveRecordButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
