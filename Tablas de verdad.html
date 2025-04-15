@@ -15,6 +15,8 @@
             width: 100%;
             margin-top: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            /* Para dejar espacio en la izquierda por la numeración */
+            margin-left: 40px;
         }
         th, td {
             border: 1px solid #4682b4;
@@ -26,6 +28,22 @@
             background-color: #4682b4;
             color: white;
             font-weight: bold;
+        }
+        /* Estilos para la celda de numeración en el cuerpo */
+        .row-number {
+            border: none;
+            background-color: transparent;
+            font-size: 0.8em;
+            text-align: right;
+            padding-right: 10px;
+            width: 30px;
+        }
+        /* En el encabezado, la celda de numeración queda vacía y sin borde */
+        .row-number-header {
+            border: none;
+            background-color: transparent;
+            width: 30px;
+            padding: 0;
         }
         input[type="text"] {
             padding: 10px;
@@ -111,6 +129,7 @@ function generateTruthTable() {
     const tableHeader = document.getElementById('headerRow');
     const tableBody = document.querySelector('#truthTable tbody');
     
+    // Limpiar encabezado y cuerpo de la tabla
     tableHeader.innerHTML = '';
     tableBody.innerHTML = '';
 
@@ -128,7 +147,7 @@ function generateTruthTable() {
         const regex = /¬[PQR]/g;
         let match;
         
-        // Buscar en expresión principal
+        // Buscar en la expresión principal
         while ((match = regex.exec(normalizedExpr)) !== null) {
             allNegations.add(match[0]);
         }
@@ -153,6 +172,12 @@ function generateTruthTable() {
         }
 
         // Configurar encabezados
+        // Se inserta una celda vacía para mantener la estructura de columnas
+        const emptyTh = document.createElement('th');
+        emptyTh.className = 'row-number-header';
+        emptyTh.textContent = ''; 
+        tableHeader.appendChild(emptyTh);
+        
         const variables = ['P', 'Q', 'R'];
         variables.forEach(variable => {
             const th = document.createElement('th');
@@ -175,26 +200,32 @@ function generateTruthTable() {
             tableHeader.appendChild(th);
         });
 
-        // Añadir columna final
+        // Añadir columna final con la expresión completa
         const finalTh = document.createElement('th');
         finalTh.textContent = normalizedExpr;
         tableHeader.appendChild(finalTh);
 
-        // Generar combinaciones
+        // Generar combinaciones para las variables (orden descendente)
         const combinations = generateCombinations(variables);
 
-        // Procesar cada combinación
-        combinations.forEach(comb => {
+        // Procesar cada combinación y numerar las filas (número discreto en la primera celda)
+        combinations.forEach((comb, index) => {
             const row = document.createElement('tr');
 
-            // Valores base PQR
+            // Celda de numeración sin encasillar
+            const tdNum = document.createElement('td');
+            tdNum.className = 'row-number';
+            tdNum.textContent = index + 1;
+            row.appendChild(tdNum);
+            
+            // Valores base de las variables (P, Q, R)
             variables.forEach(variable => {
                 const td = document.createElement('td');
                 td.textContent = comb[variable] ? 'V' : 'F';
                 row.appendChild(td);
             });
 
-            // Valores de negación
+            // Valores para las negaciones
             negations.forEach(neg => {
                 const variable = neg.charAt(1);
                 const td = document.createElement('td');
@@ -204,18 +235,18 @@ function generateTruthTable() {
 
             // Evaluar subexpresiones
             const subResults = {};
-            subExpressions.forEach((expr, index) => {
+            subExpressions.forEach((expr, indexExpr) => {
                 const result = evaluateExpression(expr, comb);
-                subResults[index] = result;
+                subResults[indexExpr] = result;
                 const td = document.createElement('td');
                 td.textContent = result ? 'V' : 'F';
                 row.appendChild(td);
             });
 
-            // Evaluar expresión final
+            // Evaluar la expresión final
             let finalExpr = normalizedExpr;
-            subExpressions.forEach((expr, index) => {
-                finalExpr = finalExpr.replace(`(${expr})`, subResults[index]);
+            subExpressions.forEach((expr, indexExpr) => {
+                finalExpr = finalExpr.replace(`(${expr})`, subResults[indexExpr]);
             });
             const finalResult = evaluateExpression(finalExpr, comb);
             
@@ -239,7 +270,7 @@ function evaluateExpression(expr, vars) {
         .replace(/∧/g, '&&')
         .replace(/∨/g, '||')
         .replace(/¬/g, '!');
-
+    
     // Manejar implicaciones iterativamente
     let hasImplication = true;
     while (hasImplication) {
