@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 1 - Primera parte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .setup-screen, .quiz-screen, .results-screen {
+            display: none;
+        }
+
+        .setup-screen.active, .quiz-screen.active, .results-screen.active {
+            display: block;
+        }
+
+        .question-selector {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .question-selector h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-number {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-number:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.3em;
+            width: 100%;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+            animation: pulse 0.5s;
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .feedback.correct {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .feedback.incorrect {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .btn-next.show {
+            display: block;
+        }
+
+        .btn-next:hover {
+            background: #5568d3;
+            transform: scale(1.02);
+        }
+
+        .results-card {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .results-message {
+            font-size: 1.5em;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .results-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            transform: scale(1.05);
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 Filosofía Tema 1- Repaso de la primera parte</h1>
+        <p class="subtitle">Tomás Cuesta - IES Juan de la Cierva</p>
+
+        <!-- Pantalla de configuración -->
+        <div class="setup-screen active">
+            <div class="question-selector">
+                <h2>¿Cuántas preguntas quieres responder?</h2>
+                <div class="button-group">
+                    <button class="btn btn-number" onclick="selectQuestions(10)">10</button>
+                    <button class="btn btn-number" onclick="selectQuestions(20)">20</button>
+                    <button class="btn btn-number" onclick="selectQuestions(30)">30</button>
+                    <button class="btn btn-number" onclick="selectQuestions(40)">40 (Todas)</button>
+                </div>
+                <button class="btn btn-start" onclick="startQuiz()">Comenzar Test</button>
+            </div>
+        </div>
+
+        <!-- Pantalla del quiz -->
+        <div class="quiz-screen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-card">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="feedback" id="feedback"></div>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de resultados -->
+        <div class="results-screen">
+            <div class="results-card">
+                <h2>¡Test Completado! 🎉</h2>
+                <div class="score-circle" id="scoreCircle"></div>
+                <div class="results-message" id="resultsMessage"></div>
+                <div class="results-details" id="resultsDetails"></div>
+                <button class="btn btn-restart" onclick="restartQuiz()">Realizar otro test</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allQuestions = [
+            { q: "¿Qué sostiene el creacionismo sobre el origen del mundo y los seres vivos?", o: ["Que surgieron del azar cósmico.", "Que evolucionaron sin propósito.", "Que fueron creados por Dios."], c: 2 },
+            { q: "¿Cómo afirma el texto creacionista que podemos conocer a Dios?", o: ["Por sus huellas en la creación.", "Por las emociones humanas.", "Por la tradición familiar."], c: 0 },
+            { q: "¿Qué representan las leyes del universo para el creacionismo?", o: ["Fenómenos sin causa.", "Pruebas de una inteligencia ordenadora divina.", "Accidentes naturales."], c: 1 },
+            { q: "¿Qué comparación usa el creacionismo para defender la idea de diseño?", o: ["El cosmos con objetos construidos por humanos.", "Los planetas con animales marinos.", "Las estrellas con árboles."], c: 0 },
+            { q: "¿Qué relación establece el texto entre orden y creación?", o: ["A más orden, mayor inteligencia creadora.", "A más orden, más azar.", "A menos orden, más perfección."], c: 0 },
+            { q: "¿Cómo interpreta el creacionismo la naturaleza?", o: ["Como una obra con propósito.", "Como un accidente sin sentido.", "Como una máquina sin dirección."], c: 0 },
+            { q: "¿Qué ejemplo usa el texto como diseño perfecto?", o: ["El ojo humano.", "El sistema solar.", "El lenguaje."], c: 0 },
+            { q: "¿Qué suposición central sostiene el argumento creacionista?", o: ["Que la complejidad implica intención.", "Que la materia se ordena sola.", "Que la vida es azarosa."], c: 0 },
+            { q: "¿Qué teoría científica se contrapone al creacionismo?", o: ["El evolucionismo.", "El geocentrismo.", "El idealismo."], c: 0 },
+            { q: "¿Qué principio básico plantea el evolucionismo?", o: ["Que la vida cambia por selección natural.", "Que la vida permanece inmutable.", "Que la vida es creada en su forma actual."], c: 0 },
+            { q: "¿Qué demuestran las imperfecciones biológicas?", o: ["La prueba del diseño divino.", "La evidencia del proceso evolutivo.", "La falta de adaptación."], c: 1 },
+            { q: "¿Qué muestra el sexto 'dedo' del panda?", o: ["Un diseño perfecto.", "Una adaptación funcional imperfecta.", "Un error genético sin utilidad."], c: 1 },
+            { q: "¿Qué revela la estructura del ojo humano?", o: ["Un diseño heredado e ineficiente.", "Una perfección total.", "Un órgano sin evolución."], c: 0 },
+            { q: "¿Qué representa el apéndice humano?", o: ["Una función nueva y necesaria.", "Un vestigio de funciones pasadas.", "Un órgano espiritual."], c: 1 },
+            { q: "¿Qué enseña la cola del pavo real sobre la evolución?", o: ["Que la belleza siempre mejora la supervivencia.", "Que la selección sexual puede ser desventajosa.", "Que los colores son un error evolutivo."], c: 1 },
+            { q: "¿Qué indican los dolores de espalda humanos?", o: ["La adaptación total al bipedismo.", "La herencia cuadrúpeda de nuestra anatomía.", "El mal uso del cuerpo moderno."], c: 1 },
+            { q: "¿Qué evidencia el riesgo de atragantamiento?", o: ["Un diseño perfecto del sistema respiratorio.", "Una disposición evolutiva imperfecta.", "Una adaptación reciente."], c: 1 },
+            { q: "¿Qué representan las muelas del juicio?", o: ["Un avance adaptativo.", "Un resto evolutivo sin función actual.", "Una mutación moderna."], c: 1 },
+            { q: "¿Cómo interpreta el evolucionismo el proceso natural?", o: ["Como un plan con finalidad divina.", "Como un proceso de ensayo y error.", "Como una creación repentina."], c: 1 },
+            { q: "¿Qué busca la evolución según la teoría científica?", o: ["La perfección absoluta.", "La utilidad suficiente para sobrevivir.", "La armonía estética."], c: 1 },
+            { q: "¿Dónde comenzó la hominización según los datos geológicos?", o: ["En Asia central.", "En África oriental.", "En Europa."], c: 1 },
+            { q: "¿Qué papel jugó el Gran Valle del Rift en la evolución humana?", o: ["Ninguno, fue solo un cambio geográfico.", "Separó poblaciones y favoreció líneas evolutivas distintas.", "Destruyó el hábitat de los simios."], c: 1 },
+            { q: "¿Qué ocurrió con los simios tras la separación ecológica?", o: ["Siguieron adaptados al bosque.", "Se extinguieron.", "Se hicieron bípedos."], c: 0 },
+            { q: "¿Qué permitió el nuevo entorno abierto a los humanos?", o: ["Mantener las mismas costumbres arbóreas.", "Desarrollar nuevas conductas adaptativas.", "Evitar la competencia entre especies."], c: 1 },
+            { q: "¿Qué cambio importante se produjo en la sexualidad humana?", o: ["La desaparición del deseo sexual.", "El abandono del estro.", "La reproducción asexual."], c: 1 },
+            { q: "¿Qué caracteriza a las hembras humanas frente a otras especies?", o: ["Más tiempo fértil y sexualmente activa.", "Su celo visible.", "Su reproducción estacional."], c: 0 },
+            { q: "¿Qué consecuencia tuvo el cambio en del estro?", o: ["Más competencia entre machos.", "Menos competencia y más cooperación.", "Mayor violencia sexual."], c: 1 },
+            { q: "¿Qué efecto social tuvo el cambio en el estro?", o: ["Favoreció vínculos de pareja estables.", "Eliminó la reproducción.", "Disminuyó la diversidad genética."], c: 0 },
+            { q: "¿Qué tipo de relación pudo surgir del cambio en el estro?", o: ["Monogamia parcial o duradera.", "Poligamia ilimitada.", "Aislamiento sexual."], c: 0 },
+            { q: "¿Qué significa 'encefalización'?", o: ["El desarrollo del cerebro respecto al cuerpo.", "El aumento de la masa muscular.", "La reducción del sistema nervioso."], c: 0 },
+            { q: "¿Un cerebro más grande significa más inteligencia?", o: ["No necesariamente.", "Sí.", "Depende del sexo."], c: 0 },
+            { q: "¿Por qué destaca el cerebro humano?", o: ["Por su índice de encefalización excepcional.", "Por ser el más grande en tamaño absoluto.", "Por su forma alargada."], c: 0 },
+            { q: "¿Qué muestra la alometría?", o: ["Que el cerebro crece proporcionalmente al cuerpo.", "Que el cerebro no aumenta al mismo ritmo que el cuerpo.", "Que el tamaño del cuerpo es irrelevante."], c: 1 },
+            { q: "¿Cuánto mayor es el cerebro humano de lo esperado?", o: ["Tres veces.", "Siete veces.", "Diez veces."], c: 1 },
+            { q: "¿Qué coste energético tiene el cerebro humano?", o: ["Consume el 25% de la energía corporal.", "Consume el 5%.", "Consume el 50%."], c: 0 },
+            { q: "¿Qué sacrificio acompañó al crecimiento cerebral?", o: ["Reducción de la fuerza muscular.", "Disminución de la vista.", "Pérdida del habla."], c: 0 },
+            { q: "¿Qué significa 'neotenia'?", o: ["Inmadurez al nacer en comparación con otras especies.", "Envejecimiento prematuro.", "Aceleración del desarrollo."], c: 0 },
+            { q: "¿Por qué los humanos nacen inmaduros?", o: ["Para permitir el crecimiento cerebral fuera del útero.", "Por fallos en la gestación.", "Por adaptación al clima."], c: 0 },
+            { q: "¿Qué ventaja dio la prolongada infancia humana?", o: ["Más aprendizaje y socialización.", "Menor dependencia.", "Reproducción más temprana."], c: 0 },
+            { q: "¿Qué derivó de la dependencia prolongada en la infancia?", o: ["La cooperación, el lenguaje y la cultura.", "La reducción de la inteligencia.", "La desaparición de los vínculos sociales."], c: 0 }
+        ];
+
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let numQuestions = 10;
+        let answered = false;
+
+        function selectQuestions(num) {
+            numQuestions = num;
+            document.querySelectorAll('.btn-number').forEach(btn => {
+                btn.style.background = '#667eea';
+            });
+            event.target.style.background = '#764ba2';
+        }
+
+        function startQuiz() {
+            selectedQuestions = shuffleArray([...allQuestions]).slice(0, numQuestions);
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.querySelector('.setup-screen').classList.remove('active');
+            document.querySelector('.quiz-screen').classList.add('active');
+            
+            showQuestion();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function showQuestion() {
+            answered = false;
+            const question = selectedQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestionIndex + 1} de ${numQuestions}`;
+            document.getElementById('questionText').textContent = question.q;
+            
+            const progressPercent = ((currentQuestionIndex) / numQuestions) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            const shuffledOptions = question.o.map((opt, idx) => ({ text: opt, originalIdx: idx }));
+            shuffleArray(shuffledOptions);
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            shuffledOptions.forEach((option, idx) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.dataset.originalIdx = option.originalIdx;
+                optionDiv.onclick = () => selectOption(optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+            document.getElementById('nextBtn').classList.remove('show');
+        }
+
+        function selectOption(selectedDiv) {
+            if (answered) return;
+            
+            answered = true;
+            const question = selectedQuestions[currentQuestionIndex];
+            const selectedIdx = parseInt(selectedDiv.dataset.originalIdx);
+            const isCorrect = selectedIdx === question.c;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+            });
+            
+            if (isCorrect) {
+                selectedDiv.classList.add('correct');
+                score++;
+                showFeedback('¡Correcto! 🎉', 'correct');
+            } else {
+                selectedDiv.classList.add('incorrect');
+                document.querySelectorAll('.option').forEach(opt => {
+                    if (parseInt(opt.dataset.originalIdx) === question.c) {
+                        opt.classList.add('correct');
+                    }
+                });
+                showFeedback('Incorrecto. La respuesta correcta está marcada en verde.', 'incorrect');
+            }
+            
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = 'feedback show ' + type;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < numQuestions) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.querySelector('.quiz-screen').classList.remove('active');
+            document.querySelector('.results-screen').classList.add('active');
+            
+            const percentage = Math.round((score / numQuestions) * 100);
+            document.getElementById('scoreCircle').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '¡Excelente! Dominas el tema 🏆';
+            } else if (percentage >= 70) {
+                message = '¡Muy bien! Buen conocimiento 👏';
+            } else if (percentage >= 50) {
+                message = 'Bien, pero puedes mejorar 📚';
+            } else {
+                message = 'Sigue estudiando 💪';
+            }
+            
+            document.getElementById('resultsMessage').textContent = message;
+            document.getElementById('resultsDetails').innerHTML = `
+                Has acertado <strong>${score}</strong> de <strong>${numQuestions}</strong> preguntas<br>
+                Porcentaje de acierto: <strong>${percentage}%</strong>
+            `;
+        }
+
+        function restartQuiz() {
+            document.querySelector('.results-screen').classList.remove('active');
+            document.querySelector('.setup-screen').classList.add('active');
+        }
+    </script>
+</body>
+</html>

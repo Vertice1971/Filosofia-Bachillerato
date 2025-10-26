@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gattaca: A la carta</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1.2em;
+    }
+    .question {
+      display: none;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gattaca: A la carta</h1>
+  <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+  <p>Este programa te permitirá seleccionar características genéticas basadas en fragmentos de ADN.</p>
+  <p>Sabrás qué característica estás eligiendo a medida que avanzas.</p>
+
+  <div id="questions">
+    <!-- Aquí se mostrarán las preguntas -->
+  </div>
+
+  <div id="results" style="display:none;">
+    <h2>Características seleccionadas:</h2>
+    <ul id="traits">
+      <!-- Características seleccionadas se mostrarán aquí -->
+    </ul>
+  </div>
+
+  <script>
+    // Lista completa de opciones genéticas
+    const allGeneticOptions = [
+      { id: "sexo", fragments: ["SRY", "XX"], labels: ["Sexo masculino", "Sexo femenino"] },
+      { id: "altura", fragments: ["rs1042725_T", "rs1042725_C"], labels: ["Altura elevada", "Altura baja"] },
+      { id: "memoria", fragments: ["rs6265_G", "rs6265_A"], labels: ["Mayor capacidad de memoria", "Capacidad de memoria limitada"] },
+      { id: "resistencia_vs_velocidad", fragments: ["rs1815739_C", "rs1815739_T"], labels: ["Mayor resistencia física", "Mayor capacidad de velocidad"] },
+      { id: "densidad_osea", fragments: ["rs3736228_T", "rs3736228_C"], labels: ["Densidad ósea alta", "Densidad ósea baja"] },
+      { id: "color_ojos", fragments: ["rs12913832_A", "rs12913832_G"], labels: ["Ojos azules", "Ojos marrones"] },
+      { id: "estres", fragments: ["rs4680_G", "rs4680_A"], labels: ["Mayor manejo del estrés", "Menor manejo del estrés"] },
+      { id: "alzheimer", fragments: ["rs7412_T", "rs7412_C"], labels: ["Mayor riesgo de Alzheimer", "Menor riesgo de Alzheimer"] },
+      { id: "obesidad", fragments: ["rs10246939_A", "rs10246939_G"], labels: ["Predisposición a obesidad", "Predisposición a peso saludable"] },
+      { id: "higado", fragments: ["rs738409_G", "rs738409_C"], labels: ["Mayor riesgo de hígado graso", "Menor riesgo de hígado graso"] },
+      { id: "apetito", fragments: ["rs9939609_A", "rs9939609_T"], labels: ["Mayor apetito", "Menor apetito"] },
+      { id: "adiccion", fragments: ["rs1800497_A", "rs1800497_G"], labels: ["Mayor riesgo de adicción", "Menor riesgo de adicción"] },
+      { id: "dolor", fragments: ["rs1799971_G", "rs1799971_A"], labels: ["Mayor tolerancia al dolor", "Menor tolerancia al dolor"] },
+      { id: "cardiacos", fragments: ["rs1801133_C", "rs1801133_T"], labels: ["Mayor riesgo de problemas cardíacos", "Menor riesgo de problemas cardíacos"] },
+      { id: "prostata", fragments: ["rs602662_T", "rs602662_C"], labels: ["Mayor riesgo de cáncer de próstata", "Menor riesgo de cáncer de próstata"] },
+      { id: "hemocromatosis", fragments: ["rs1799945_C", "rs1799945_G"], labels: ["Mayor riesgo de hemocromatosis", "Menor riesgo de hemocromatosis"] },
+      { id: "asma", fragments: ["rs1805015_G", "rs1805015_A"], labels: ["Mayor riesgo de asma", "Menor riesgo de asma"] },
+      { id: "artritis", fragments: ["rs3753344_G", "rs3753344_T"], labels: ["Mayor riesgo de artritis", "Menor riesgo de artritis"] },
+      { id: "empatia", fragments: ["rs1234567_A", "rs1234567_T"], labels: ["Mayor empatía", "Menor empatía"] },
+      { id: "personalidad", fragments: ["rs7654321_C", "rs7654321_G"], labels: ["Mayor tendencia a la introversión", "Mayor tendencia a la extroversión"] }
+    ];
+
+    // Variables globales
+    let userChoices = [];
+    let orderedQuestions = []; // Preguntas a usar (sin la de sexo)
+    let currentQuestion = 0;
+    let userSex = null; // "masculino" o "femenino"
+
+    // Función para mostrar la pregunta del sexo
+    function presentSexQuestion() {
+      const questionsDiv = document.getElementById("questions");
+      questionsDiv.innerHTML = "";
+      const sexoOption = allGeneticOptions.find(option => option.id === "sexo");
+      const questionDiv = document.createElement("div");
+      questionDiv.classList.add("question");
+      questionDiv.id = "question-sex";
+      questionDiv.innerHTML = `
+        <h3>Rasgo 1: ${sexoOption.labels[0]} vs ${sexoOption.labels[1]}</h3>
+        <p>1. Fragmento de ADN: ${sexoOption.fragments[0]}</p>
+        <p>2. Fragmento de ADN: ${sexoOption.fragments[1]}</p>
+        <button onclick="chooseSex(1)">Elige 1</button>
+        <button onclick="chooseSex(2)">Elige 2</button>
+      `;
+      questionsDiv.appendChild(questionDiv);
+      questionDiv.style.display = "block";
+    }
+
+    // Función para gestionar la elección del sexo
+    function chooseSex(choice) {
+      const sexoOption = allGeneticOptions.find(option => option.id === "sexo");
+      userSex = (choice === 1) ? "masculino" : "femenino";
+      userChoices.push(sexoOption.labels[choice - 1]);
+
+      // Preparar el resto de preguntas en función del sexo
+      prepareQuestions();
+
+      // Ocultar la pregunta del sexo y mostrar la siguiente
+      document.getElementById("question-sex").style.display = "none";
+      showNextQuestion();
+    }
+
+    // Función para preparar las preguntas restantes
+    function prepareQuestions() {
+      // Excluir la opción de sexo
+      orderedQuestions = allGeneticOptions.filter(option => option.id !== "sexo");
+
+      // Para mujeres, eliminamos la opción de cáncer de próstata
+      if (userSex === "femenino") {
+        orderedQuestions = orderedQuestions.filter(option => option.id !== "prostata");
+        // Añadimos una opción específica para mujeres: riesgo de cáncer de mama
+        orderedQuestions.push({
+          id: "mama",
+          fragments: ["BRCA1", "BRCA2"],
+          labels: ["Mayor riesgo de cáncer de mama", "Menor riesgo de cáncer de mama"]
+        });
+      }
+      // Barajar las preguntas restantes
+      orderedQuestions.sort(() => Math.random() - 0.5);
+    }
+
+    // Función para mostrar la siguiente pregunta
+    function showNextQuestion() {
+      if (currentQuestion < orderedQuestions.length) {
+        const questionsDiv = document.getElementById("questions");
+        questionsDiv.innerHTML = "";
+        const option = orderedQuestions[currentQuestion];
+        // El número de rasgo se calcula sumando 2 (ya que el primer rasgo es el sexo)
+        const questionDiv = document.createElement("div");
+        questionDiv.classList.add("question");
+        questionDiv.id = `question-${currentQuestion}`;
+        questionDiv.innerHTML = `
+          <h3>Rasgo ${currentQuestion + 2}: ${option.labels[0]} vs ${option.labels[1]}</h3>
+          <p>1. Fragmento de ADN: ${option.fragments[0]}</p>
+          <p>2. Fragmento de ADN: ${option.fragments[1]}</p>
+          <button onclick="chooseTrait(1)">Elige 1</button>
+          <button onclick="chooseTrait(2)">Elige 2</button>
+        `;
+        questionsDiv.appendChild(questionDiv);
+        questionDiv.style.display = "block";
+      } else {
+        revealChoices();
+      }
+    }
+
+    // Función para gestionar la elección de cada rasgo
+    function chooseTrait(choice) {
+      const option = orderedQuestions[currentQuestion];
+      userChoices.push(option.labels[choice - 1]);
+      currentQuestion++;
+      showNextQuestion();
+    }
+
+    // Función para mostrar las elecciones finales
+    function revealChoices() {
+      const resultsDiv = document.getElementById("results");
+      const traitsList = document.getElementById("traits");
+      traitsList.innerHTML = "";
+      userChoices.forEach((trait, index) => {
+        const listItem = document.createElement("li");
+        listItem.innerText = `Rasgo ${index + 1}: ${trait}`;
+        traitsList.appendChild(listItem);
+      });
+      document.getElementById("questions").style.display = "none";
+      document.querySelector("h1").style.display = "none";
+      document.querySelectorAll("p").forEach(p => p.style.display = "none");
+      resultsDiv.style.display = "block";
+    }
+
+    // Inicializar mostrando la pregunta del sexo
+    presentSexQuestion();
+  </script>
+</body>
+</html>

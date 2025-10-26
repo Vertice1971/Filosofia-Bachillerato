@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Elementos de la Cultura</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Estilos generales */
+        body { font-family: Arial, sans-serif; margin: 10px; }
+        .container { max-width: 800px; margin: auto; }
+        h1, h2 { text-align: center; }
+        button { padding: 10px; font-size: 16px; width: 100%; margin-bottom: 10px; cursor: pointer; }
+        input { width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box; }
+        .error { color: red; font-size: 14px; }
+        .success { color: green; font-size: 14px; }
+        .name-entry, .category-block { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Elementos de la Cultura</h1>
+        <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+        <!-- Pantalla de Registro de Nombres -->
+        <div id="name-registration">
+            <h2>Registro de Nombres</h2>
+            <div id="name-container"></div>
+            <button id="add-name-button">Añadir Persona</button>
+            <button id="finish-registration-button">Terminar Registro</button>
+            <div id="name-message" class="error"></div>
+        </div>
+
+        <!-- Ingreso de Datos Culturales -->
+        <div id="cultural-data" class="hidden">
+            <h2>Datos Culturales</h2>
+            <p>Introduce el nombre de la cultura y dos ejemplos para cada categoría cultural.</p>
+            <input type="text" id="culture-name" placeholder="Nombre de la Cultura" required />
+            <div id="categories-container"></div>
+            <button id="generate-json-button">Generar JSON</button>
+            <div id="message" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables generales
+        const categories = [
+            'Artefactos',
+            'Procedimientos',
+            'Normas (Y su sanción)',
+            'Costumbres (Y su sanción)',
+            'Conocimientos y Creencias (Un ejemplo de cada)',
+            'Valores',
+            'Símbolos'
+        ];
+
+        let data = {
+            participants: [],
+            cultureName: '',
+            categories: {}
+        };
+
+        // Elementos del DOM
+        const nameContainer = document.getElementById('name-container');
+        const addNameButton = document.getElementById('add-name-button');
+        const finishRegistrationButton = document.getElementById('finish-registration-button');
+        const nameMessageDiv = document.getElementById('name-message');
+        const nameRegistrationDiv = document.getElementById('name-registration');
+
+        const cultureNameInput = document.getElementById('culture-name');
+        const categoriesContainer = document.getElementById('categories-container');
+        const generateJsonButton = document.getElementById('generate-json-button');
+        const messageDiv = document.getElementById('message');
+        const culturalDataDiv = document.getElementById('cultural-data');
+
+        // Registro de Nombres
+        function addNameEntry() {
+            const nameEntry = document.createElement('div');
+            nameEntry.className = 'name-entry';
+            nameEntry.innerHTML = `
+                <input type="text" placeholder="Nombre" class="name-input" required />
+                <input type="text" placeholder="Apellido" class="surname-input" required />
+                <input type="text" placeholder="Curso" class="course-input" required />
+            `;
+            nameContainer.appendChild(nameEntry);
+        }
+
+        // Evento para añadir una nueva entrada de nombre
+        addNameButton.addEventListener('click', addNameEntry);
+
+        // Añadir una entrada de nombre por defecto al cargar la página
+        addNameEntry();
+
+        // Evento para terminar el registro de nombres
+        finishRegistrationButton.addEventListener('click', () => {
+            nameMessageDiv.textContent = '';
+            data.participants = [];
+
+            const nameEntries = document.querySelectorAll('#name-container .name-entry');
+            let isValid = true;
+
+            nameEntries.forEach(entry => {
+                const name = entry.querySelector('.name-input').value.trim();
+                const surname = entry.querySelector('.surname-input').value.trim();
+                const course = entry.querySelector('.course-input').value.trim();
+
+                if (!name || !surname || !course) {
+                    isValid = false;
+                    nameMessageDiv.textContent = 'Por favor, completa todos los campos de las personas.';
+                } else {
+                    data.participants.push({ name, surname, course });
+                }
+            });
+
+            if (isValid && data.participants.length > 0) {
+                nameRegistrationDiv.classList.add('hidden');
+                culturalDataDiv.classList.remove('hidden');
+                generateCategoryBlocks();
+            }
+        });
+
+        // Generar los bloques de categorías
+        function generateCategoryBlocks() {
+            categories.forEach(category => {
+                const categoryBlock = document.createElement('div');
+                categoryBlock.className = 'category-block';
+                categoryBlock.innerHTML = `
+                    <h3>${category}</h3>
+                    <input type="text" placeholder="Ejemplo 1 de ${category}" class="category-input" data-category="${category}" required />
+                    <input type="text" placeholder="Ejemplo 2 de ${category}" class="category-input" data-category="${category}" required />
+                `;
+                categoriesContainer.appendChild(categoryBlock);
+            });
+        }
+
+        // Evento para generar y descargar el JSON
+        generateJsonButton.addEventListener('click', () => {
+            messageDiv.textContent = '';
+            data.cultureName = cultureNameInput.value.trim();
+            data.categories = {};
+
+            // Validar que se haya ingresado el nombre de la cultura
+            if (!data.cultureName) {
+                messageDiv.textContent = 'Por favor, ingresa el nombre de la cultura.';
+                cultureNameInput.style.borderColor = 'red';
+                return;
+            } else {
+                cultureNameInput.style.borderColor = '';
+            }
+
+            // Validar y obtener los datos de las categorías
+            const categoryBlocks = document.querySelectorAll('.category-block');
+            let isValid = true;
+
+            categoryBlocks.forEach(block => {
+                const categoryName = block.querySelector('h3').textContent;
+                const inputs = block.querySelectorAll('.category-input');
+                const example1 = inputs[0].value.trim();
+                const example2 = inputs[1].value.trim();
+
+                if (!example1 || !example2) {
+                    isValid = false;
+                    inputs[0].style.borderColor = example1 ? '' : 'red';
+                    inputs[1].style.borderColor = example2 ? '' : 'red';
+                } else {
+                    inputs[0].style.borderColor = '';
+                    inputs[1].style.borderColor = '';
+                    data.categories[categoryName] = [example1, example2];
+                }
+            });
+
+            if (!isValid) {
+                messageDiv.textContent = 'Por favor, completa todos los campos de las categorías.';
+                return;
+            }
+
+            // Generar el archivo JSON
+            downloadJson();
+            messageDiv.className = 'success';
+            messageDiv.textContent = 'El archivo JSON ha sido generado y descargado.';
+        });
+
+        // Función para generar el nombre del archivo JSON
+        function generateJsonFilename() {
+            if (data.participants.length === 0) return 'datos_culturales.json';
+
+            // Obtener los apellidos, ordenarlos alfabéticamente y concatenarlos con guiones bajos
+            const sortedSurnames = data.participants.map(p => p.surname).sort().join('_');
+            // Obtener el curso del primer participante
+            const firstCourse = data.participants[0].course.replace(/\s+/g, '_');
+
+            // Generar el nombre del archivo
+            return `${sortedSurnames}_${firstCourse}.json`;
+        }
+
+        // Función para descargar el JSON
+        function downloadJson() {
+            const jsonContent = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = generateJsonFilename();
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

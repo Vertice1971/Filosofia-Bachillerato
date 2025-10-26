@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gattaca: A Ciegas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        .question {
+            display: none;
+        }
+        ul {
+            list-style-type: none; /* Eliminar viñetas */
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gattaca: A Ciegas</h1>
+    <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
+    <p>Este programa te permitirá seleccionar fragmentos de ADN.</p>
+    <p>No sabrás qué característica estás eligiendo hasta el final.</p>
+    <p>¡Comencemos!</p>
+
+    <div id="questions">
+        <!-- Preguntas se mostrarán aquí -->
+    </div>
+
+    <div id="results" style="display:none;">
+        <h2>Características seleccionadas:</h2>
+        <ul id="traits">
+            <!-- Características seleccionadas se mostrarán aquí -->
+        </ul>
+    </div>
+
+    <script>
+        // Opciones genéticas
+        const geneticOptions = [
+            [["SRY", "XX"], ["Sexo masculino", "Sexo femenino"]], // Pregunta de sexo
+            [["rs1042725_T", "rs1042725_C"], ["Altura elevada", "Altura baja"]],
+            [["rs6265_G", "rs6265_A"], ["Mayor capacidad de memoria", "Capacidad de memoria limitada"]],
+            [["rs1815739_C", "rs1815739_T"], ["Mayor resistencia física", "Mayor capacidad de velocidad"]],
+            [["rs3736228_T", "rs3736228_C"], ["Densidad ósea alta", "Densidad ósea baja"]],
+            [["rs12913832_A", "rs12913832_G"], ["Ojos azules", "Ojos negros"]],
+            [["ACTGAC", "GCGTCA"], ["Predisposición a la creatividad", "Predisposición a la lógica"]],
+            [["GTACCG", "CTAGGT"], ["Mayor fuerza muscular", "Menor fuerza muscular"]],
+            [["CGTGAT", "AGCGTA"], ["Menor necesidad de sueño", "Mayor necesidad de sueño"]],
+            [["AACGTA", "TACGTC"], ["Mayor tolerancia al frío", "Menor tolerancia al frío"]]
+        ];
+
+        // Lista de elecciones del usuario
+        let userChoices = [];
+
+        // Función para mostrar preguntas
+        function presentQuestion() {
+            const questionsDiv = document.getElementById("questions");
+            questionsDiv.innerHTML = "";  // Limpiar cualquier contenido previo
+
+            // Extraer la pregunta sobre sexo para que sea siempre la primera
+            const sexoPregunta = geneticOptions[0];
+            const restantesPreguntas = geneticOptions.slice(1); // Las demás preguntas
+            restantesPreguntas.sort(() => Math.random() - 0.5); // Barajar el resto de las preguntas
+
+            // Insertar la pregunta de sexo al principio
+            const orderedQuestions = [sexoPregunta, ...restantesPreguntas];
+
+            // Mostrar cada pregunta
+            orderedQuestions.forEach((option, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.classList.add("question");
+                questionDiv.id = `question-${index}`;
+                questionDiv.innerHTML = `
+                    <h3>Pregunta ${index + 1}</h3>
+                    <p>1. Fragmento de ADN: ${option[0][0]}</p>
+                    <p>2. Fragmento de ADN: ${option[0][1]}</p>
+                    <button onclick="chooseTrait(${index}, 1)">Elige 1</button>
+                    <button onclick="chooseTrait(${index}, 2)">Elige 2</button>
+                `;
+                questionsDiv.appendChild(questionDiv);
+            });
+
+            // Mostrar la primera pregunta
+            document.getElementById("question-0").style.display = "block";
+        }
+
+        // Función para manejar la elección del usuario
+        function chooseTrait(questionIndex, choice) {
+            const selectedOption = geneticOptions[questionIndex][1][choice - 1];
+            userChoices.push(selectedOption);
+
+            // Ocultar la pregunta actual
+            document.getElementById(`question-${questionIndex}`).style.display = "none";
+
+            // Mostrar la siguiente pregunta o resultados
+            if (questionIndex + 1 < geneticOptions.length) {
+                document.getElementById(`question-${questionIndex + 1}`).style.display = "block";
+            } else {
+                revealTraits();
+            }
+        }
+
+        // Función para revelar las características seleccionadas
+        function revealTraits() {
+            const resultsDiv = document.getElementById("results");
+            const traitsList = document.getElementById("traits");
+            traitsList.innerHTML = "";  // Limpiar contenido previo
+
+            userChoices.forEach((trait, index) => {
+                const listItem = document.createElement("li");
+                listItem.innerText = `Rasgo ${index + 1}: ${trait}`;
+                traitsList.appendChild(listItem);
+            });
+
+            // Ocultar preguntas y todo el contenido previo
+            document.getElementById("questions").style.display = "none";
+            document.querySelector("h1").style.display = "none";
+            document.querySelectorAll("p").forEach((p) => p.style.display = "none");
+
+            // Mostrar los resultados
+            resultsDiv.style.display = "block";
+        }
+
+        // Inicializar el programa
+        presentQuestion();
+    </script>
+</body>
+</html>
