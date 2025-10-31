@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elementos Culturales</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 { text-align: center; color: #333; margin-bottom: 10px; font-size: 2em; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+    .text-container {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 2px solid #667eea;
+    }
+    .text-container h2 { color: #667eea; margin-bottom: 15px; }
+    .text-container p { line-height: 1.6; color: #444; margin-bottom: 10px; }
+    .game-area { display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+    .categories { display: flex; flex-direction: column; gap: 10px; }
+    .category-box {
+      background: #fff;
+      border: 3px solid #667eea;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 80px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .category-box.active { background: #e8eaf6; border-color: #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+    .category-title { font-weight: bold; color: #667eea; margin-bottom: 8px; font-size: 0.9em; }
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      align-content: start;
+    }
+    .card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 12px rgba(0,0,0,0.2); }
+    .card.selected {
+      border: 3px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255,215,0,0.8);
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    }
+    .card.placed { cursor: default; background: linear-gradient(135deg, #26a69a 0%, #00897b 100%); }
+    .card.correct { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); }
+    .card.incorrect { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); animation: shake 0.5s; }
+    @keyframes shake { 0%,100%{ transform: translateX(0); } 25%{ transform: translateX(-10px);} 75%{ transform: translateX(10px);} }
+    .button-container { text-align: center; margin-top: 20px; }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff; border: none; padding: 12px 30px;
+      border-radius: 25px; font-size: 1.1em; cursor: pointer;
+      transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin: 0 5px;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+    .score { text-align: center; font-size: 1.2em; color: #667eea; margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Clasifica los Elementos Culturales</h1>
+    <p class="subtitle">Tomás Cuesta - IES Juan de la Cierva</p>
+
+    <div class="text-container" id="textContainer"></div>
+
+    <div class="game-area">
+      <div class="categories" id="categories"></div>
+      <div class="cards-container" id="cardsContainer"></div>
+    </div>
+
+    <div class="button-container">
+      <button onclick="checkAnswers()">Verificar Respuestas</button>
+      <button onclick="location.reload()">Nuevo Juego</button>
+    </div>
+
+    <div class="score" id="score"></div>
+  </div>
+
+  <script>
+    const texts = {
+      hogwarts: {
+        title: "Hogwarts",
+        content: `En Hogwarts las plumas encantadas escribían solas sobre el pergamino mientras los alumnos se apresuraban por los pasillos con sus túnicas. En las cocinas, los elfos preparaban el desayuno con magia usando sus varitas, y las tostadas nunca se enfriaban. Cuando sonaba la campana, todos debían estar ya sentados; quien llegaba tarde perdía puntos para su casa, y si repetía la falta, debía limpiar los trofeos sin ayuda mágica.
+
+Por la noche, era costumbre reunirse junto al fuego del salón común para charlar, pero algunos preferían explorar el castillo, aunque sabían que no debían hacerlo. A veces, los profesores descubrían a quienes salían de sus dormitorios y les castigaban con tareas extra o sin permisos para ir a Hogsmeade.
+
+En los muros colgaban retratos que hablaban, y las escaleras cambiaban de dirección, recordando que el colegio tenía vida propia. Los estudiantes sabían que estaba prohibido usar magia fuera de clase o entrar al Bosque Prohibido. Sin embargo, algunos lo hacían movidos por la curiosidad o la valentía, y acababan recibiendo sanciones ejemplares.
+
+A pesar de todo, se consideraba honorable defender a los amigos y ser leal a la propia casa. Quienes buscaban la gloria soñaban con ganar la Copa, mientras otros estudiaban para comprender los misterios del bien y del mal. En los estandartes brillaban los símbolos de las casas, cada uno con su propio ideal: el valor, la sabiduría, la justicia y la ambición. Bajo el techo encantado, todos levantaban sus varitas en homenaje a los que habían luchado por esos valores.`,
+        solutions: {
+          "Artefactos": "Plumas encantadas y pergaminos. Varitas mágicas.",
+          "Procedimientos": "Las plumas encantadas escriben solas sobre los pergaminos mediante conjuros. Los elfos usan las varitas haciendo magia con ollas y sartenes para mantener calientes las tostadas.",
+          "Normas": "Estar en el aula al sonar la campana: supone pérdida de puntos o tareas obligatorias. Prohibición de entrar al Bosque Prohibido o usar magia fuera de clase: multa ejemplar.",
+          "Costumbres": "Reunirse por la noche junto al fuego: quien no lo hace o rompe la costumbre puede ser mal visto. Desobedecer las normas no escritas de convivencia (como salir de noche) provoca desaprobación o pérdida de privilegios.",
+          "Conocimientos": "Estudio de hechizos y criaturas mágicas. Aprendizaje sobre los encantamientos del castillo.",
+          "Creencias": "Piensan que existen el bien y el mal. Fe en la importancia del valor y la justicia.",
+          "Valores": "Lealtad y amistad. Respeto al coraje, la sabiduría, la justicia y la ambición.",
+          "Símbolos": "Estandartes con animales de las casas. Techo encantado que representa la unión de todos bajo un mismo ideal."
+        }
+      },
+      hambre: {
+        title: "Los Juegos del Hambre",
+        content: `En los Juegos del Hambre, cada distrito tenía sus propias rutinas antes del sorteo. Las familias limpiaban sus casas y preparaban algo especial de comer, aunque fuera poco. En el Distrito 12, los mineros regresaban cubiertos de carbón, mientras sus hijos aprendían a usar el arco o a colocar trampas para sobrevivir en los bosques. Cada año, cuando el nombre de los tributos era pronunciado, todos debían permanecer en silencio y con la cabeza baja; quien protestaba podía ser arrestado o azotado en la plaza.
+
+Al caer la noche, era costumbre que algunos vecinos dejaran flores en las puertas de las familias que habían perdido a alguien en los Juegos. No era obligatorio, pero quien no lo hacía era mirado con desprecio. En cambio, los más fieles al Capitolio colgaban banderas y cantaban el himno con orgullo, esperando ser recompensados.
+
+Los rebeldes se reunían en secreto, estudiando los mapas del terreno y compartiendo información sobre cómo esquivar las cámaras ocultas (que espían y graban todo) o los enjambres mecánicos. Muchos creían que el Capitolio era invencible, otros confiaban en que un día el fuego se extendería y derribaría su poder. En los entrenamientos, los tributos aprendían a usar armas, pero también a aparentar calma frente a las pantallas que transmitían su imagen a todo Panem.
+
+La gente valoraba el coraje y el sacrificio por los demás, aunque el miedo los mantenía obedientes. El sinsajo se convirtió en un símbolo de esperanza, tanto como la mano levantada con tres dedos, un gesto que podía costar la vida. Los que desafiaban al sistema sabían que la consecuencia era la muerte, pero también que el silencio prolongado era otra forma de morir.`,
+        solutions: {
+          "Artefactos": "Arcos, trampas y armas de entrenamiento. Cámaras ocultas del Capitolio.",
+          "Procedimientos": "El arco y las trampas se usan siguiendo técnicas de caza y supervivencia aprendidas en los distritos. Las cámaras ocultas del Capitolio graban y transmiten los movimientos de los tributos mediante sistemas automáticos de vigilancia.",
+          "Normas": "Obligación de asistir al sorteo en silencio: arresto o maltrato físico. Prohibición de gestos o protestas contra el Capitolio: pena de muerte.",
+          "Costumbres": "Dejar flores a las familias de los tributos caídos: quien no lo hace sufre rechazo social. Cantar el himno y colgar banderas del Capitolio: quienes no participan son vistos con sospecha o desprecio.",
+          "Conocimientos": "Estrategias de combate y técnicas de supervivencia. Uso de la tecnología del Capitolio para vigilancia y control.",
+          "Creencias": "Confían en la invencibilidad del Capitolio. Fe en la posibilidad de una rebelión liberadora.",
+          "Valores": "Coraje y sacrificio por los demás. Esperanza frente al miedo y la opresión.",
+          "Símbolos": "El sinsajo. El saludo de los tres dedos."
+        }
+      },
+      comarca: {
+        title: "La Comarca / Tierra Media",
+        content: `En la Comarca, los hobbits vivían tranquilos, disfrutando de las cosechas y las fiestas al aire libre. Cada familia cuidaba con esmero sus utensilios, desde las pipas de fumar hasta las teteras de cobre, que pasaban de generación en generación. Todos sabían que debían acudir puntuales a los banquetes comunales, y quien llegaba tarde o se marchaba antes era objeto de murmuraciones durante semanas.
+
+Más allá, en Minas Tirith, los guardias patrullaban siguiendo un código estricto: nunca abandonar el puesto sin relevo y obedecer las órdenes del capitán sin réplica. El incumplimiento se castigaba con la pérdida del rango o con días de encierro. Sin embargo, había costumbres que no estaban escritas en ninguna ley, como saludar con una leve inclinación al pasar junto a una tumba o no mencionar en voz alta el nombre de Sauron; quien rompía estas costumbres recibía miradas de desaprobación y quedaba marcado como irrespetuoso.
+
+Los pueblos libres compartían saberes antiguos: los elfos conocían los cantos que sanaban heridas, los enanos dominaban los secretos de la forja y los hombres aprendían el arte de la guerra. Al mismo tiempo, muchos creían en la fuerza invisible que mantenía el equilibrio del mundo y en que cada criatura tenía un papel en el destino común. Algunos, sin embargo, se aferraban a la idea de que el poder del Anillo podía usarse para el bien, sin comprender su verdadera corrupción.
+
+En todos los rincones se apreciaban el valor, la fidelidad y la amistad. Los estandartes de las casas nobles ondeaban con orgullo, y los cuernos de guerra resonaban como llamada al deber. La hoja blanca sobre fondo verde era símbolo de esperanza para los del bosque, mientras el Ojo de Fuego inspiraba temor y obediencia entre los siervos del mal.`,
+        solutions: {
+          "Artefactos": "Pipas, teteras y utensilios domésticos de los hobbits. Espadas, cuernos de guerra y estandartes.",
+          "Procedimientos": "Los hobbits usan las pipas para fumar tabaco aromático y las teteras para preparar las infusiones que acompañan sus reuniones familiares. Los enanos emplean martillos y yunques para forjar espadas, mientras los soldados hacen sonar los cuernos de guerra.",
+          "Normas": "Código militar: no abandonar el puesto sin relevo (se encierra o se pierde el rango). Obedecer las órdenes del capitán sin réplica (arresto disciplinario).",
+          "Costumbres": "Llegar puntual y permanecer en los banquetes comunales (quien no lo hace recibe murmuraciones). No pronunciar el nombre de Sauron o no saludar en los cementerios (provoca rechazo social o desaprobación).",
+          "Conocimientos": "Saber de forja y metalurgia de los enanos. Arte de la guerra y estrategias de defensa de los hombres.",
+          "Creencias": "Confían en la existencia de una fuerza invisible que mantiene el equilibrio del mundo. Fe en el destino y en la misión de cada ser dentro del plan general.",
+          "Valores": "Valor, fidelidad y amistad. Honor y respeto hacia los caídos.",
+          "Símbolos": "Estandartes de las casas nobles. El Ojo de Fuego y la hoja blanca sobre fondo verde."
+        }
+      }
+    };
+
+    const categories = ["Artefactos","Procedimientos","Normas","Costumbres","Conocimientos","Creencias","Valores","Símbolos"];
+
+    // Selección del texto activo
+    const textKeys = Object.keys(texts);
+    const selectedKey = textKeys[Math.floor(Math.random() * textKeys.length)];
+    const selectedText = texts[selectedKey];
+    const otherKeys = textKeys.filter(k => k !== selectedKey);
+
+    // Mostrar el texto
+    document.getElementById('textContainer').innerHTML =
+      `<h2>${selectedText.title}</h2><p>${selectedText.content}</p>`;
+
+    // Crear cajas de categorías
+    const categoriesContainer = document.getElementById('categories');
+    categories.forEach(cat => {
+      const box = document.createElement('div');
+      box.className = 'category-box';
+      box.dataset.category = cat;
+      box.innerHTML = `<div class="category-title">${cat}</div>`;
+      categoriesContainer.appendChild(box);
+    });
+
+    // Crear fichas (1 correcta + 1 distractora por categoría)
+    const cards = [];
+    categories.forEach(cat => {
+      cards.push({ category: cat, text: selectedText.solutions[cat], correct: true });
+      const randomOther = otherKeys[Math.floor(Math.random() * otherKeys.length)];
+      cards.push({ category: cat, text: texts[randomOther].solutions[cat], correct: false });
+    });
+
+    // Mezclar y renderizar fichas
+    cards.sort(() => Math.random() - 0.5);
+    const cardsContainer = document.getElementById('cardsContainer');
+
+    cards.forEach((card, i) => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.index = i;
+      el.dataset.category = card.category;
+      el.dataset.correct = String(card.correct);
+      el.textContent = card.text;
+      cardsContainer.appendChild(el);
+      el.addEventListener('click', handleCardClick);
+    });
+
+    let selectedCard = null;
+
+    function resetCardVisual(card){
+      card.classList.remove('placed','selected','correct','incorrect');
+    }
+    function deactivateBoxes(){
+      document.querySelectorAll('.category-box').forEach(b => b.classList.remove('active'));
+    }
+
+    // Selección de ficha; si estaba colocada y se pulsa de nuevo estando seleccionada, vuelve al mazo
+    function handleCardClick() {
+      if (selectedCard && selectedCard !== this) selectedCard.classList.remove('selected');
+
+      if (selectedCard === this) {
+        if (this.classList.contains('placed')) {
+          resetCardVisual(this);
+          cardsContainer.appendChild(this);
+        }
+        selectedCard = null;
+        deactivateBoxes();
+        return;
+      }
+
+      selectedCard = this;
+      this.classList.add('selected');
+      document.querySelectorAll('.category-box').forEach(b => b.classList.add('active'));
+    }
+
+    // Activar click en cajas (máximo 1 ficha por categoría; si hay alguna, se devuelve al mazo)
+    document.querySelectorAll('.category-box').forEach(box => {
+      box.addEventListener('click', handleBoxClick);
+    });
+
+    function handleBoxClick() {
+      if (!selectedCard) return;
+
+      const toReturn = Array.from(this.querySelectorAll('.card'));
+      for (const c of toReturn) {
+        resetCardVisual(c);
+        cardsContainer.appendChild(c);
+      }
+
+      resetCardVisual(selectedCard);
+      this.appendChild(selectedCard);
+      selectedCard.classList.add('placed');
+      selectedCard = null;
+      deactivateBoxes();
+    }
+
+    function checkAnswers() {
+      let correct = 0;
+      let total = 0;
+
+      document.querySelectorAll('.category-box').forEach(box => {
+        const category = box.dataset.category;
+        const inside = box.querySelectorAll('.card');
+
+        inside.forEach(card => {
+          total++;
+          const ok = (card.dataset.category === category) && (card.dataset.correct === 'true');
+          card.classList.remove('correct','incorrect');
+          if (ok) { card.classList.add('correct'); correct++; }
+          else { card.classList.add('incorrect'); }
+        });
+      });
+
+      const scoreElement = document.getElementById('score');
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+      scoreElement.textContent = `Resultado: ${correct} de ${total} correctas (${pct}%)`;
+    }
+  </script>
+</body>
+</html>
