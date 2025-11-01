@@ -2,504 +2,236 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Situaciones para el Parque Tierra</title>
-    <!-- Importar fuente Open Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+
     <style>
-        /* Estilos Generales */
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f0f2f5;
-            text-align: center;
-            padding: 20px;
+        body { font-family:'Open Sans',sans-serif;background:#f0f2f5;text-align:center;padding:20px }
+        h1 { color:#333 }
+        .container { display:flex;justify-content:center;flex-wrap:wrap;margin-top:20px }
+        .input-section,.output-section {
+            background:#fff;padding:30px;margin:10px;border-radius:8px;max-width:800px;width:100%;
+            box-shadow:0 2px 8px rgba(0,0,0,.1);box-sizing:border-box
         }
-
-        h1 {
-            color: #333;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .input-section, .output-section {
-            background-color: #fff;
-            padding: 30px;
-            margin: 10px;
-            border-radius: 8px;
-            box-sizing: border-box;
-            width: 100%;
-            max-width: 800px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-section h2, .output-section h2 {
-            color: #555;
-            margin-bottom: 20px;
-        }
-
         .input-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            position: relative;
+            display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+            gap:20px;position:relative
         }
-
-        .input-wrapper {
-            position: relative;
-            text-align: left;
-        }
-
-        .input-wrapper label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
+        .input-wrapper { position:relative;text-align:left }
+        .input-wrapper label { display:block;font-weight:bold;margin-bottom:5px }
         .input-wrapper input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
+            width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;transition:border-color .3s
         }
-
-        .input-wrapper input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-        .error-message {
-            color: #e74c3c;
-            font-size: 12px;
-            position: absolute;
-            top: 100%;
-            left: 0;
-        }
-
+        .input-wrapper input:focus { border-color:#007bff;outline:none }
+        .error-message { color:#e74c3c;font-size:12px;position:absolute;top:100%;left:0 }
         button {
-            padding: 12px 24px;
-            margin-top: 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            padding:12px 24px;margin-top:20px;font-size:16px;background:#007bff;color:#fff;
+            border:none;border-radius:4px;cursor:pointer;transition:.3s
         }
-
-        button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        button:hover:not(:disabled) {
-            background-color: #0056b3;
-        }
-
+        button:disabled { background:#6c757d;cursor:not-allowed }
         #questions-list {
-            text-align: left;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-left: 20px;
+            text-align:left;max-height:340px;overflow-y:auto;padding-left:20px
         }
-
         #questions-list li {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 768px) {
-            .input-section, .output-section {
-                padding: 20px;
-            }
+            background:#e9ecef;padding:10px;margin:10px 0;border-radius:4px;font-size:18px
         }
     </style>
 </head>
+
 <body>
-    <h1>Generador de Situaciones para el Parque Tierra</h1>
-    <h2 style="font-size: 0.6em; color: #555;">Tomás Cuesta. IES Juan de la Cierva</h2>
-    <div class="container" id="main-content">
-        <!-- Sección de Entrada de Datos -->
-        <div class="input-section" id="input-section">
-            <h2>¿Cuántos grupos de trabajo hay en la clase?</h2>
-            <div class="input-wrapper">
-                <label for="num-groups">Número de grupos:</label>
-                <input type="number" id="num-groups" min="1" placeholder="Ingrese el número de grupos">
-            </div>
-            <h2>Ingrese 10 Seres Vivos (de diferentes categorías)</h2>
-            <div id="beings-input" class="input-group">
-                <!-- Campos para ingresar seres vivos -->
-                <!-- Campo 1 -->
-                <div class="input-wrapper">
-                    <label for="being-1">Ser vivo 1</label>
-                    <input type="text" id="being-1" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 2 -->
-                <div class="input-wrapper">
-                    <label for="being-2">Ser vivo 2</label>
-                    <input type="text" id="being-2" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 3 -->
-                <div class="input-wrapper">
-                    <label for="being-3">Ser vivo 3</label>
-                    <input type="text" id="being-3" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 4 -->
-                <div class="input-wrapper">
-                    <label for="being-4">Ser vivo 4</label>
-                    <input type="text" id="being-4" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 5 -->
-                <div class="input-wrapper">
-                    <label for="being-5">Ser vivo 5</label>
-                    <input type="text" id="being-5" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 6 -->
-                <div class="input-wrapper">
-                    <label for="being-6">Ser vivo 6</label>
-                    <input type="text" id="being-6" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 7 -->
-                <div class="input-wrapper">
-                    <label for="being-7">Ser vivo 7</label>
-                    <input type="text" id="being-7" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 8 -->
-                <div class="input-wrapper">
-                    <label for="being-8">Ser vivo 8</label>
-                    <input type="text" id="being-8" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 9 -->
-                <div class="input-wrapper">
-                    <label for="being-9">Ser vivo 9</label>
-                    <input type="text" id="being-9" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 10 -->
-                <div class="input-wrapper">
-                    <label for="being-10">Ser vivo 10</label>
-                    <input type="text" id="being-10" class="being-input" placeholder="Ingrese ser vivo">
-                    <div class="error-message"></div>
-                </div>
-            </div>
-            <h2>Ingrese 10 Usos o Relaciones</h2>
-            <div id="uses-input" class="input-group">
-                <!-- Campos para ingresar usos o relaciones -->
-                <!-- Campo 1 -->
-                <div class="input-wrapper">
-                    <label for="use-1">Uso/Relación 1</label>
-                    <input type="text" id="use-1" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 2 -->
-                <div class="input-wrapper">
-                    <label for="use-2">Uso/Relación 2</label>
-                    <input type="text" id="use-2" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 3 -->
-                <div class="input-wrapper">
-                    <label for="use-3">Uso/Relación 3</label>
-                    <input type="text" id="use-3" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 4 -->
-                <div class="input-wrapper">
-                    <label for="use-4">Uso/Relación 4</label>
-                    <input type="text" id="use-4" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 5 -->
-                <div class="input-wrapper">
-                    <label for="use-5">Uso/Relación 5</label>
-                    <input type="text" id="use-5" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 6 -->
-                <div class="input-wrapper">
-                    <label for="use-6">Uso/Relación 6</label>
-                    <input type="text" id="use-6" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 7 -->
-                <div class="input-wrapper">
-                    <label for="use-7">Uso/Relación 7</label>
-                    <input type="text" id="use-7" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 8 -->
-                <div class="input-wrapper">
-                    <label for="use-8">Uso/Relación 8</label>
-                    <input type="text" id="use-8" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 9 -->
-                <div class="input-wrapper">
-                    <label for="use-9">Uso/Relación 9</label>
-                    <input type="text" id="use-9" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-                <!-- Campo 10 -->
-                <div class="input-wrapper">
-                    <label for="use-10">Uso/Relación 10</label>
-                    <input type="text" id="use-10" class="use-input" placeholder="Ingrese uso o relación">
-                    <div class="error-message"></div>
-                </div>
-            </div>
-            <button id="start" disabled>Iniciar</button>
+<h1>Generador de Situaciones para el Parque Tierra</h1>
+
+<div class="container" id="main-content">
+    <div class="input-section" id="input-section">
+
+        <h2>¿Cuántos grupos de trabajo hay en la clase?</h2>
+        <div class="input-wrapper">
+            <label for="num-groups">Número de grupos:</label>
+            <input type="number" id="num-groups" min="1" max="50" placeholder="Ingrese el número de grupos">
+            <div class="error-message" id="groups-error"></div>
         </div>
+
+        <h2>Ingrese 10 Seres Vivos</h2>
+        <div id="beings-input" class="input-group"></div>
+
+        <h2>Ingrese 10 Usos o Relaciones</h2>
+        <div id="uses-input" class="input-group"></div>
+
+        <button id="start" disabled>Iniciar</button>
     </div>
+</div>
 
-    <script>
-        let groupOrderFirstRound = [];
-        let groupOrderSecondRound = [];
-        let currentGroupIndex = 0;
-        let questionsMap = {}; // { groupNumber: [question1, question2] }
-        let totalGroups = 0;
+<script>
+/* Generar dinámicamente los campos */
+document.addEventListener("DOMContentLoaded", ()=>{
+    const beingsBox = document.getElementById("beings-input");
+    const usesBox   = document.getElementById("uses-input");
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Añadir eventos para verificar duplicados en tiempo real
-            const beingInputs = document.querySelectorAll('.being-input');
-            const useInputs = document.querySelectorAll('.use-input');
+    beingsBox.innerHTML = Array.from({length:10},(_,i)=>`
+        <div class="input-wrapper">
+            <label for="being-${i+1}">Ser vivo ${i+1}</label>
+            <input type="text" id="being-${i+1}" class="being-input">
+            <div class="error-message"></div>
+        </div>`).join("");
 
-            beingInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    checkDuplicates('being');
-                });
-            });
+    usesBox.innerHTML = Array.from({length:10},(_,i)=>`
+        <div class="input-wrapper">
+            <label for="use-${i+1}">Uso/Relación ${i+1}</label>
+            <input type="text" id="use-${i+1}" class="use-input">
+            <div class="error-message"></div>
+        </div>`).join("");
 
-            useInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    checkDuplicates('use');
-                });
-            });
+    addListeners();
+});
 
-            // Evento para el botón "Iniciar"
-            document.getElementById('start').addEventListener('click', () => {
-                iniciarProceso();
-            });
-        });
+/* Variables globales */
+let groupOrderFirstRound   = [];
+let groupOrderSecondRound  = [];
+let currentGroupIndex      = 0;
+let questionsMap           = {};
+let totalGroups            = 0;
 
-        function checkDuplicates(type) {
-            let inputs, errorMessages;
-            if (type === 'being') {
-                inputs = document.querySelectorAll('.being-input');
-                errorMessages = document.querySelectorAll('#beings-input .error-message');
-            } else if (type === 'use') {
-                inputs = document.querySelectorAll('.use-input');
-                errorMessages = document.querySelectorAll('#uses-input .error-message');
-            }
+/* Añadir escuchas */
+function addListeners(){
+    document.querySelectorAll('.being-input').forEach(i=>{
+        i.addEventListener('input', ()=>{ validateSet('.being-input','#beings-input'); updateStartButton(); });
+    });
 
-            const values = [];
-            let hasError = false;
+    document.querySelectorAll('.use-input').forEach(i=>{
+        i.addEventListener('input', ()=>{ validateSet('.use-input','#uses-input'); updateStartButton(); });
+    });
 
-            inputs.forEach((input, index) => {
-                const value = input.value.trim().toLowerCase();
-                let isDuplicate = false;
+    document.getElementById('num-groups').addEventListener('input', ()=>{
+        const v=document.getElementById('num-groups').value.trim();
+        document.getElementById('groups-error').textContent=(!v || v<1)?'Número no válido.':'';
+        updateStartButton();
+    });
 
-                if (value !== '') {
-                    if (values.includes(value)) {
-                        isDuplicate = true;
-                        hasError = true;
-                    } else {
-                        values.push(value);
-                    }
-                }
+    document.getElementById('start').addEventListener('click', iniciarProceso);
+}
 
-                if (isDuplicate) {
-                    input.value = '';
-                    errorMessages[index].textContent = 'Este valor ya ha sido ingresado.';
-                    setTimeout(() => {
-                        errorMessages[index].textContent = '';
-                    }, 1000);
-                } else {
-                    errorMessages[index].textContent = '';
-                }
-            });
+/* Validación sin borrar datos */
+function validateSet(selector, container){
+    const inputs       = [...document.querySelectorAll(selector)];
+    const errorBlocks  = [...document.querySelectorAll(container+' .error-message')];
 
-            // Verificar si todos los campos están llenos
-            const allBeingFilled = Array.from(document.querySelectorAll('.being-input')).every(input => input.value.trim() !== '');
-            const allUseFilled = Array.from(document.querySelectorAll('.use-input')).every(input => input.value.trim() !== '');
-            const numGroupsFilled = document.getElementById('num-groups').value.trim() !== '';
+    const values = new Map();
 
-            // Habilitar o deshabilitar el botón "Iniciar" basado en las condiciones
-            const startButton = document.getElementById('start');
-            if (allBeingFilled && allUseFilled && numGroupsFilled && !hasError) {
-                startButton.disabled = false;
-            } else {
-                startButton.disabled = true;
-            }
+    inputs.forEach((input,idx)=>{
+        const v = input.value.trim().toLowerCase();
+        let msg = "";
+
+        if(v!==""){
+            if(values.has(v)) msg = "Duplicado.";
+            else values.set(v,true);
         }
 
-        function iniciarProceso() {
-            const numGroups = parseInt(document.getElementById('num-groups').value);
-            let beings = [];
-            let uses = [];
-            const maxQuestions = 2 * numGroups;
+        errorBlocks[idx].textContent = msg;
+    });
+}
 
-            // Validar el número de grupos
-            if (isNaN(numGroups) || numGroups < 1) {
-                alert('Por favor, ingresa un número válido de grupos.');
-                return;
-            }
+/* Botón Iniciar */
+function updateStartButton(){
+    const allBeingsFilled = [...document.querySelectorAll('.being-input')].every(i=>i.value.trim()!=="");
+    const allUsesFilled   = [...document.querySelectorAll('.use-input')].every(i=>i.value.trim()!=="");
+    const groupsOk        = document.getElementById('num-groups').value.trim()!=="" &&
+                            document.getElementById('groups-error').textContent==="";
 
-            // Obtener los valores de los seres vivos
-            const beingsInputs = document.querySelectorAll('.being-input');
-            beingsInputs.forEach(input => {
-                const value = input.value.trim();
-                if (value !== '') {
-                    beings.push(value.toLowerCase());
-                }
-            });
+    const anyError = [...document.querySelectorAll('.error-message')].some(e=>e.textContent!=="");
 
-            // Obtener los valores de los usos o relaciones
-            const usesInputs = document.querySelectorAll('.use-input');
-            usesInputs.forEach(input => {
-                const value = input.value.trim();
-                if (value !== '') {
-                    uses.push(value.toLowerCase());
-                }
-            });
+    document.getElementById('start').disabled = !(allBeingsFilled && allUsesFilled && groupsOk && !anyError);
+}
 
-            // Validar que haya 10 seres vivos y 10 usos
-            if (beings.length !== 10 || uses.length !== 10) {
-                alert('Por favor, ingresa exactamente 10 seres vivos y 10 usos o relaciones.');
-                return;
-            }
+/* Inicio */
+function iniciarProceso(){
+    const numGroups = parseInt(document.getElementById('num-groups').value);
+    if(isNaN(numGroups) || numGroups<1){ alert("Número de grupos no válido."); return; }
 
-            // Generar lista aleatoria de grupos
-            totalGroups = numGroups;
-            const groupNumbers = Array.from({ length: numGroups }, (_, i) => i + 1);
-            shuffleArray(groupNumbers);
-            groupOrderFirstRound = [...groupNumbers]; // Primera ronda
+    const beings = [...document.querySelectorAll('.being-input')].map(i=>i.value.trim());
+    const uses   = [...document.querySelectorAll('.use-input')].map(i=>i.value.trim());
 
-            // Generar combinaciones únicas y aleatorias para las preguntas
-            const combinations = [];
-            for (let i = 0; i < beings.length; i++) {
-                for (let j = 0; j < uses.length; j++) {
-                    combinations.push({ being: beings[i], use: uses[j] });
-                }
-            }
+    totalGroups = numGroups;
 
-            // Mezclar las combinaciones aleatoriamente
-            shuffleArray(combinations);
+    const combos = [];
+    for(let b of beings) for(let u of uses) combos.push({being:b,use:u});
 
-            // Seleccionar el doble de N preguntas o menos si hay menos combinaciones disponibles
-            const selectedCombinations = combinations.slice(0, Math.min(maxQuestions, combinations.length));
+    shuffleArray(combos);
 
-            // Verificar si hay suficientes combinaciones para asignar dos preguntas a cada grupo
-            if (selectedCombinations.length < maxQuestions) {
-                alert('No hay suficientes combinaciones para asignar dos preguntas a cada grupo.');
-                return;
-            }
+    const needed = 2*numGroups;
+    const selected = combos.slice(0,needed);
 
-            // Generar preguntas con tipos al azar
-            const questionTypes = ["¿Es posible", "¿Está permitido", "¿Resulta aceptable"];
-            const questions = selectedCombinations.map(combo => {
-                const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-                return `${randomType} ${combo.use} a un ${combo.being}?`;
-            });
+    const types = ["¿Es posible","¿Está permitido","¿Resulta aceptable"];
+    const questions = selected.map((c,i)=>`${types[i%3]} ${c.use} a un ${c.being}?`);
 
-            // Asignar preguntas a los grupos de manera equitativa
-            questionsMap = {};
-            for (let i = 0; i < numGroups; i++) {
-                questionsMap[groupNumbers[i]] = [];
-            }
+    shuffleArray(questions);
 
-            // Asignar una pregunta a cada grupo primero
-            for (let i = 0; i < questions.length; i++) {
-                const groupNumber = groupNumbers[i % numGroups];
-                questionsMap[groupNumber].push(questions[i]);
-            }
+    const groupNumbers = Array.from({length:numGroups},(_,i)=>i+1);
+    questionsMap = {};
 
-            // Generar segunda ronda de grupos
-            groupOrderSecondRound = [...groupNumbers];
-            shuffleArray(groupOrderSecondRound);
+    for(let i=0;i<numGroups;i++){
+        questionsMap[groupNumbers[i]] = [
+            questions[i],
+            questions[i+numGroups]
+        ];
+    }
 
-            // Preparar la interfaz para la nueva sección y borrar el contenido anterior
-            document.getElementById('main-content').innerHTML = `
-                <div class="output-section">
-                    <h2>Preguntas para los Grupos</h2>
-                    <div id="group-questions">
-                        <p id="current-group"></p>
-                        <ol id="questions-list"></ol>
-                        <button id="next-group">Siguiente Grupo</button>
-                    </div>
-                </div>
-            `;
-            currentGroupIndex = 0;
-            showNextQuestion();
+    groupOrderFirstRound  = [...groupNumbers];
+    groupOrderSecondRound = [...groupNumbers];
+    shuffleArray(groupOrderFirstRound);
+    shuffleArray(groupOrderSecondRound);
 
-            // Configurar el botón "Siguiente Grupo"
-            document.getElementById('next-group').addEventListener('click', () => {
-                showNextQuestion();
-            });
-        }
+    renderQuestionsInterface();
+}
 
-        function showNextQuestion() {
-            if (currentGroupIndex < totalGroups) {
-                // Primera ronda
-                const groupNumber = groupOrderFirstRound[currentGroupIndex];
-                const question = questionsMap[groupNumber][0];
-                if (question) {
-                    displayQuestion(groupNumber, question);
-                } else {
-                    displayQuestion(groupNumber, 'No hay pregunta disponible para este grupo en esta ronda.');
-                }
-                currentGroupIndex++;
-            } else if (currentGroupIndex < 2 * totalGroups) {
-                // Segunda ronda
-                const groupNumber = groupOrderSecondRound[currentGroupIndex - totalGroups];
-                const question = questionsMap[groupNumber][1];
-                if (question) {
-                    displayQuestion(groupNumber, question);
-                } else {
-                    displayQuestion(groupNumber, 'No hay pregunta disponible para este grupo en esta ronda.');
-                }
-                currentGroupIndex++;
-            } else {
-                // Todas las preguntas han sido asignadas
-                alert('Todas las preguntas han sido asignadas a los grupos.');
-                document.getElementById('next-group').style.display = 'none';
-                document.getElementById('current-group').textContent = '¡Todas las preguntas han sido asignadas!';
-                document.getElementById('questions-list').innerHTML = '';
-            }
-        }
+/* Pantalla de preguntas */
+function renderQuestionsInterface(){
+    document.getElementById('main-content').innerHTML = `
+        <div class="output-section">
+            <h2>Preguntas para los Grupos</h2>
 
-        function displayQuestion(groupNumber, question) {
-            document.getElementById('current-group').textContent = `Grupo ${groupNumber}:`;
-            const questionsList = document.getElementById('questions-list');
-            questionsList.innerHTML = ''; // Limpiar preguntas anteriores
+            <p id="current-group" style="font-size:22px;font-weight:bold;color:#007bff;"></p>
+            <ol id="questions-list"></ol>
+            <button id="next-group">Siguiente Grupo</button>
+        </div>
+    `;
 
-            const li = document.createElement('li');
-            li.textContent = question;
-            questionsList.appendChild(li);
-        }
+    currentGroupIndex=0;
+    document.getElementById('next-group').addEventListener('click', showNextQuestion);
+    showNextQuestion();
+}
 
-        // Función para mezclar un array (Fisher-Yates shuffle)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-    </script>
+/* Mostrar preguntas */
+function showNextQuestion(){
+    if(currentGroupIndex < totalGroups){
+        const g = groupOrderFirstRound[currentGroupIndex];
+        displayQuestion(g, questionsMap[g][0], 1);
+        currentGroupIndex++;
+    }
+    else if(currentGroupIndex < 2*totalGroups){
+        const g = groupOrderSecondRound[currentGroupIndex-totalGroups];
+        displayQuestion(g, questionsMap[g][1], 2);
+        currentGroupIndex++;
+    }
+    else{
+        document.getElementById('next-group').style.display='none';
+        document.getElementById('current-group').textContent='Finalizado.';
+        document.getElementById('questions-list').innerHTML='';
+    }
+}
+
+function displayQuestion(groupNumber,question,round){
+    document.getElementById('current-group').textContent=`Grupo ${groupNumber} – Ronda ${round}`;
+    document.getElementById('questions-list').innerHTML = `<li>${question}</li>`;
+}
+
+function shuffleArray(arr){
+    for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+}
+</script>
+
 </body>
 </html>
