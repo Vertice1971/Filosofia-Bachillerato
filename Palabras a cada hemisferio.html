@@ -1,359 +1,281 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palabras a cada hemisferio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        /* Estilos generales */
-        body {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-        }
-
-        /* Estilo del título */
-        #title {
-            font-size: 2em;
-            margin-bottom: 30px;
-            font-weight: 600;
-            color: #2c3e50;
-            text-align: center;
-        }
-
-        /* Estilo de la cruz */
-        .cross {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin-top: -5vh;
-            display: none;
-        }
-
-        .cross::before, .cross::after {
-            content: '';
-            position: absolute;
-            background-color: #2c3e50;
-            border-radius: 5px;
-        }
-
-        .cross::before {
-            width: 200px;
-            height: 10px;
-            top: 45px;
-            left: -50px;
-        }
-
-        .cross::after {
-            width: 10px;
-            height: 200px;
-            top: -50px;
-            left: 45px;
-        }
-
-        /* Estilo de los botones */
-        button {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 1em;
-            cursor: pointer;
-            border: none;
-            border-radius: 25px;
-            background-color: #3498db;
-            color: #fff;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        #resetButton {
-            display: none;
-            margin-top: 50px;
-        }
-
-        /* Estilo de las palabras */
-        #leftText, #rightText {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #2c3e50;
-            display: none;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        #leftText {
-            left: 10%;
-        }
-
-        #rightText {
-            right: 10%;
-        }
-
-        /* Estilos para el control deslizante y el contenedor de iteraciones */
-        #sliderContainer, #iterationsContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-            color: #2c3e50;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 300px;
-            height: 5px;
-            background: #bdc3c7;
-            border-radius: 5px;
-            outline: none;
-            margin-bottom: 10px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 15px;
-            height: 15px;
-            background: #3498db;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: #2980b9;
-        }
-
-        input[type="text"] {
-            width: 50px;
-            padding: 5px;
-            font-size: 1em;
-            text-align: center;
-            border: 2px solid #bdc3c7;
-            border-radius: 5px;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            border-color: #3498db;
-        }
-
-        #sliderValue {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Palabras a cada hemisferio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      color: #333;
+    }
+    #title {
+      font-size: 2em;
+      margin-bottom: 30px;
+      font-weight: 600;
+      color: #2c3e50;
+      text-align: center;
+    }
+    #subtitle {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: -20px;
+      text-align: center;
+    }
+    .cross {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-top: -5vh;
+      display: none;
+    }
+    .cross::before, .cross::after {
+      content: '';
+      position: absolute;
+      background-color: #2c3e50;
+      border-radius: 5px;
+    }
+    .cross::before {
+      width: 200px;
+      height: 10px;
+      top: 45px;
+      left: -50px;
+    }
+    .cross::after {
+      width: 10px;
+      height: 200px;
+      top: -50px;
+      left: 45px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      border-radius: 25px;
+      background-color: #3498db;
+      color: #fff;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #resetButton {
+      display: none;
+      margin-top: 50px;
+    }
+    #leftText, #rightText {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #2c3e50;
+      display: none;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #leftText { left: 10%; }
+    #rightText { right: 10%; }
+    #sliderContainer, #iterationsContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      color: #2c3e50;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 300px;
+      height: 5px;
+      background: #bdc3c7;
+      border-radius: 5px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background: #3498db;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #2980b9;
+    }
+    input[type="text"] {
+      width: 50px;
+      padding: 5px;
+      font-size: 1em;
+      text-align: center;
+      border: 2px solid #bdc3c7;
+      border-radius: 5px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #3498db;
+    }
+    #sliderValue {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #7f8c8d;
+    }
+  </style>
 </head>
 <body>
-    <!-- Título -->
-    <h1 id="title">Palabras a cada hemisferio</h1>
+  <h1 id="title">Palabras a cada hemisferio</h1>
+  <p id="subtitle">tomcue@juandelacierva.com</p>
 
-    <div class="cross"></div>
+  <div class="cross"></div>
 
-    <!-- Control deslizante -->
-    <div id="sliderContainer">
-        <label for="displayTimeSlider">Tiempo de visualización</label>
-        <input type="range" id="displayTimeSlider" min="5" max="1000" value="500" step="5">
-        <div id="sliderValue">500 milisegundos</div>
-    </div>
+  <div id="sliderContainer">
+    <label for="displayTimeSlider">Tiempo de visualización</label>
+    <input type="range" id="displayTimeSlider" min="5" max="1000" value="500" step="5">
+    <div id="sliderValue">500 milisegundos</div>
+  </div>
 
-    <!-- Entrada de iteraciones -->
-    <div id="iterationsContainer">
-        <label for="iterationsInput">Número de iteraciones (1 a 4)</label>
-        <input type="text" id="iterationsInput" maxlength="1" pattern="[1-4]" required>
-    </div>
+  <div id="iterationsContainer">
+    <label for="iterationsInput">Número de iteraciones (1 a 4)</label>
+    <input type="text" id="iterationsInput" maxlength="1" pattern="[1-4]" required>
+  </div>
 
-    <button id="startButton" disabled>Iniciar</button>
-    <button id="resetButton">Reiniciar</button>
+  <button id="startButton" disabled>Iniciar</button>
+  <button id="resetButton">Reiniciar</button>
 
-    <div id="leftText">Esencia</div>
-    <div id="rightText">Existencia</div>
+  <div id="leftText">Esencia</div>
+  <div id="rightText">Existencia</div>
 
-    <script>
-        const startButton = document.getElementById('startButton');
-        const resetButton = document.getElementById('resetButton');
-        const displayTimeSlider = document.getElementById('displayTimeSlider');
-        const sliderValue = document.getElementById('sliderValue');
-        const leftText = document.getElementById('leftText');
-        const rightText = document.getElementById('rightText');
-        const iterationsInput = document.getElementById('iterationsInput');
-        const cross = document.querySelector('.cross');
-        const title = document.getElementById('title');
+  <script>
+    const startButton = document.getElementById('startButton');
+    const resetButton = document.getElementById('resetButton');
+    const displayTimeSlider = document.getElementById('displayTimeSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const leftText = document.getElementById('leftText');
+    const rightText = document.getElementById('rightText');
+    const iterationsInput = document.getElementById('iterationsInput');
+    const cross = document.querySelector('.cross');
+    const title = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
 
-        // Configuración de la Web Audio API para generar el pitido
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
 
-        function playBeep() {
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+    function playBeep() {
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.2);
+    }
 
-            oscillator.type = 'sine'; // Tipo de onda
-            oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // Frecuencia en Hz
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Volumen
+    displayTimeSlider.addEventListener('input', () => {
+      const effectiveValue = Math.max(parseInt(displayTimeSlider.value), 13);
+      sliderValue.textContent = `${effectiveValue} milisegundos`;
+    });
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+    iterationsInput.addEventListener('input', () => {
+      const value = iterationsInput.value;
+      startButton.disabled = !(value === '1' || value === '2' || value === '3' || value === '4');
+    });
 
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.2); // Duración del pitido
-        }
+    let startWithLeft;
 
-        // Actualizar el valor del tiempo de visualización
-        displayTimeSlider.addEventListener('input', () => {
-            sliderValue.textContent = `${displayTimeSlider.value} milisegundos`;
-        });
+    startButton.addEventListener('click', () => {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
 
-        // Validar entrada de iteraciones
-        iterationsInput.addEventListener('input', () => {
-            const value = iterationsInput.value;
-            startButton.disabled = !(value === '1' || value === '2' || value === '3' || value === '4');
-        });
+      startButton.style.display = 'none';
+      document.getElementById('sliderContainer').style.display = 'none';
+      document.getElementById('iterationsContainer').style.display = 'none';
+      title.style.display = 'none';
+      subtitle.style.display = 'none';
+      cross.style.display = 'block';
 
-        // Variable para determinar el orden inicial
-        let startWithLeft;
+      const rawTime = parseInt(displayTimeSlider.value);
+      const displayTime = Math.max(rawTime, 13);
+      const iterations = parseInt(iterationsInput.value);
+      const randomDelay = Math.random() * 2000 + 3000;
+      startWithLeft = Math.random() < 0.5;
 
-        // Función para iniciar la secuencia
-        startButton.addEventListener('click', () => {
-            // Despertar el contexto de audio en algunos navegadores
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            // Ocultar elementos
-            startButton.style.display = 'none';
-            document.getElementById('sliderContainer').style.display = 'none';
-            document.getElementById('iterationsContainer').style.display = 'none';
-            title.style.display = 'none';
-
-            // Mostrar la cruz
-            cross.style.display = 'block';
-
-            // Tiempo de visualización
-            const displayTime = parseInt(displayTimeSlider.value);
-
-            // Número de iteraciones
-            const iterations = parseInt(iterationsInput.value);
-
-            // Generar un intervalo aleatorio
-            const randomDelay = Math.random() * 2000 + 3000;
-
-            // Elegir aleatoriamente si comienza por la palabra de la izquierda o la derecha
-            startWithLeft = Math.random() < 0.5;
-
-            // Iniciar el proceso después del intervalo aleatorio
+      setTimeout(() => {
+        let fontSize = 1.5;
+        for (let i = 0; i < iterations; i++) {
+          ((i, fontSize) => {
             setTimeout(() => {
-                let fontSize = 1.5;
-                for (let i = 0; i < iterations; i++) {
-                    (function(i, fontSize) {
-                        setTimeout(() => {
-                            leftText.style.fontSize = `${fontSize}em`;
-                            rightText.style.fontSize = `${fontSize}em`;
+              leftText.style.fontSize = `${fontSize}em`;
+              rightText.style.fontSize = `${fontSize}em`;
 
-                            if (startWithLeft) {
-                                // Mostrar "Esencia" primero en cada iteración
-                                leftText.style.display = 'block';
-                                leftText.style.opacity = '1';
-                                playBeep();
+              function show(textEl, hideCallback) {
+                textEl.style.display = 'block';
+                textEl.style.opacity = '1';
+                playBeep();
+                setTimeout(() => {
+                  textEl.style.opacity = '0';
+                  setTimeout(() => {
+                    textEl.style.display = 'none';
+                    hideCallback();
+                  }, 500);
+                }, displayTime);
+              }
 
-                                setTimeout(() => {
-                                    leftText.style.opacity = '0';
-                                    setTimeout(() => {
-                                        leftText.style.display = 'none';
+              if (startWithLeft) {
+                show(leftText, () => {
+                  show(rightText, () => {
+                    if (i === iterations - 1) resetButton.style.display = 'block';
+                  });
+                });
+              } else {
+                show(rightText, () => {
+                  show(leftText, () => {
+                    if (i === iterations - 1) resetButton.style.display = 'block';
+                  });
+                });
+              }
+            }, i * (displayTime * 2 + 1000));
+          })(i, fontSize);
+          fontSize *= 1.5;
+        }
+      }, randomDelay);
+    });
 
-                                        // Mostrar "Existencia"
-                                        rightText.style.display = 'block';
-                                        rightText.style.opacity = '1';
-                                        playBeep();
-
-                                        setTimeout(() => {
-                                            rightText.style.opacity = '0';
-                                            setTimeout(() => {
-                                                rightText.style.display = 'none';
-
-                                                // Mostrar botón de reinicio si es la última iteración
-                                                if (i === iterations - 1) {
-                                                    resetButton.style.display = 'block';
-                                                }
-                                            }, 500);
-                                        }, displayTime);
-                                    }, 500);
-                                }, displayTime);
-                            } else {
-                                // Mostrar "Existencia" primero en cada iteración
-                                rightText.style.display = 'block';
-                                rightText.style.opacity = '1';
-                                playBeep();
-
-                                setTimeout(() => {
-                                    rightText.style.opacity = '0';
-                                    setTimeout(() => {
-                                        rightText.style.display = 'none';
-
-                                        // Mostrar "Esencia"
-                                        leftText.style.display = 'block';
-                                        leftText.style.opacity = '1';
-                                        playBeep();
-
-                                        setTimeout(() => {
-                                            leftText.style.opacity = '0';
-                                            setTimeout(() => {
-                                                leftText.style.display = 'none';
-
-                                                // Mostrar botón de reinicio si es la última iteración
-                                                if (i === iterations - 1) {
-                                                    resetButton.style.display = 'block';
-                                                }
-                                            }, 500);
-                                        }, displayTime);
-                                    }, 500);
-                                }, displayTime);
-                            }
-                        }, i * (displayTime * 2 + 1000));
-                    })(i, fontSize);
-
-                    fontSize *= 1.5;
-                }
-            }, randomDelay);
-        });
-
-        // Función para reiniciar el programa
-        resetButton.addEventListener('click', () => {
-            // Restablecer elementos
-            title.style.display = 'block';
-            document.getElementById('sliderContainer').style.display = 'flex';
-            document.getElementById('iterationsContainer').style.display = 'flex';
-            startButton.style.display = 'inline-block';
-            resetButton.style.display = 'none';
-            cross.style.display = 'none';
-            leftText.style.display = 'none';
-            rightText.style.display = 'none';
-            leftText.style.opacity = '0';
-            rightText.style.opacity = '0';
-
-            // Restablecer valores de entrada
-            displayTimeSlider.value = 500;
-            sliderValue.textContent = '500 milisegundos';
-            iterationsInput.value = '';
-            startButton.disabled = true;
-        });
-    </script>
+    resetButton.addEventListener('click', () => {
+      title.style.display = 'block';
+      subtitle.style.display = 'block';
+      document.getElementById('sliderContainer').style.display = 'flex';
+      document.getElementById('iterationsContainer').style.display = 'flex';
+      startButton.style.display = 'inline-block';
+      resetButton.style.display = 'none';
+      cross.style.display = 'none';
+      leftText.style.display = 'none';
+      rightText.style.display = 'none';
+      leftText.style.opacity = '0';
+      rightText.style.opacity = '0';
+      displayTimeSlider.value = 500;
+      sliderValue.textContent = '500 milisegundos';
+      iterationsInput.value = '';
+      startButton.disabled = true;
+    });
+  </script>
 </body>
 </html>
