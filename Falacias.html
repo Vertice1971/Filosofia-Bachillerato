@@ -503,11 +503,11 @@ const restartButton = document.getElementById('restart-btn');
 const startButton = document.getElementById('start-btn');
 const infoContainer = document.getElementById('info-container');
 
-infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas. Podrás elegir cuántas usar.</p>`;
+infoContainer.innerHTML = `<p>El ejercicio contiene <strong>${preguntas.length}</strong> preguntas. Podrás elegir cuántas usar.</p>`;
 startButton.style.display = 'block';
 
 startButton.addEventListener('click', function () {
-  let numPreguntas = prompt(`El test tiene ${preguntas.length} preguntas. ¿Cuántas deseas jugar?`, preguntas.length);
+  let numPreguntas = prompt(`El ejercicio tiene ${preguntas.length} preguntas. ¿Cuántas deseas jugar?`, preguntas.length);
   numPreguntas = parseInt(numPreguntas);
 
   if (isNaN(numPreguntas) || numPreguntas < 1 || numPreguntas > preguntas.length) {
@@ -553,7 +553,7 @@ function mostrarPregunta() {
 
   } else {
     quizContainer.innerHTML =
-      `<h2>¡Test finalizado!</h2><p>Has acertado ${correctas} de ${preguntasElegidas.length} preguntas.</p>`;
+      `<h2>¡Ejercicio finalizado!</h2><p>Has acertado ${correctas} de ${preguntasElegidas.length} preguntas.</p>`;
     nextButton.style.display = 'none';
     restartButton.style.display = 'block';
   }
@@ -584,7 +584,7 @@ restartButton.onclick = function () {
   startButton.style.display = 'none';
   preguntaActual = 0;
   correctas = 0;
-  infoContainer.innerHTML = `<p>El test contiene <strong>${preguntas.length}</strong> preguntas.</p>`;
+  infoContainer.innerHTML = `<p>El ejercicio contiene <strong>${preguntas.length}</strong> preguntas.</p>`;
   startButton.style.display = 'block';
   quizContainer.style.display = 'none';
   quizContainer.innerHTML = '';
@@ -594,3 +594,4 @@ restartButton.onclick = function () {
 
 </body>
 </html>
+
