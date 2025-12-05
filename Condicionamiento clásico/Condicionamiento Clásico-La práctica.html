@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Condicionamiento Clásico</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f9f9f9;
+        }
+        .container { 
+            width: 90%; 
+            max-width: 800px; 
+            margin: auto; 
+            padding: 20px; 
+            background-color: #fff; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .btn { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            cursor: pointer; 
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .btn:hover { 
+            background-color: #0056b3; 
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+        }
+        .table th, .table td { 
+            border: 1px solid #000; 
+            padding: 10px; 
+            text-align: center; 
+            vertical-align: middle;
+        }
+        .header { 
+            font-weight: bold; 
+            background-color: #f2f2f2; 
+        }
+        .phase-label { 
+            font-weight: bold; 
+            background-color: #e9ecef;
+        }
+        .ficha { 
+            display: inline-block; 
+            padding: 10px 15px; 
+            margin: 5px; 
+            border: 1px solid #000; 
+            cursor: pointer; 
+            font-size: 16px; 
+            background-color: #ffc107;
+            border-radius: 5px;
+            user-select: none;
+            transition: all 0.3s;
+        }
+        .ficha:hover {
+            transform: scale(1.05);
+        }
+        .ficha.selected {
+            background-color: #28a745;
+            color: #fff;
+            border-color: #1e7e34;
+        }
+        .celda.correcto {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+        .celda.incorrecto {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+        }
+        #fichas { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            margin-top: 20px;
+        }
+        .progreso {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .mensaje-validacion {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .mensaje-correcto {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .mensaje-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #resultado-final {
+            background-color: #e7f3ff;
+            border: 2px solid #007BFF;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .resultado-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .nota-final {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+            margin: 20px 0;
+        }
+        @media (max-width: 600px) {
+            .table th, .table td { 
+                font-size: 14px; 
+                padding: 8px; 
+            }
+            .ficha { 
+                font-size: 14px; 
+                padding: 8px 12px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="portada" class="container">
+    <h1>Práctica de Condicionamiento Clásico</h1>
+    <p>Pulsa el botón para comenzar la práctica. Se cargarán cinco condicionamientos al azar.</p>
+    <p><em>En esta práctica recibirás retroalimentación inmediata después de cada ejercicio.</em></p>
+    <button class="btn" onclick="iniciarPractica()">Comenzar Práctica</button>
+</div>
+
+<div id="actividad" class="container" style="display: none;">
+    <div class="progreso">
+        <strong>Ejercicio <span id="numero-ejercicio"></span> de 5</strong>
+    </div>
+    
+    <h2 id="descripcion"></h2>
+    
+    <div id="mensaje-validacion" style="display: none;"></div>
+    
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>E. I.</th>
+            <th>E. N.</th>
+            <th>E. C.</th>
+            <th>R. I.</th>
+            <th>R. C.</th>
+        </tr>
+        <tr>
+            <td class="phase-label">Fase 1</td>
+            <td id="pre_ei" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="pre_en" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="pre_ec" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="pre_ri" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="pre_rc" class="celda" onclick="colocarFicha(event)"></td>
+        </tr>
+        <tr>
+            <td class="phase-label">Fase 2</td>
+            <td id="cond_ei" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="cond_en" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="cond_ec" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="cond_ri" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="cond_rc" class="celda" onclick="colocarFicha(event)"></td>
+        </tr>
+        <tr>
+            <td class="phase-label">Fase 3</td>
+            <td id="post_ei" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="post_en" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="post_ec" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="post_ri" class="celda" onclick="colocarFicha(event)"></td>
+            <td id="post_rc" class="celda" onclick="colocarFicha(event)"></td>
+        </tr>
+    </table>
+    <div id="fichas"></div>
+    <button class="btn" id="btn-validar" onclick="validar()">Validar Respuesta</button>
+    <button class="btn" id="btn-siguiente" onclick="siguiente()" style="display: none;">Siguiente Ejercicio</button>
+    <button class="btn" onclick="reiniciarCeldas()">Reiniciar Celdas</button>
+</div>
+
+<div id="resultado" class="container" style="display: none;">
+    <h1>¡Práctica Finalizada!</h1>
+    <div id="resultado-final"></div>
+    <button class="btn" onclick="reiniciarPractica()">Realizar Nueva Práctica</button>
+</div>
+
+<script>
+    const condicionamientos = [
+        {
+            "id": 1,
+            "descripcion": "Queremos lograr que un perro salive cuando escucha una campana.",
+            "fichas_respuesta": ["comida", "campana", "salivación"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "comida", "pre_en": "", "pre_ec": "", "pre_ri": "salivación", "pre_rc": "" },
+                "fase2": { "cond_ei": "comida", "cond_en": "campana", "cond_ec": "", "cond_ri": "salivación", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "campana", "post_ri": "", "post_rc": "salivación" }
+            }
+        },
+        {
+            "id": 2,
+            "descripcion": "Queremos lograr que un perro aumente su frecuencia cardíaca cuando escucha el himno nacional francés.",
+            "fichas_respuesta": ["perrita en celo", "himno nacional francés", "aumento de frecuencia cardíaca"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "perrita en celo", "pre_en": "", "pre_ec": "", "pre_ri": "aumento de frecuencia cardíaca", "pre_rc": "" },
+                "fase2": { "cond_ei": "perrita en celo", "cond_en": "himno nacional francés", "cond_ec": "", "cond_ri": "aumento de frecuencia cardíaca", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "himno nacional francés", "post_ri": "", "post_rc": "aumento de frecuencia cardíaca" }
+            }
+        },
+        {
+            "id": 3,
+            "descripcion": "Queremos lograr que una persona sienta náuseas cuando ve escenas de violencia.",
+            "fichas_respuesta": ["tóxico", "escenas de violencia", "náuseas"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "tóxico", "pre_en": "", "pre_ec": "", "pre_ri": "náuseas", "pre_rc": "" },
+                "fase2": { "cond_ei": "tóxico", "cond_en": "escenas de violencia", "cond_ec": "", "cond_ri": "náuseas", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "escenas de violencia", "post_ri": "", "post_rc": "náuseas" }
+            }
+        },
+        {
+            "id": 4,
+            "descripcion": "Queremos lograr que un niño llore cada vez que ve una bata blanca.",
+            "fichas_respuesta": ["pinchazo", "bata blanca", "llanto"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "pinchazo", "pre_en": "", "pre_ec": "", "pre_ri": "llanto", "pre_rc": "" },
+                "fase2": { "cond_ei": "pinchazo", "cond_en": "bata blanca", "cond_ec": "", "cond_ri": "llanto", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "bata blanca", "post_ri": "", "post_rc": "llanto" }
+            }
+        },
+        {
+            "id": 5,
+            "descripcion": "Queremos lograr que una persona sienta desagrado al ver un cigarrillo.",
+            "fichas_respuesta": ["descargas eléctricas", "cigarrillo", "desagrado"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "descargas eléctricas", "pre_en": "", "pre_ec": "", "pre_ri": "desagrado", "pre_rc": "" },
+                "fase2": { "cond_ei": "descargas eléctricas", "cond_en": "cigarrillo", "cond_ec": "", "cond_ri": "desagrado", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "cigarrillo", "post_ri": "", "post_rc": "desagrado" }
+            }
+        },
+        {
+            "id": 6,
+            "descripcion": "Nuestro gato cada vez que ve un anuncio de aspiradoras en la tele se asusta.",
+            "fichas_respuesta": ["ruido de la aspiradora", "imagen de la aspiradora", "asustarse"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ruido de la aspiradora", "pre_en": "", "pre_ec": "", "pre_ri": "asustarse", "pre_rc": "" },
+                "fase2": { "cond_ei": "ruido de la aspiradora", "cond_en": "imagen de la aspiradora", "cond_ec": "", "cond_ri": "asustarse", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "imagen de la aspiradora", "post_ri": "", "post_rc": "asustarse" }
+            }
+        },
+        {
+            "id": 7,
+            "descripcion": "Queremos lograr que unos niños sientan alivio de dolor de cabeza al oler rosas.",
+            "fichas_respuesta": ["ibuprofeno", "olor de rosas", "alivio del dolor de cabeza"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ibuprofeno", "pre_en": "", "pre_ec": "", "pre_ri": "alivio del dolor de cabeza", "pre_rc": "" },
+                "fase2": { "cond_ei": "ibuprofeno", "cond_en": "olor de rosas", "cond_ec": "", "cond_ri": "alivio del dolor de cabeza", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "olor de rosas", "post_ri": "", "post_rc": "alivio del dolor de cabeza" }
+            }
+        },
+        {
+            "id": 8,
+            "descripcion": "Hay personas que solo con oír cómo se abre la lata de un refresco sienten una especie de frescor.",
+            "fichas_respuesta": ["sabor del refresco", "sonido de la lata abriéndose", "frescor"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "sabor del refresco", "pre_en": "", "pre_ec": "", "pre_ri": "frescor", "pre_rc": "" },
+                "fase2": { "cond_ei": "sabor del refresco", "cond_en": "sonido de la lata abriéndose", "cond_ec": "", "cond_ri": "frescor", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "sonido de la lata abriéndose", "post_ri": "", "post_rc": "frescor" }
+            }
+        },
+        {
+            "id": 9,
+            "descripcion": "Queremos lograr que un perro se esconda al ver una caja de petardos.",
+            "fichas_respuesta": ["ruido fuerte", "caja de petardos", "esconderse"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "ruido fuerte", "pre_en": "", "pre_ec": "", "pre_ri": "esconderse", "pre_rc": "" },
+                "fase2": { "cond_ei": "ruido fuerte", "cond_en": "caja de petardos", "cond_ec": "", "cond_ri": "esconderse", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "caja de petardos", "post_ri": "", "post_rc": "esconderse" }
+            }
+        },
+        {
+            "id": 10,
+            "descripcion": "Queremos lograr que señoras de mediana edad y con buen poder adquisitivo sientan deseos de llevarse una cafetera a casa.",
+            "fichas_respuesta": ["George Clooney", "cafetera", "atracción"],
+            "condicionamiento": {
+                "fase1": { "pre_ei": "George Clooney", "pre_en": "", "pre_ec": "", "pre_ri": "atracción", "pre_rc": "" },
+                "fase2": { "cond_ei": "George Clooney", "cond_en": "cafetera", "cond_ec": "", "cond_ri": "atracción", "cond_rc": "" },
+                "fase3": { "post_ei": "", "post_en": "", "post_ec": "cafetera", "post_ri": "", "post_rc": "atracción" }
+            }
+        }
+    ];
+
+    let practicaCondiciones = [];
+    let respuestasCorrectas = {};
+    let condicionActual = 0;
+    let resultadoPractica = [];
+    let fichaSeleccionada = null;
+    let validado = false;
+
+    function normalizarTexto(texto) {
+        return texto
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function iniciarPractica() {
+        practicaCondiciones = seleccionarCondicionamientosAleatorios(condicionamientos, 5);
+        condicionActual = 0;
+        resultadoPractica = [];
+        mostrarCondicionamiento(practicaCondiciones[condicionActual]);
+        document.getElementById("portada").style.display = "none";
+        document.getElementById("actividad").style.display = "block";
+        document.getElementById("resultado").style.display = "none";
+    }
+
+    function seleccionarCondicionamientosAleatorios(arr, n) {
+        let resultado = [];
+        let indicesUsados = new Set();
+        while (resultado.length < n && resultado.length < arr.length) {
+            let indice = Math.floor(Math.random() * arr.length);
+            if (!indicesUsados.has(indice)) {
+                resultado.push(arr[indice]);
+                indicesUsados.add(indice);
+            }
+        }
+        return resultado;
+    }
+
+    function mostrarCondicionamiento(data) {
+        limpiarTabla();
+        validado = false;
+        document.getElementById("mensaje-validacion").style.display = "none";
+        document.getElementById("btn-validar").style.display = "inline-block";
+        document.getElementById("btn-siguiente").style.display = "none";
+        
+        if (fichaSeleccionada) {
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        }
+        
+        document.getElementById("descripcion").textContent = data.descripcion;
+        document.getElementById("numero-ejercicio").textContent = condicionActual + 1;
+        respuestasCorrectas = prepararRespuestas(data);
+        mostrarFichas(data.fichas_respuesta);
+    }
+
+    function limpiarTabla() {
+        const celdas = document.querySelectorAll('.table td.celda');
+        celdas.forEach(celda => {
+            celda.textContent = "";
+            celda.classList.remove('correcto', 'incorrecto');
+        });
+    }
+
+    function prepararRespuestas(data) {
+        return {
+            ...data.condicionamiento.fase1,
+            ...data.condicionamiento.fase2,
+            ...data.condicionamiento.fase3
+        };
+    }
+
+    function mostrarFichas(fichas) {
+        const fichasContainer = document.getElementById("fichas");
+        fichasContainer.innerHTML = "";
+        
+        const fichasMezcladas = shuffleArray([...fichas]);
+
+        fichasMezcladas.forEach(ficha => {
+            const fichaElem = document.createElement("div");
+            fichaElem.classList.add("ficha");
+            fichaElem.textContent = ficha;
+            fichaElem.onclick = seleccionarFicha;
+            fichasContainer.appendChild(fichaElem);
+        });
+    }
+
+    function seleccionarFicha(event) {
+        if (validado) return; // No permitir selección después de validar
+        
+        const fichaElem = event.target;
+        if (fichaSeleccionada === fichaElem) {
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        } else {
+            if (fichaSeleccionada) {
+                fichaSeleccionada.classList.remove('selected');
+            }
+            fichaSeleccionada = fichaElem;
+            fichaSeleccionada.classList.add('selected');
+        }
+    }
+
+    function colocarFicha(event) {
+        if (validado) return; // No permitir cambios después de validar
+        
+        const celda = event.target;
+        if (fichaSeleccionada) {
+            celda.textContent = fichaSeleccionada.textContent;
+        } else {
+            celda.textContent = "";
+        }
+    }
+
+    function reiniciarCeldas() {
+        if (validado) return; // No permitir reiniciar después de validar
+        
+        limpiarTabla();
+        if (fichaSeleccionada) {
+            fichaSeleccionada.classList.remove('selected');
+            fichaSeleccionada = null;
+        }
+    }
+
+    function validar() {
+        if (validado) return; // Evitar validar dos veces
+        
+        let errores = 0;
+        const celdas = document.querySelectorAll('.table td.celda');
+        
+        celdas.forEach(celda => {
+            const id = celda.id;
+            const respuestaEsperada = respuestasCorrectas[id] ? normalizarTexto(respuestasCorrectas[id]) : "";
+            const respuestaUsuario = normalizarTexto(celda.textContent);
+            
+            if (respuestaEsperada === "" && respuestaUsuario !== "") {
+                errores++;
+                celda.classList.add('incorrecto');
+            } else if (respuestaEsperada !== "" && respuestaUsuario !== respuestaEsperada) {
+                errores++;
+                celda.classList.add('incorrecto');
+            } else {
+                celda.classList.add('correcto');
+            }
+        });
+
+        validado = true;
+        
+        // Guardar resultado
+        resultadoPractica.push({
+            "id": practicaCondiciones[condicionActual].id,
+            "descripcion": practicaCondiciones[condicionActual].descripcion,
+            "errores": errores
+        });
+
+        // Mostrar mensaje
+        const mensajeDiv = document.getElementById("mensaje-validacion");
+        if (errores === 0) {
+            mensajeDiv.className = "mensaje-validacion mensaje-correcto";
+            mensajeDiv.textContent = "¡Perfecto! Todas las respuestas son correctas. 🎉";
+        } else {
+            mensajeDiv.className = "mensaje-validacion mensaje-error";
+            mensajeDiv.textContent = `Tienes ${errores} ${errores === 1 ? 'error' : 'errores'}. Revisa las celdas marcadas en rojo.`;
+        }
+        mensajeDiv.style.display = "block";
+        
+        // Cambiar botones
+        document.getElementById("btn-validar").style.display = "none";
+        document.getElementById("btn-siguiente").style.display = "inline-block";
+    }
+
+    function siguiente() {
+        if (condicionActual < practicaCondiciones.length - 1) {
+            condicionActual++;
+            mostrarCondicionamiento(practicaCondiciones[condicionActual]);
+        } else {
+            finalizarPractica();
+        }
+    }
+
+    function finalizarPractica() {
+        document.getElementById("actividad").style.display = "none";
+        document.getElementById("resultado").style.display = "block";
+        
+        const totalErrores = resultadoPractica.reduce((sum, result) => sum + result.errores, 0);
+        const totalCeldas = 75; // 5 ejercicios × 15 celdas cada uno
+        const correctas = totalCeldas - totalErrores;
+        const porcentaje = ((correctas / totalCeldas) * 100).toFixed(1);
+        const nota = ((correctas / totalCeldas) * 10).toFixed(2);
+        
+        let resultadoHTML = `
+            <div class="nota-final">Nota Final: ${nota} / 10</div>
+            <p><strong>Respuestas correctas:</strong> ${correctas} de ${totalCeldas} (${porcentaje}%)</p>
+            <p><strong>Errores totales:</strong> ${totalErrores}</p>
+            <hr>
+            <h3>Detalle por ejercicio:</h3>
+        `;
+        
+        resultadoPractica.forEach((resultado, index) => {
+            const celdasPorEjercicio = 15;
+            const correctasEjercicio = celdasPorEjercicio - resultado.errores;
+            const emoji = resultado.errores === 0 ? "✅" : resultado.errores <= 3 ? "👍" : "📝";
+            resultadoHTML += `
+                <div class="resultado-item">
+                    ${emoji} <strong>Ejercicio ${index + 1}:</strong> ${correctasEjercicio}/${celdasPorEjercicio} correctas 
+                    ${resultado.errores > 0 ? `(${resultado.errores} errores)` : '(¡Perfecto!)'}
+                </div>
+            `;
+        });
+        
+        document.getElementById("resultado-final").innerHTML = resultadoHTML;
+    }
+
+    function reiniciarPractica() {
+        document.getElementById("resultado").style.display = "none";
+        document.getElementById("portada").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
