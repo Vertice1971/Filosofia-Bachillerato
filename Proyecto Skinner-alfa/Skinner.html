@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condicionamiento Operante - Caja de Skinner</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <!-- Botón para descargar la bitácora -->
+            <button id="downloadLogButton">Descargar Condicionamiento</button>
+            <!-- Título principal -->
+            <h1>Condicionamiento Operante</h1>
+            <!-- Controles de velocidad -->
+            <div class="speed-controls">
+                <button class="speed-button active" data-speed="1">1x</button>
+                <button class="speed-button" data-speed="2">2x</button>
+                <button class="speed-button" data-speed="4">4x</button>
+            </div>
+        </div>
+        <!-- Odómetro para mostrar las unidades temporales -->
+        <div id="odometer-container" class="odometer-container">
+            <div id="contador" class="odometer">0000</div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Contenedor principal de la Caja de Skinner -->
+        <section class="box" id="skinnerBox">
+            <!-- Ratón dentro de la caja -->
+            <div class="mouse looking-right" id="mouse">🐁</div>
+
+            <!-- Dispositivos interactivos -->
+            <div class="device" id="palanca"></div> <!-- D1 - Palanca -->
+            <div class="device" id="comedero"></div> <!-- D2 - Comedero -->
+
+            <!-- D3 - Altavoz -->
+            <div class="device" id="altavoz">
+                <div class="sound-wave"></div>
+                <div class="sound-wave"></div>
+            </div>
+
+            <!-- Selector de canciones -->
+            <div id="songSelectorContainer">
+                <div id="songSlider" data-position="left"></div>
+                <div id="songSelectorLabels">
+                    <span data-label="1">macarena</span>
+                    <span data-label="2">sultans</span>
+                </div>
+            </div>
+            <audio id="altavozSound" src="css/macarena.mp3"></audio>
+
+            <!-- D4 - Luz -->
+            <div class="device" id="luz"></div> <!-- Luz principal -->
+
+            <!-- D5 - Luz secundaria -->
+            <div class="device" id="luz2"></div> <!-- Luz secundaria -->
+
+            <!-- D6 - Rejilla eléctrica -->
+            <div class="device" id="rejilla"></div>
+        </section>
+
+        <!-- Cuadro de información -->
+        <section class="status-panel">
+            <p id="instructions">Comienza el condicionamiento</p>
+            <div id="counters"></div> <!-- Contadores de recompensas y castigos -->
+        </section>
+    </main>
+
+    <!-- Inclusión de los scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/movement.js"></script>
+    <script src="js/learning.js"></script>
+</body>
+</html>
