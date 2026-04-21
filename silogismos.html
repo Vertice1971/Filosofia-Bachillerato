@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silogismos — Filosofía</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1929;
+    --surface2: #232236;
+    --accent: #e8c547;
+    --accent2: #7b61ff;
+    --green: #3ddc84;
+    --red: #ff5c6a;
+    --text: #fffffe;
+    --text-dim: #a8a7b8;
+    --border: rgba(255,255,255,0.08);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 2.5rem 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(232,197,71,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(232,197,71,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  header p {
+    margin-top: 0.75rem;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1rem;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: rgba(232,197,71,0.4); color: var(--text); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    margin-bottom: 0.4rem;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  /* ── SYLLOGISM DISPLAY ── */
+  .syl-box {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 2;
+    margin-bottom: 1.2rem;
+  }
+  .syl-box .premise { color: var(--text); }
+  .syl-box .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin: 0.4rem 0;
+  }
+  .syl-box .conclusion { color: var(--accent); }
+
+  /* ── RECOGNITION BUTTONS ── */
+  .choice-row {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .choice-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .choice-btn:hover { border-color: var(--accent2); }
+  .choice-btn.correct { background: rgba(61,220,132,0.15); border-color: var(--green); color: var(--green); }
+  .choice-btn.wrong   { background: rgba(255,92,106,0.15); border-color: var(--red);   color: var(--red);   }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: rgba(61,220,132,0.1);  border: 1px solid rgba(61,220,132,0.3);  color: var(--green); }
+  .feedback.bad { background: rgba(255,92,106,0.1);  border: 1px solid rgba(255,92,106,0.3);  color: var(--red); }
+
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .score-val { font-family: 'DM Mono', monospace; color: var(--accent); font-size: 1rem; }
+
+  .next-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: none;
+  }
+  .next-btn.show { display: inline-block; }
+  .next-btn:hover { background: var(--accent); color: var(--bg); }
+
+  /* ── BUILD PANEL ── */
+  .build-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  @media (max-width: 600px) { .build-grid { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .field-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.18s;
+    width: 100%;
+  }
+  .field-input:focus { border-color: var(--accent2); }
+  .field-input::placeholder { color: var(--text-dim); opacity: 0.5; }
+
+  .build-btn {
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent2);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.18s;
+    margin-bottom: 1.2rem;
+  }
+  .build-btn:hover { opacity: 0.85; }
+
+  .preview-box {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.88rem;
+    line-height: 2;
+    min-height: 120px;
+    border: 1px dashed var(--border);
+    color: var(--text-dim);
+  }
+  .preview-box .p-line { color: var(--text); }
+  .preview-box .p-conc { color: var(--accent); }
+  .preview-box .p-div {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 0.3rem 0;
+  }
+
+  .validity-badge {
+    display: inline-block;
+    margin-top: 0.8rem;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+  }
+  .validity-badge.valid   { background: rgba(61,220,132,0.15); color: var(--green); border: 1px solid rgba(61,220,132,0.4); }
+  .validity-badge.invalid { background: rgba(255,92,106,0.15); color: var(--red);   border: 1px solid rgba(255,92,106,0.4); }
+  .validity-badge.neutral { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+
+  .explain-box {
+    margin-top: 0.8rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    background: var(--surface2);
+    color: var(--text-dim);
+    border-left: 3px solid var(--accent2);
+  }
+
+  /* ── DRAG PANEL ── */
+  .drag-instructions {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .drag-game {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 600px) { .drag-game { grid-template-columns: 1fr; } }
+
+  .chips-pool {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 1rem;
+    min-height: 120px;
+    border: 1px solid var(--border);
+  }
+  .chips-pool-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.8rem;
+  }
+  .chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 60px;
+  }
+
+  .chip {
+    padding: 0.45rem 0.9rem;
+    border-radius: 100px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--accent2); transform: translateY(-1px); }
+  .chip.dragging { opacity: 0.4; cursor: grabbing; }
+  .chip.placed-correct { background: rgba(61,220,132,0.15); border-color: var(--green); color: var(--green); cursor: default; }
+  .chip.placed-wrong   { background: rgba(255,92,106,0.15); border-color: var(--red);   color: var(--red);   cursor: default; }
+
+  .syl-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .slot-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .slot-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    width: 70px;
+    flex-shrink: 0;
+  }
+  .slot {
+    flex: 1;
+    min-height: 42px;
+    border-radius: 8px;
+    border: 1px dashed rgba(255,255,255,0.2);
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    padding: 0 0.8rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .slot.drag-over { border-color: var(--accent2); background: rgba(123,97,255,0.1); }
+  .slot.filled    { border-style: solid; border-color: var(--border); color: var(--text); }
+  .slot.correct   { border-color: var(--green); background: rgba(61,220,132,0.08); }
+  .slot.wrong     { border-color: var(--red);   background: rgba(255,92,106,0.08); }
+
+  .slot-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 0.2rem 0;
+  }
+
+  .drag-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    padding: 0.65rem 1.3rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .action-btn.primary { background: var(--accent2); border-color: var(--accent2); color: white; }
+  .action-btn:hover { opacity: 0.8; }
+
+  .drag-feedback {
+    margin-top: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .drag-feedback.show { display: block; }
+  .drag-feedback.ok  { background: rgba(61,220,132,0.1); border: 1px solid rgba(61,220,132,0.3); color: var(--green); }
+  .drag-feedback.bad { background: rgba(255,92,106,0.1); border: 1px solid rgba(255,92,106,0.3); color: var(--red); }
+
+  .drag-exercise-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .ex-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .ex-dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .ex-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .ex-dot.done { background: var(--accent); border-color: var(--accent); }
+  .ex-dot.active { background: var(--accent2); border-color: var(--accent2); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Filosofía · 1.º Bachillerato</div>
+  <h1>El arte del<br><em>silogismo</em></h1>
+  <p>Razona con estructura. Tres modos de practicar.</p>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="showPanel('reconoce')">① Reconocer</button>
+  <button class="tab-btn" onclick="showPanel('construye')">② Construir</button>
+  <button class="tab-btn" onclick="showPanel('arrastra')">③ Ordenar</button>
+</nav>
+
+<main>
+
+  <!-- ══════════════════════════════════════════
+       PANEL 1 — RECONOCER
+  ══════════════════════════════════════════ -->
+  <div class="panel active" id="panel-reconoce">
+    <p class="section-title">Reconoce el silogismo</p>
+    <p class="section-desc">Lee cada razonamiento y decide si es <strong>válido</strong> (la conclusión se sigue necesariamente de las premisas) o <strong>inválido</strong> (hay un error en la estructura).</p>
+
+    <div class="score-bar">
+      Aciertos: <span class="score-val" id="rec-score">0 / 0</span>
+    </div>
+
+    <div class="card" id="rec-card">
+      <div class="card-label" id="rec-num">Razonamiento 1 de 8</div>
+      <div class="syl-box" id="rec-syl"></div>
+      <div class="choice-row">
+        <button class="choice-btn" id="btn-valid" onclick="checkRec(true)">✓ Válido</button>
+        <button class="choice-btn" id="btn-invalid" onclick="checkRec(false)">✗ Inválido</button>
+      </div>
+      <div class="feedback" id="rec-feedback"></div>
+      <button class="next-btn" id="rec-next" onclick="nextRec()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PANEL 2 — CONSTRUIR
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="panel-construye">
+    <p class="section-title">Construye tu silogismo</p>
+    <p class="section-desc">Rellena los campos con tus propias ideas. El sistema comprobará si la estructura es correcta y te explicará por qué.</p>
+
+    <div class="card">
+      <div class="card-label">Introduce los términos</div>
+      <div class="build-grid">
+        <div class="field-group">
+          <label class="field-label">Término mayor (grupo amplio)</label>
+          <input class="field-input" id="b-mayor" placeholder="ej: personas que estudian de noche" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Término medio (grupo intermedio)</label>
+          <input class="field-input" id="b-medio" placeholder="ej: streamers de Twitch" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Sujeto (individuo o grupo)</label>
+          <input class="field-input" id="b-sujeto" placeholder="ej: Ibai" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Tipo de premisa 1</label>
+          <select class="field-input" id="b-tipo">
+            <option value="todo">Todo P es Q  (universal afirmativa)</option>
+            <option value="ninguno">Ningún P es Q  (universal negativa)</option>
+            <option value="algun">Algún P es Q  (particular afirmativa)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-bottom:1rem">
+        <label class="field-label">Premisa 2 — relación del sujeto con el término medio</label>
+        <select class="field-input" id="b-rel">
+          <option value="es">S es P  (el sujeto pertenece al grupo intermedio)</option>
+          <option value="no-es">S no es P  (el sujeto NO pertenece al grupo intermedio)</option>
+          <option value="es-q">S es Q  (el sujeto pertenece al grupo amplio)</option>
+        </select>
+      </div>
+
+      <button class="build-btn" onclick="buildSyl()">Construir silogismo</button>
+
+      <div class="card-label">Vista previa</div>
+      <div class="preview-box" id="build-preview">
+        <span style="opacity:0.4">Rellena los campos y pulsa «Construir»...</span>
+      </div>
+      <div id="build-badge"></div>
+      <div class="explain-box" id="build-explain" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PANEL 3 — ARRASTRAR
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="panel-arrastra">
+    <p class="section-title">Ordena las piezas</p>
+    <p class="section-desc">Arrastra cada ficha al lugar correcto: Premisa 1, Premisa 2 o Conclusión.</p>
+
+    <div class="drag-exercise-nav">
+      <span class="ex-counter" id="drag-counter">Ejercicio 1 de 6</span>
+      <div class="ex-dots" id="drag-dots"></div>
+    </div>
+
+    <div class="drag-game">
+      <div class="chips-pool">
+        <div class="chips-pool-label">Fichas disponibles</div>
+        <div class="chips-container" id="chips-pool"></div>
+      </div>
+
+      <div class="syl-slots">
+        <div class="slot-row">
+          <span class="slot-label">Premisa 1</span>
+          <div class="slot" id="slot-p1" data-slot="p1"
+               ondragover="dragOver(event)" ondrop="drop(event,'p1')"
+               ondragleave="dragLeave(event)">
+            Suelta aquí
+          </div>
+        </div>
+        <div class="slot-row">
+          <span class="slot-label">Premisa 2</span>
+          <div class="slot" id="slot-p2" data-slot="p2"
+               ondragover="dragOver(event)" ondrop="drop(event,'p2')"
+               ondragleave="dragLeave(event)">
+            Suelta aquí
+          </div>
+        </div>
+        <hr class="slot-divider">
+        <div class="slot-row">
+          <span class="slot-label">Conclusión</span>
+          <div class="slot" id="slot-conc" data-slot="conc"
+               ondragover="dragOver(event)" ondrop="drop(event,'conc')"
+               ondragleave="dragLeave(event)">
+            Suelta aquí
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drag-actions">
+      <button class="action-btn primary" onclick="checkDrag()">Comprobar</button>
+      <button class="action-btn" onclick="resetDrag()">Reiniciar</button>
+      <button class="action-btn" onclick="nextDrag()">Siguiente ejercicio →</button>
+    </div>
+    <div class="drag-feedback" id="drag-feedback"></div>
+  </div>
+
+</main>
+
+<footer>filosofía · bachillerato · silogismos</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// PANEL SWITCHING
+// ═══════════════════════════════════════════════════════
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// PANEL 1 — RECONOCER
+// ═══════════════════════════════════════════════════════
+const recExercises = [
+  {
+    premises: ["Todo streamer de Twitch pasa muchas horas frente a la pantalla.",
+               "Ibai es un streamer de Twitch."],
+    conclusion: "Ibai pasa muchas horas frente a la pantalla.",
+    valid: true,
+    explain: "✓ Estructura correcta. Ibai está dentro del grupo de streamers, y todos los streamers están dentro del grupo de los que pasan muchas horas frente a la pantalla. La cadena funciona."
+  },
+  {
+    premises: ["Todos los que usan AirPods en el metro quieren evitar conversaciones.",
+               "Clara quiere evitar conversaciones."],
+    conclusion: "Clara usa AirPods en el metro.",
+    valid: false,
+    explain: "✗ Error clásico: afirmar el consecuente. Querer evitar conversaciones no implica necesariamente usar AirPods. Puede haber otras formas de lograrlo. El grupo de los que evitan conversaciones es más grande que el de los usuarios de AirPods."
+  },
+  {
+    premises: ["Ningún examen sorpresa avisa con antelación.",
+               "Este control es un examen sorpresa."],
+    conclusion: "Este control no avisa con antelación.",
+    valid: true,
+    explain: "✓ Silogismo negativo válido. Si ningún miembro del grupo avisa, y el sujeto está en ese grupo, el sujeto tampoco avisa."
+  },
+  {
+    premises: ["Todas las personas que aprueban selectividad estudian mucho.",
+               "Marta estudia mucho."],
+    conclusion: "Marta aprobará selectividad.",
+    valid: false,
+    explain: "✗ Estudiar mucho es condición de los que aprueban, pero no es suficiente por sí sola para garantizar el aprobado. Puede que Marta estudie mucho y aun así no apruebe por otros factores."
+  },
+  {
+    premises: ["Todo videojuego con más de 90 en Metacritic es considerado un clásico.",
+               "The Legend of Zelda: Breath of the Wild tiene más de 90 en Metacritic."],
+    conclusion: "The Legend of Zelda: Breath of the Wild es considerado un clásico.",
+    valid: true,
+    explain: "✓ Estructura perfecta. El juego entra en el grupo de los que superan 90 en Metacritic, y todos los de ese grupo son considerados clásicos."
+  },
+  {
+    premises: ["Algunos youtubers de tecnología saben programar.",
+               "Carlos es youtuber de tecnología."],
+    conclusion: "Carlos sabe programar.",
+    valid: false,
+    explain: "✗ La premisa 1 dice «algunos», no «todos». Carlos puede ser youtuber de tecnología sin saber programar. La particular afirmativa no permite concluir nada sobre un individuo concreto."
+  },
+  {
+    premises: ["Todo algoritmo de redes sociales maximiza el tiempo de pantalla.",
+               "TikTok tiene un algoritmo de redes sociales."],
+    conclusion: "El algoritmo de TikTok maximiza el tiempo de pantalla.",
+    valid: true,
+    explain: "✓ Silogismo válido. TikTok está dentro del grupo de redes sociales, y todos los algoritmos de ese grupo maximizan el tiempo de pantalla."
+  },
+  {
+    premises: ["Ningún spoiler avisa de lo que va a ocurrir antes de que ocurra.",
+               "Nadie avisa de lo que va a ocurrir antes de que ocurra."],
+    conclusion: "Todo el mundo hace spoilers.",
+    valid: false,
+    explain: "✗ Las premisas hablan de lo que hacen los spoilers y de quienes no avisan, pero no permiten concluir nada sobre «todo el mundo». La conclusión es mucho más amplia que lo que las premisas autorizan."
+  }
+];
+
+let recIdx = 0;
+let recCorrect = 0;
+let recAnswered = 0;
+let recDone = false;
+
+function renderRec() {
+  const ex = recExercises[recIdx];
+  document.getElementById('rec-num').textContent = `Razonamiento ${recIdx + 1} de ${recExercises.length}`;
+  const box = document.getElementById('rec-syl');
+  box.innerHTML = ex.premises.map(p => `<div class="premise">${p}</div>`).join('') +
+    `<hr class="divider"><div class="conclusion">∴ ${ex.conclusion}</div>`;
+  document.getElementById('rec-feedback').className = 'feedback';
+  document.getElementById('rec-feedback').textContent = '';
+  document.getElementById('rec-next').className = 'next-btn';
+  document.getElementById('btn-valid').className = 'choice-btn';
+  document.getElementById('btn-invalid').className = 'choice-btn';
+  recDone = false;
+}
+
+function checkRec(userSaysValid) {
+  if (recDone) return;
+  recDone = true;
+  recAnswered++;
+  const ex = recExercises[recIdx];
+  const correct = userSaysValid === ex.valid;
+  if (correct) recCorrect++;
+  document.getElementById('rec-score').textContent = `${recCorrect} / ${recAnswered}`;
+
+  const fb = document.getElementById('rec-feedback');
+  fb.textContent = ex.explain;
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'bad');
+
+  document.getElementById('btn-valid').className = 'choice-btn' + (ex.valid ? ' correct' : ' wrong');
+  document.getElementById('btn-invalid').className = 'choice-btn' + (!ex.valid ? ' correct' : ' wrong');
+  document.getElementById('rec-next').className = 'next-btn show';
+}
+
+function nextRec() {
+  recIdx = (recIdx + 1) % recExercises.length;
+  renderRec();
+}
+
+renderRec();
+
+// ═══════════════════════════════════════════════════════
+// PANEL 2 — CONSTRUIR
+// ═══════════════════════════════════════════════════════
+function buildSyl() {
+  const mayor  = document.getElementById('b-mayor').value.trim();
+  const medio  = document.getElementById('b-medio').value.trim();
+  const sujeto = document.getElementById('b-sujeto').value.trim();
+  const tipo   = document.getElementById('b-tipo').value;
+  const rel    = document.getElementById('b-rel').value;
+
+  if (!mayor || !medio || !sujeto) {
+    document.getElementById('build-preview').innerHTML = '<span style="color:var(--red)">Rellena todos los campos antes de continuar.</span>';
+    return;
+  }
+
+  let p1, p2, conc, valid, explain;
+
+  // Build premise 1
+  if (tipo === 'todo')    p1 = `Todo ${medio} es ${mayor}.`;
+  if (tipo === 'ninguno') p1 = `Ningún ${medio} es ${mayor}.`;
+  if (tipo === 'algun')   p1 = `Algún ${medio} es ${mayor}.`;
+
+  // Build premise 2 & conclusion based on relation
+  if (rel === 'es') {
+    p2 = `${sujeto} es ${medio}.`;
+    if (tipo === 'todo') {
+      conc = `${sujeto} es ${mayor}.`;
+      valid = true;
+      explain = `La estructura es correcta. ${sujeto} pertenece al grupo «${medio}», y todos los de ese grupo pertenecen a «${mayor}». La cadena P → M → Mayor funciona.`;
+    } else if (tipo === 'ninguno') {
+      conc = `${sujeto} no es ${mayor}.`;
+      valid = true;
+      explain = `Silogismo negativo válido. Si ningún ${medio} es ${mayor}, y ${sujeto} es ${medio}, entonces ${sujeto} tampoco puede ser ${mayor}.`;
+    } else {
+      conc = `${sujeto} es ${mayor}.`;
+      valid = false;
+      explain = `Atención: la premisa 1 dice «algún», no «todos». Que algunos ${medio} sean ${mayor} no permite concluir nada seguro sobre ${sujeto} en particular. El silogismo no es válido.`;
+    }
+  } else if (rel === 'no-es') {
+    p2 = `${sujeto} no es ${medio}.`;
+    conc = `${sujeto} no es ${mayor}.`;
+    valid = false;
+    explain = `Error estructural: que ${sujeto} no sea ${medio} no implica que no sea ${mayor}. Puede pertenecer a «${mayor}» por otra vía. Las premisas no autorizan esta conclusión.`;
+  } else {
+    p2 = `${sujeto} es ${mayor}.`;
+    conc = `${sujeto} es ${medio}.`;
+    valid = false;
+    explain = `Error clásico: afirmar el consecuente. Pertenecer a «${mayor}» no implica pertenecer a «${medio}». El grupo «${mayor}» puede contener muchas otras cosas además de «${medio}».`;
+  }
+
+  // Render preview
+  document.getElementById('build-preview').innerHTML =
+    `<div class="p-line">${p1}</div>` +
+    `<div class="p-line">${p2}</div>` +
+    `<hr class="p-div">` +
+    `<div class="p-conc">∴ ${conc}</div>`;
+
+  const badge = document.getElementById('build-badge');
+  badge.innerHTML = `<span class="validity-badge ${valid ? 'valid' : 'invalid'}">${valid ? '✓ Silogismo válido' : '✗ Silogismo inválido'}</span>`;
+
+  const expl = document.getElementById('build-explain');
+  expl.style.display = 'block';
+  expl.textContent = explain;
+}
+
+// ═══════════════════════════════════════════════════════
+// PANEL 3 — ARRASTRAR
+// ═══════════════════════════════════════════════════════
+const dragExercises = [
+  {
+    chips: [
+      "∴ Bad Bunny es muy escuchado en todo el mundo.",
+      "Todo artista latino con más de 50 millones de oyentes mensuales es muy escuchado en todo el mundo.",
+      "Bad Bunny tiene más de 50 millones de oyentes mensuales en Spotify.",
+      "Los lunes son difíciles." // distractor
+    ],
+    answer: {
+      p1:   "Todo artista latino con más de 50 millones de oyentes mensuales es muy escuchado en todo el mundo.",
+      p2:   "Bad Bunny tiene más de 50 millones de oyentes mensuales en Spotify.",
+      conc: "∴ Bad Bunny es muy escuchado en todo el mundo."
+    }
+  },
+  {
+    chips: [
+      "∴ Inception es una película que requiere atención.",
+      "Ninguna película de Nolan es fácil de ver distraído.",
+      "Ver series en el móvil es cómodo.",
+      "Inception es una película de Nolan."
+    ],
+    answer: {
+      p1:   "Ninguna película de Nolan es fácil de ver distraído.",
+      p2:   "Inception es una película de Nolan.",
+      conc: "∴ Inception es una película que requiere atención."
+    }
+  },
+  {
+    chips: [
+      "∴ Este partido de Champions será impredecible.",
+      "Todo partido de Champions con dos equipos en racha es impredecible.",
+      "Hoy hay tráfico en la ciudad.",
+      "Este partido de Champions tiene dos equipos en racha."
+    ],
+    answer: {
+      p1:   "Todo partido de Champions con dos equipos en racha es impredecible.",
+      p2:   "Este partido de Champions tiene dos equipos en racha.",
+      conc: "∴ Este partido de Champions será impredecible."
+    }
+  },
+  {
+    chips: [
+      "∴ Este restaurante tiene lista de espera.",
+      "Todos los restaurantes con más de 4,8 en Google tienen lista de espera.",
+      "El tiempo en Málaga es bueno en verano.",
+      "Este restaurante tiene 4,9 en Google."
+    ],
+    answer: {
+      p1:   "Todos los restaurantes con más de 4,8 en Google tienen lista de espera.",
+      p2:   "Este restaurante tiene 4,9 en Google.",
+      conc: "∴ Este restaurante tiene lista de espera."
+    }
+  },
+  {
+    chips: [
+      "∴ Fortnite consume mucha RAM.",
+      "Todo juego con gráficos en tiempo real consume mucha RAM.",
+      "Fortnite tiene gráficos en tiempo real.",
+      "Las zapatillas de baloncesto son caras."
+    ],
+    answer: {
+      p1:   "Todo juego con gráficos en tiempo real consume mucha RAM.",
+      p2:   "Fortnite tiene gráficos en tiempo real.",
+      conc: "∴ Fortnite consume mucha RAM."
+    }
+  },
+  {
+    chips: [
+      "∴ Este meme ya no hace gracia.",
+      "Todo meme que lleva más de dos semanas circulando ya no hace gracia.",
+      "Este meme lleva tres semanas circulando.",
+      "El café con leche está bueno por las mañanas."
+    ],
+    answer: {
+      p1:   "Todo meme que lleva más de dos semanas circulando ya no hace gracia.",
+      p2:   "Este meme lleva tres semanas circulando.",
+      conc: "∴ Este meme ya no hace gracia."
+    }
+  }
+];
+
+let dragIdx = 0;
+let dragPlaced = { p1: null, p2: null, conc: null };
+let dragChecked = false;
+
+function initDragDots() {
+  const dots = document.getElementById('drag-dots');
+  dots.innerHTML = dragExercises.map((_, i) =>
+    `<div class="ex-dot ${i === 0 ? 'active' : ''}" id="dot-${i}"></div>`
+  ).join('');
+}
+
+function renderDrag() {
+  const ex = dragExercises[dragIdx];
+  dragPlaced = { p1: null, p2: null, conc: null };
+  dragChecked = false;
+
+  document.getElementById('drag-counter').textContent = `Ejercicio ${dragIdx + 1} de ${dragExercises.length}`;
+
+  // Update dots
+  document.querySelectorAll('.ex-dot').forEach((d, i) => {
+    d.className = 'ex-dot' + (i < dragIdx ? ' done' : i === dragIdx ? ' active' : '');
+  });
+
+  // Shuffle chips
+  const shuffled = [...ex.chips].sort(() => Math.random() - 0.5);
+  const pool = document.getElementById('chips-pool');
+  pool.innerHTML = '';
+  shuffled.forEach((text, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.id = `chip-${i}`;
+    chip.textContent = text;
+    chip.draggable = true;
+    chip.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', text);
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+    pool.appendChild(chip);
+  });
+
+  // Reset slots
+  ['p1','p2','conc'].forEach(s => {
+    const slot = document.getElementById('slot-' + s);
+    slot.textContent = 'Suelta aquí';
+    slot.className = 'slot';
+    slot.dataset.value = '';
+  });
+
+  // Reset feedback
+  const fb = document.getElementById('drag-feedback');
+  fb.className = 'drag-feedback';
+  fb.textContent = '';
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function drop(e, slotId) {
+  e.preventDefault();
+  if (dragChecked) return;
+  const text = e.dataTransfer.getData('text/plain');
+  const slot = document.getElementById('slot-' + slotId);
+  slot.classList.remove('drag-over');
+
+  // If slot already had a value, return it to pool
+  const prev = slot.dataset.value;
+  if (prev) {
+    const pool = document.getElementById('chips-pool');
+    const returnChip = document.createElement('div');
+    returnChip.className = 'chip';
+    returnChip.textContent = prev;
+    returnChip.draggable = true;
+    returnChip.addEventListener('dragstart', ev => {
+      ev.dataTransfer.setData('text/plain', prev);
+      returnChip.classList.add('dragging');
+    });
+    returnChip.addEventListener('dragend', () => returnChip.classList.remove('dragging'));
+    pool.appendChild(returnChip);
+  }
+
+  // Remove chip from pool
+  Array.from(document.getElementById('chips-pool').children).forEach(c => {
+    if (c.textContent === text) c.remove();
+  });
+
+  slot.textContent = text;
+  slot.dataset.value = text;
+  slot.className = 'slot filled';
+  dragPlaced[slotId] = text;
+}
+
+function checkDrag() {
+  const ex = dragExercises[dragIdx];
+  if (!dragPlaced.p1 || !dragPlaced.p2 || !dragPlaced.conc) {
+    const fb = document.getElementById('drag-feedback');
+    fb.textContent = 'Coloca una ficha en cada posición antes de comprobar.';
+    fb.className = 'drag-feedback show bad';
+    return;
+  }
+  dragChecked = true;
+
+  let allOk = true;
+  ['p1','p2','conc'].forEach(s => {
+    const slot = document.getElementById('slot-' + s);
+    const correct = dragPlaced[s] === ex.answer[s];
+    slot.className = 'slot filled ' + (correct ? 'correct' : 'wrong');
+    if (!correct) allOk = false;
+  });
+
+  const fb = document.getElementById('drag-feedback');
+  if (allOk) {
+    fb.textContent = '✓ Perfecto. Las tres piezas están en el lugar correcto. La cadena del silogismo funciona.';
+    fb.className = 'drag-feedback show ok';
+  } else {
+    fb.textContent = '✗ Hay alguna pieza fuera de su sitio. Fíjate en cuál es la premisa universal, cuál conecta el sujeto con el término medio, y cuál es la conclusión (va precedida de ∴).';
+    fb.className = 'drag-feedback show bad';
+  }
+}
+
+function resetDrag() {
+  dragChecked = false;
+  renderDrag();
+}
+
+function nextDrag() {
+  dragIdx = (dragIdx + 1) % dragExercises.length;
+  renderDrag();
+}
+
+initDragDots();
+renderDrag();
+</script>
+</body>
+</html>
