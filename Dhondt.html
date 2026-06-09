@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De votos a escaños · La Ley d'Hondt</title>
+<style>
+  :root{
+    --paper:#EEEBE2;
+    --paper-2:#E6E2D6;
+    --ink:#16140F;
+    --ink-soft:#4A463C;
+    --cobalt:#1F3BB3;
+    --cobalt-dk:#16297d;
+    --coral:#EE5A36;
+    --gold:#E0A11B;
+    --line:#16140F;
+    --empty:#cfcabb;
+    --shadow: 4px 4px 0 var(--ink);
+    --r:14px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  .mono{font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;}
+
+  /* ---------- Stage / deck ---------- */
+  .deck{position:fixed; inset:0; display:flex; flex-direction:column;}
+  .progress{height:6px; background:var(--paper-2); flex:0 0 auto;}
+  .progress > i{display:block; height:100%; background:var(--coral); width:0; transition:width .4s cubic-bezier(.2,.7,.2,1);}
+  .stage{flex:1 1 auto; overflow:hidden; position:relative;}
+  .track{display:flex; height:100%; width:100%; transition:transform .55s cubic-bezier(.22,.61,.21,1);}
+  .slide{
+    flex:0 0 100%; height:100%; overflow-y:auto; overflow-x:hidden;
+    padding:clamp(22px,5vw,64px); padding-bottom:96px;
+    display:flex; flex-direction:column;
+  }
+  .slide-inner{width:100%; max-width:980px; margin:auto;}
+
+  /* ---------- Typography ---------- */
+  .eyebrow{
+    font-family: ui-monospace, Menlo, monospace; font-size:.72rem; letter-spacing:.28em;
+    text-transform:uppercase; color:var(--cobalt); font-weight:700; margin:0 0 .9rem;
+    display:inline-flex; align-items:center; gap:.6rem;
+  }
+  .eyebrow::before{content:""; width:26px; height:3px; background:var(--coral); display:inline-block;}
+  h1{font-size:clamp(2.5rem,8vw,5.2rem); line-height:.95; margin:0 0 1rem; font-weight:800; letter-spacing:-.02em;}
+  h2{font-size:clamp(1.7rem,4.5vw,2.9rem); line-height:1.02; margin:0 0 1.1rem; font-weight:800; letter-spacing:-.015em;}
+  h3{font-size:1.1rem; margin:0 0 .4rem; font-weight:800;}
+  p{margin:0 0 1rem; color:var(--ink-soft); font-size:clamp(1rem,2.3vw,1.18rem); max-width:62ch;}
+  .lead{font-size:clamp(1.12rem,2.8vw,1.45rem); color:var(--ink); max-width:55ch;}
+  .hl{background:linear-gradient(transparent 60%, var(--gold) 60%); padding:0 .1em; color:var(--ink); font-weight:600;}
+  strong{color:var(--ink);}
+
+  /* ---------- Components ---------- */
+  .cards{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:1.4rem;}
+  .card{
+    background:#fff; border:2.5px solid var(--ink); border-radius:var(--r);
+    padding:20px 20px 22px; box-shadow:var(--shadow);
+  }
+  .card p{margin:0; font-size:1rem;}
+  .card .tag{font-family:ui-monospace,monospace; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; font-weight:700; display:inline-block; margin-bottom:.55rem; padding:.2rem .5rem; border-radius:6px;}
+  .tag.ok{background:var(--cobalt); color:#fff;}
+  .tag.no{background:var(--coral); color:#fff;}
+  .tag.note{background:var(--gold); color:var(--ink);}
+
+  .steps{counter-reset:s; display:grid; gap:14px; margin:1.4rem 0;}
+  .step{display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;}
+  .step .num{
+    counter-increment:s; width:44px; height:44px; flex:0 0 44px; border-radius:50%;
+    background:var(--cobalt); color:#fff; display:grid; place-items:center;
+    font-weight:800; font-size:1.2rem; box-shadow:var(--shadow);
+  }
+  .step .num::before{content:counter(s);}
+  .step .body{padding-top:.2rem;}
+  .step .body p{margin:.2rem 0 0; font-size:1rem;}
+
+  .callout{
+    border-left:5px solid var(--coral); background:#fff; border:2.5px solid var(--ink);
+    border-left-width:8px; border-radius:var(--r); padding:18px 20px; margin:1.2rem 0; box-shadow:var(--shadow);
+  }
+  .callout p{margin:0; color:var(--ink);}
+
+  /* fraction example */
+  .frac-row{display:flex; flex-wrap:wrap; gap:12px; margin:1rem 0;}
+  .frac{
+    background:#fff; border:2.5px solid var(--ink); border-radius:var(--r); padding:14px 16px; box-shadow:var(--shadow);
+    min-width:150px; flex:1;
+  }
+  .frac .name{font-weight:800; font-size:.95rem;}
+  .frac .votes{font-family:ui-monospace,monospace; font-size:.85rem; color:var(--ink-soft);}
+  .frac .seats{font-size:2rem; font-weight:800; font-family:ui-monospace,monospace; margin-top:.2rem;}
+  .frac .seats small{font-size:.85rem; color:var(--coral); font-weight:700;}
+
+  /* ---------- Quotient table ---------- */
+  .qwrap{overflow-x:auto; margin:1.1rem 0; -webkit-overflow-scrolling:touch;}
+  table.q{border-collapse:separate; border-spacing:0; width:100%; min-width:440px; font-family:ui-monospace,monospace; font-size:.92rem;}
+  table.q th, table.q td{padding:9px 10px; text-align:right; border-bottom:1.5px solid var(--paper-2); white-space:nowrap;}
+  table.q thead th{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); text-align:right; border-bottom:2.5px solid var(--ink);}
+  table.q thead th:first-child, table.q td.pname{text-align:left;}
+  table.q td.pname{font-family:inherit; font-weight:800; display:flex; align-items:center; gap:8px;}
+  .swatch{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--ink); flex:0 0 13px; display:inline-block;}
+  td.cell{position:relative; color:var(--ink-soft); transition:background .25s, color .25s;}
+  td.cell.win{background:var(--cobalt); color:#fff; font-weight:700; border-radius:6px;}
+  td.cell .rank{position:absolute; top:-7px; left:6px; background:var(--coral); color:#fff; font-size:.6rem; width:17px; height:17px; border-radius:50%; display:grid; place-items:center; font-weight:800; border:1.5px solid var(--ink);}
+  tr.out{opacity:.4;}
+  tr.out td.pname::after{content:"· no supera el umbral"; font-weight:500; font-size:.72rem; color:var(--coral); margin-left:4px;}
+
+  /* ---------- Hemicycle ---------- */
+  .hemi{width:100%; max-width:520px; margin:0 auto; display:block;}
+  .hemi circle{stroke:var(--ink); stroke-width:1.2; transition:fill .35s;}
+
+  /* result bars */
+  .results{display:grid; gap:10px; margin-top:1rem;}
+  .rbar{display:grid; grid-template-columns:130px 1fr 54px; align-items:center; gap:12px;}
+  .rbar .rname{font-weight:800; font-size:.92rem; display:flex; align-items:center; gap:7px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .rbar .track2{height:24px; background:var(--paper-2); border:2px solid var(--ink); border-radius:7px; overflow:hidden;}
+  .rbar .fill{height:100%; transition:width .5s cubic-bezier(.2,.7,.2,1);}
+  .rbar .rseats{font-family:ui-monospace,monospace; font-weight:800; text-align:right; font-size:1.05rem;}
+  .rbar .rseats small{font-size:.68rem; color:var(--ink-soft); font-weight:600;}
+
+  /* comparison */
+  .cmp-grid{display:grid; gap:18px; grid-template-columns:1fr; margin-top:.3rem;}
+  @media(min-width:760px){ .cmp-grid{grid-template-columns:1fr 1fr;} }
+  .card.cmp h3{margin-bottom:.8rem; padding-bottom:.5rem; border-bottom:2.5px solid var(--ink);}
+  .card.cmp .rbar{grid-template-columns:minmax(0,1fr) 60px 26px; gap:9px;}
+  .rbar.changed{background:rgba(224,161,27,.18); border-radius:7px; padding:3px 6px; margin:0 -6px;}
+  em.chg{font-style:normal; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; font-weight:800; color:#fff; background:var(--gold); color:var(--ink); padding:.1rem .35rem; border-radius:5px; border:1.5px solid var(--ink); margin-left:5px;}
+  .verdict{margin-top:1rem; padding:11px 13px; border:2.5px solid var(--ink); border-left-width:8px; border-radius:9px; background:#fff; font-size:.9rem; line-height:1.4;}
+  .verdict .who{display:block; font-family:ui-monospace,monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; font-weight:800; margin-bottom:.25rem; color:var(--ink-soft);}
+
+  /* ---------- Simulator form ---------- */
+  .panel{background:#fff; border:2.5px solid var(--ink); border-radius:var(--r); box-shadow:var(--shadow); padding:20px; margin-bottom:18px;}
+  .panel h3{margin-bottom:.9rem;}
+  .field-row{display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;}
+  .field{display:flex; flex-direction:column; gap:5px;}
+  .field label{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--ink-soft);}
+  input[type=number], input[type=text]{
+    font-family:inherit; font-size:1rem; padding:9px 11px; border:2px solid var(--ink); border-radius:9px;
+    background:var(--paper); color:var(--ink); width:100%;
+  }
+  input[type=number]{font-family:ui-monospace,monospace; max-width:120px;}
+  input:focus-visible{outline:3px solid var(--gold); outline-offset:1px;}
+  .pdata{display:grid; gap:10px; margin:.4rem 0 1rem;}
+  .prow{display:grid; grid-template-columns:30px minmax(0,1.4fr) minmax(0,1fr) 38px; gap:10px; align-items:center;}
+  .prow .dot{width:22px;height:22px;border-radius:6px;border:2px solid var(--ink);}
+  .prow input[type=text]{font-weight:700;}
+  .prow input[type=number]{max-width:none;}
+  .iconbtn{border:2px solid var(--ink); background:#fff; border-radius:9px; width:38px; height:40px; font-size:1.2rem; cursor:pointer; font-weight:800; line-height:1; color:var(--ink);}
+  .iconbtn:hover{background:var(--coral); color:#fff;}
+  .prowhead{display:grid; grid-template-columns:30px minmax(0,1.4fr) minmax(0,1fr) 38px; gap:10px; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--ink-soft); margin-bottom:2px;}
+  .prowhead span:first-child{grid-column:1 / 3;}
+
+  .btn{
+    font-family:inherit; font-weight:800; font-size:.95rem; cursor:pointer;
+    border:2.5px solid var(--ink); border-radius:11px; padding:11px 18px; background:#fff; color:var(--ink);
+    box-shadow:3px 3px 0 var(--ink); transition:transform .1s, box-shadow .1s;
+  }
+  .btn:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink);}
+  .btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink);}
+  .btn.primary{background:var(--cobalt); color:#fff;}
+  .btn.coral{background:var(--coral); color:#fff;}
+  .btn.small{padding:7px 13px; font-size:.82rem; box-shadow:2px 2px 0 var(--ink);}
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:.2rem;}
+
+  .hint{font-size:.82rem; color:var(--ink-soft); margin:.3rem 0 0;}
+  .simgrid{display:grid; gap:18px; grid-template-columns:1fr;}
+  @media(min-width:880px){ .simgrid{grid-template-columns:1fr 1fr;} }
+  .empty-note{text-align:center; color:var(--ink-soft); padding:30px 10px; font-style:italic;}
+
+  /* ---------- Nav ---------- */
+  .nav{position:fixed; bottom:0; left:0; right:0; height:66px; background:#fff; border-top:2.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:space-between; padding:0 16px; gap:12px; z-index:30;}
+  .dots{display:flex; gap:9px; align-items:center;}
+  .dot{width:11px; height:11px; border-radius:50%; border:2px solid var(--ink); background:#fff; cursor:pointer; padding:0;}
+  .dot.active{background:var(--cobalt);}
+  .navbtn{border:2.5px solid var(--ink); background:#fff; border-radius:10px; padding:9px 16px; font-weight:800; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:7px; box-shadow:2px 2px 0 var(--ink); color:var(--ink);}
+  .navbtn:hover:not(:disabled){background:var(--cobalt); color:#fff;}
+  .navbtn:disabled{opacity:.32; cursor:default;}
+  .counter{font-family:ui-monospace,monospace; font-size:.78rem; color:var(--ink-soft); min-width:42px; text-align:center;}
+
+  .title-art{display:flex; gap:7px; align-items:flex-end; margin-top:2rem; height:90px;}
+  .title-art i{display:block; width:30px; border-radius:6px 6px 0 0; border:2.5px solid var(--ink); border-bottom:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    .track,.progress>i,.rbar .fill,td.cell,.hemi circle,.btn{transition:none !important;}
+  }
+  @media(max-width:600px){
+    .slide{justify-content:flex-start; padding-top:30px;}
+    .rbar{grid-template-columns:90px 1fr 48px;}
+    .navbtn span.lbl{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="progress"><i id="prog"></i></div>
+  <div class="stage">
+    <div class="track" id="track">
+
+      <!-- SLIDE 0 · Portada -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">Departamento de Filosofía. IES Juan de la Cierva</span>
+        <h1>De votos<br>a escaños</h1>
+        <p class="lead">Descubre cómo la <strong>Ley d'Hondt</strong> convierte miles de papeletas en un número exacto de representantes. Explicado paso a paso, con ejemplos y un simulador para que pruebes tus combinaciones.</p>
+        <div class="title-art" aria-hidden="true">
+          <i style="height:40%;background:var(--cobalt)"></i>
+          <i style="height:70%;background:var(--coral)"></i>
+          <i style="height:100%;background:var(--gold)"></i>
+          <i style="height:55%;background:#2E8B6F"></i>
+          <i style="height:30%;background:#7B4FA3"></i>
+        </div>
+        <p class="hint" style="margin-top:2rem">Usa las flechas ← → del teclado, o los botones de abajo, para avanzar.</p>
+      </div></section>
+
+      <!-- SLIDE 1 · Por qué hace falta una fórmula -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">El problema</span>
+        <h2>Contar votos es fácil.<br>Repartir escaños, no.</h2>
+        <p>Contar las papeletas solo es sumar. Lo difícil viene después: hay que repartir un número <strong>fijo y entero</strong> de escaños entre los partidos. Y un escaño no se puede partir por la mitad.</p>
+        <p>Por eso, antes de unas elecciones, la ley fija una <span class="hl">fórmula electoral</span>: una regla de reparto que todos conocen de antemano y que convierte los votos en puestos sin discusión.</p>
+        <div class="callout"><p>🍬 Imagina que hay que repartir <strong>5 chuches</strong> entre amigas y amigos según cuánto hayan ayudado y que las chuches no se puedan trocear. Entonces necesitas una regla clara y además justa para decidir cuántas darle a cada uno. Con los escaños pasa lo mismo.</p></div>
+      </div></section>
+
+      <!-- SLIDE 2 · El problema de los decimales -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">El problema, con números</span>
+        <h2>El lío de los medios escaños</h2>
+        <p>Tres partidos se reparten <strong>5 escaños</strong>. Estos son sus votos (100.000 en total):</p>
+        <div class="frac-row">
+          <div class="frac"><div class="name">Partido A</div><div class="votes">50.000 votos · 50%</div><div class="seats">2,5 <small>escaños</small></div></div>
+          <div class="frac"><div class="name">Partido B</div><div class="votes">30.000 votos · 30%</div><div class="seats">1,5 <small>escaños</small></div></div>
+          <div class="frac"><div class="name">Partido C</div><div class="votes">20.000 votos · 20%</div><div class="seats">1,0 <small>escaños</small></div></div>
+        </div>
+        <p>Si repartimos "a lo bruto", según el porcentaje, salen <strong>2,5 + 1,5 + 1 escaños</strong>. ¿Pero qué hacemos con los medios escaños? No podemos repartir medios escaños, así que hay que probar otras cosas...</p>
+        <div class="cards">
+          <div class="card"><span class="tag no">Redondeo arriba</span><p>3 + 2 + 1 = <strong>6 escaños</strong>. Demasiados: solo hay 5.</p></div>
+          <div class="card"><span class="tag no">Redondeo abajo</span><p>2 + 1 + 1 = <strong>4 escaños</strong>. Faltan: sobra 1 por repartir.</p></div>
+          <div class="card"><span class="tag ok">Una fórmula</span><p>Una regla decide a quién dar cada escaño sin sobrar ni faltar. La más usada en España: <strong>d'Hondt</strong>.</p></div>
+        </div>
+      </div></section>
+
+      <!-- SLIDE 3 · La fórmula -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">La fórmula</span>
+        <h2>Así funciona d'Hondt</h2>
+        <p>La idea es sencilla: en lugar de redondear, se reparten los escaños <strong>de uno en uno</strong>, dándoselos siempre al partido que "más lo merece" en ese momento.</p>
+        <div class="steps">
+          <div class="step"><div class="num"></div><div class="body"><h3>Divide los votos de cada partido</h3><p>Entre 1, luego entre 2, entre 3… hasta el número de escaños. Sale una tabla de <strong>cocientes</strong>.</p></div></div>
+          <div class="step"><div class="num"></div><div class="body"><h3>Busca los cocientes más altos</h3><p>De toda la tabla, marca el mayor, luego el siguiente, y así sucesivamente.</p></div></div>
+          <div class="step"><div class="num"></div><div class="body"><h3>Cada cociente alto = un escaño</h3><p>Reparte tantos cocientes como escaños haya. Cuando se acaban los escaños, paras.</p></div></div>
+        </div>
+        <div class="callout"><p>Dividir entre 2, 3, 4… es una forma de "penalizar" a quien ya va ganando escaños, para que los demás tengan su turno. Por eso d'Hondt da un reparto proporcional, aunque <strong>favorece un poco a los partidos grandes</strong>.</p></div>
+      </div></section>
+
+      <!-- SLIDE 4 · Ejemplo paso a paso -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">Ejemplo resuelto</span>
+        <h2>Repartamos esos 5 escaños</h2>
+        <p>Mismos partidos de antes. Pulsa <strong>“Repartir el siguiente”</strong> y mira cómo cada escaño va al cociente más alto que queda.</p>
+        <div class="qwrap"><table class="q" id="exTable"></table></div>
+        <div class="toolbar">
+          <button class="btn coral small" id="exStep">Repartir el siguiente →</button>
+          <button class="btn small" id="exReset">Reiniciar</button>
+          <span class="hint" id="exMsg" style="margin:0"></span>
+        </div>
+        <svg class="hemi" id="exHemi" viewBox="0 0 100 56" role="img" aria-label="Reparto de escaños"></svg>
+        <div class="results" id="exResults"></div>
+      </div></section>
+
+      <!-- SLIDE 4b · Comparación de fórmulas -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">La fórmula decide quién gobierna</span>
+        <h2>Mismos votos, gobiernos distintos</h2>
+        <p>d'Hondt no es la única fórmula posible. Otra muy conocida es el <strong>resto mayor</strong> (cuota Hare). Con exactamente los mismos votos puede cambiar no solo el reparto, sino <strong>qué alianza llega a gobernar</strong>.</p>
+
+        <div class="card" style="margin-bottom:1.3rem">
+          <span class="tag note">Resto mayor · cómo funciona</span>
+          <div class="steps" style="margin:.7rem 0 0">
+            <div class="step"><div class="num"></div><div class="body"><h3>Calcula la cuota</h3><p>Cuota = votos totales ÷ escaños. Es "cuántos votos cuesta cada escaño".</p></div></div>
+            <div class="step"><div class="num"></div><div class="body"><h3>Reparte las cuotas enteras</h3><p>Cada partido recibe tantos escaños como veces completas le quepa la cuota.</p></div></div>
+            <div class="step"><div class="num"></div><div class="body"><h3>Los que sobran, al mayor resto</h3><p>Los escaños que quedan van a los partidos con el resto más alto.</p></div></div>
+          </div>
+        </div>
+
+        <p>Un parlamento de <strong>5 escaños</strong> (mayoría: 3). Hay dos bloques que no pactan entre sí: el <strong>azul</strong>, con un solo partido grande, y el <strong>verde</strong>, con dos partidos que sí se alían entre ellos.</p>
+        <div class="frac-row" id="cmpVotes"></div>
+
+        <div class="cmp-grid">
+          <div class="card cmp"><h3>Ley d'Hondt</h3><div class="results" id="cmpDhondt"></div><div class="verdict" id="cmpDhondtGov"></div></div>
+          <div class="card cmp">
+            <h3>Resto mayor</h3>
+            <div class="results" id="cmpResto"></div>
+            <div class="verdict" id="cmpRestoGov"></div>
+            <div id="cmpRevealBox" style="text-align:center;padding:14px 0 4px">
+              <button class="btn coral small" id="cmpReveal">Aplicar resto mayor →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" id="cmpTakeaway" style="display:none"></div>
+      </div></section>
+
+      <!-- SLIDE 5 · Voto en blanco vs nulo -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">Dudas frecuentes</span>
+        <h2>Voto en blanco y voto nulo</h2>
+        <p>No son lo mismo, y su efecto sobre el reparto es muy distinto.</p>
+        <div class="cards">
+          <div class="card"><span class="tag note">Voto en blanco</span>
+            <p style="margin-bottom:.6rem"><strong>Es un voto válido</strong>, pero no va a ningún partido (sobre vacío o papeleta "en blanco").</p>
+            <p>Cuenta dentro del total de votos válidos, así que <strong>sube el listón</strong> que hay que superar para entrar (la barrera del 3%). No da escaños a nadie, pero pone las cosas un poco más difíciles a los partidos pequeños.</p>
+          </div>
+          <div class="card"><span class="tag no">Voto nulo</span>
+            <p style="margin-bottom:.6rem"><strong>No es válido</strong>: papeleta rota, tachada, con cosas escritas, dos papeletas en el sobre…</p>
+            <p>Como si no existiera: <strong>no cuenta para nada</strong>. No afecta al reparto ni a la barrera. Es solo un voto que se descarta.</p>
+          </div>
+        </div>
+        <div class="callout"><p><strong>La barrera electoral.</strong> En las elecciones al Congreso, un partido debe lograr al menos el <strong>3% de los votos válidos</strong> de su circunscripción para entrar en el reparto. Por debajo, queda fuera aunque tenga votos. Como el voto en blanco es válido, hace que ese 3% equivalga a un poco más de papeletas.</p></div>
+      </div></section>
+
+      <!-- SLIDE 6 · Simulador -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">Tu turno</span>
+        <h2>Simulador d'Hondt</h2>
+        <p>Pon los partidos que quieras, sus votos y el número de escaños. El reparto se calcula al instante.</p>
+
+        <div class="panel">
+          <div class="field-row" style="margin-bottom:1rem">
+            <div class="field"><label for="seats">Escaños a repartir</label><input type="number" id="seats" min="1" max="350" value="5"></div>
+            <div class="field"><label for="thr">Barrera (% válidos)</label><input type="number" id="thr" min="0" max="20" step="0.5" value="3"></div>
+            <div class="field"><label for="blank">Votos en blanco</label><input type="number" id="blank" min="0" value="0"></div>
+            <div class="field"><label for="null">Votos nulos</label><input type="number" id="null" min="0" value="0"></div>
+          </div>
+          <div class="prowhead"><span>Partido</span><span>Votos</span><span></span></div>
+          <div class="pdata" id="pdata"></div>
+          <div class="toolbar">
+            <button class="btn small" id="addParty">+ Añadir partido</button>
+            <button class="btn small" id="toggleQ">Ver tabla de cocientes (puedes pasar a verlo en la página siguiente y luego volver aquí)</button>
+          </div>
+          <p class="hint" id="validNote"></p>
+        </div>
+
+        <div class="panel" id="outPanel">
+          <h3>Reparto de escaños</h3>
+          <svg class="hemi" id="simHemi" viewBox="0 0 100 56" role="img" aria-label="Reparto de escaños"></svg>
+          <div class="results" id="simResults"></div>
+          <div class="qwrap" id="simQWrap" style="display:none"><table class="q" id="simTable"></table></div>
+        </div>
+        <p class="hint">Los empates entre cocientes se resuelven a favor del partido con más votos totales (y, si persisten, por sorteo).</p>
+      </div></section>
+
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="navbtn" id="prev"><span aria-hidden="true">←</span><span class="lbl">Anterior</span></button>
+    <div class="dots" id="dots"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="counter" id="counter"></span>
+      <button class="navbtn" id="next"><span class="lbl">Siguiente</span><span aria-hidden="true">→</span></button>
+    </div>
+  </nav>
+</div>
+
+<script>
+"use strict";
+const PARTY_COLORS = ["#1F3BB3","#EE5A36","#E0A11B","#2E8B6F","#7B4FA3","#C03A5B","#3F7CC0","#9C6B3F","#3C9A3C","#555555","#0E8F8F","#B5497E"];
+
+/* ---------------- Core d'Hondt ---------------- */
+function computeDhondt(parties, seats, opts){
+  opts = opts || {};
+  const blank = opts.blank || 0, thresholdPct = opts.thresholdPct || 0;
+  const valid = parties.reduce((s,p)=> s + (p.votes||0), 0) + blank;
+  const thresholdVotes = valid * thresholdPct / 100;
+  const elig = parties.map(p => p.votes > 0 && p.votes >= thresholdVotes);
+  let qs = [];
+  parties.forEach((p,pi)=>{
+    if(!elig[pi]) return;
+    for(let d=1; d<=seats; d++) qs.push({party:pi, divisor:d, value:p.votes/d});
+  });
+  qs.sort((a,b)=> b.value - a.value
+                || parties[b.party].votes - parties[a.party].votes
+                || a.party - b.party);
+  const order = [];
+  for(let i=0; i<Math.min(seats, qs.length); i++){ qs[i].rank = i+1; order.push(qs[i].party); }
+  const seatsByParty = parties.map(()=>0);
+  order.forEach(pi => seatsByParty[pi]++);
+  const rankMap = {};
+  qs.forEach(q => { if(q.rank) rankMap[q.party + "-" + q.divisor] = q.rank; });
+  return {valid, thresholdVotes, elig, qs, order, seatsByParty, rankMap, seats};
+}
+const fmt  = n => Math.round(n).toLocaleString("es-ES");
+const fmtQ = n => n.toLocaleString("es-ES", {maximumFractionDigits:1});
+
+/* ---------------- Hemicycle layout ---------------- */
+function layoutHemicycle(n){
+  const pts = [];
+  if(n <= 0) return pts;
+  let rows = Math.max(1, Math.round(Math.sqrt(n / 3)));
+  rows = Math.min(rows, 14);
+  const r0 = 0.45;
+  const radii = [];
+  for(let i=0;i<rows;i++) radii.push(r0 + (1-r0)*(rows===1 ? 1 : i/(rows-1)));
+  const wsum = radii.reduce((a,b)=>a+b,0);
+  let perRow = radii.map(r => Math.max(1, Math.round(n * r / wsum)));
+  let guard = 0;
+  let diff = n - perRow.reduce((a,b)=>a+b,0);
+  let idx = rows-1;
+  while(diff !== 0 && guard++ < 500){
+    if(diff > 0){ perRow[idx]++; diff--; }
+    else if(perRow[idx] > 1){ perRow[idx]--; diff++; }
+    idx = (idx - 1 + rows) % rows;
+  }
+  for(let i=0;i<rows;i++){
+    const count = perRow[i], radius = radii[i];
+    for(let j=0;j<count;j++){
+      const angle = Math.PI * (count===1 ? 0.5 : j/(count-1));
+      pts.push({x:-Math.cos(angle)*radius, y:-Math.sin(angle)*radius, angle, row:i});
+    }
+  }
+  pts.sort((a,b)=> a.angle - b.angle || a.row - b.row);
+  return pts;
+}
+function renderHemicycle(svg, total, seatsByParty, parties, filled){
+  if(filled === undefined) filled = seatsByParty.reduce((a,b)=>a+b,0);
+  const pts = layoutHemicycle(total);
+  // assignment of party per filled position (block by party order)
+  const assign = [];
+  seatsByParty.forEach((c,pi)=>{ for(let k=0;k<c;k++) assign.push(pi); });
+  const cx=50, cy=52, R=46;
+  let dots = "";
+  const radius = total > 80 ? 1.4 : total > 40 ? 1.9 : 2.6;
+  pts.forEach((p,i)=>{
+    const x = cx + p.x*R, y = cy + p.y*R;
+    let fill = "var(--empty)";
+    if(i < assign.length && i < filled){
+      const pi = assign[i];
+      fill = parties[pi] ? (parties[pi].color || PARTY_COLORS[pi%PARTY_COLORS.length]) : "var(--empty)";
+    }
+    dots += `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${radius}" fill="${fill}"/>`;
+  });
+  svg.innerHTML = dots;
+}
+function renderResults(container, parties, seatsByParty, totalSeats){
+  const maxSeats = Math.max(1, ...seatsByParty);
+  let html = "";
+  parties.forEach((p,pi)=>{
+    const s = seatsByParty[pi];
+    const color = p.color || PARTY_COLORS[pi%PARTY_COLORS.length];
+    const pct = totalSeats ? Math.round(s/totalSeats*100) : 0;
+    html += `<div class="rbar">
+      <div class="rname"><span class="swatch" style="background:${color}"></span>${p.name||("P"+(pi+1))}</div>
+      <div class="track2"><div class="fill" style="width:${(s/maxSeats*100)}%;background:${color}"></div></div>
+      <div class="rseats">${s}<br><small>${pct}%</small></div></div>`;
+  });
+  container.innerHTML = html;
+}
+function renderQTable(table, parties, res, maxRevealed){
+  const seats = res.seats;
+  let head = "<thead><tr><th>Partido</th>";
+  for(let d=1; d<=seats; d++) head += `<th>÷${d}</th>`;
+  head += "</tr></thead>";
+  let body = "<tbody>";
+  parties.forEach((p,pi)=>{
+    const color = p.color || PARTY_COLORS[pi%PARTY_COLORS.length];
+    const out = !res.elig[pi];
+    body += `<tr class="${out?'out':''}"><td class="pname"><span class="swatch" style="background:${color}"></span>${p.name||("P"+(pi+1))}</td>`;
+    for(let d=1; d<=seats; d++){
+      if(out){ body += `<td class="cell">·</td>`; continue; }
+      const rank = res.rankMap[pi+"-"+d];
+      const isWin = rank && (maxRevealed===undefined || rank<=maxRevealed);
+      body += `<td class="cell ${isWin?'win':''}">${isWin?`<span class="rank">${rank}</span>`:''}${fmtQ(p.votes/d)}</td>`;
+    }
+    body += "</tr>";
+  });
+  body += "</tbody>";
+  table.innerHTML = head + body;
+}
+
+/* ---------------- Deck navigation ---------------- */
+const track = document.getElementById("track");
+const slides = [...track.children];
+const dotsBox = document.getElementById("dots");
+const prog = document.getElementById("prog");
+const counter = document.getElementById("counter");
+let idx = 0;
+slides.forEach((_,i)=>{
+  const b = document.createElement("button");
+  b.className = "dot"; b.setAttribute("aria-label","Ir a la diapositiva "+(i+1));
+  b.onclick = ()=> go(i);
+  dotsBox.appendChild(b);
+});
+function go(i){
+  idx = Math.max(0, Math.min(slides.length-1, i));
+  track.style.transform = `translateX(-${idx*100}%)`;
+  prog.style.width = ((idx)/(slides.length-1)*100) + "%";
+  counter.textContent = (idx+1) + " / " + slides.length;
+  [...dotsBox.children].forEach((d,j)=> d.classList.toggle("active", j===idx));
+  document.getElementById("prev").disabled = idx===0;
+  document.getElementById("next").disabled = idx===slides.length-1;
+  slides[idx].scrollTop = 0;
+}
+document.getElementById("prev").onclick = ()=> go(idx-1);
+document.getElementById("next").onclick = ()=> go(idx+1);
+document.addEventListener("keydown", e=>{
+  if(["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+  if(e.key==="ArrowRight") go(idx+1);
+  if(e.key==="ArrowLeft") go(idx-1);
+});
+go(0);
+
+/* ---------------- Slide 4: stepped example ---------------- */
+const exParties = [
+  {name:"Partido A", votes:50000, color:PARTY_COLORS[0]},
+  {name:"Partido B", votes:30000, color:PARTY_COLORS[1]},
+  {name:"Partido C", votes:20000, color:PARTY_COLORS[2]},
+];
+const exSeats = 5;
+const exRes = computeDhondt(exParties, exSeats);
+let exStepN = 0;
+const exTable = document.getElementById("exTable");
+const exHemi = document.getElementById("exHemi");
+const exResultsEl = document.getElementById("exResults");
+const exMsg = document.getElementById("exMsg");
+function exRender(){
+  renderQTable(exTable, exParties, exRes, exStepN);
+  const partial = exParties.map(()=>0);
+  for(let i=0;i<exStepN;i++) partial[exRes.order[i]]++;
+  renderHemicycle(exHemi, exSeats, partial, exParties, exStepN);
+  renderResults(exResultsEl, exParties, partial, exSeats);
+  if(exStepN===0) exMsg.textContent = "Aún no se ha repartido ningún escaño.";
+  else if(exStepN<exSeats){
+    const pi = exRes.order[exStepN-1];
+    exMsg.innerHTML = `Escaño ${exStepN} → <strong>${exParties[pi].name}</strong>`;
+  } else {
+    exMsg.innerHTML = `¡Listo! <strong>A: 3 · B: 1 · C: 1</strong>`;
+  }
+  document.getElementById("exStep").disabled = exStepN>=exSeats;
+}
+document.getElementById("exStep").onclick = ()=>{ if(exStepN<exSeats){ exStepN++; exRender(); } };
+document.getElementById("exReset").onclick = ()=>{ exStepN=0; exRender(); };
+exRender();
+
+/* ---------------- Slide 4b: formula comparison ---------------- */
+function computeRestoMayor(parties, seats){
+  const total = parties.reduce((s,p)=> s + p.votes, 0);
+  const seatsByParty = parties.map(()=>0);
+  if(total === 0 || seats <= 0) return {seatsByParty, quota:0};
+  const quota = total / seats;
+  const base = parties.map(p => Math.floor(p.votes / quota));
+  let assigned = base.reduce((a,b)=>a+b,0);
+  let remaining = seats - assigned;
+  const rem = parties.map((p,i)=> ({i, r: p.votes/quota - base[i], votes:p.votes}));
+  rem.sort((a,b)=> b.r - a.r || b.votes - a.votes || a.i - b.i);
+  for(let k=0;k<base.length;k++) seatsByParty[k] = base[k];
+  for(let k=0; k<remaining && k<rem.length; k++) seatsByParty[rem[k].i]++;
+  return {seatsByParty, quota};
+}
+function renderCmpResults(container, parties, seatsByParty, changedSet){
+  const maxSeats = Math.max(1, ...seatsByParty);
+  let html = "";
+  parties.forEach((p,pi)=>{
+    const s = seatsByParty[pi], changed = changedSet && changedSet.has(pi);
+    html += `<div class="rbar ${changed?'changed':''}">
+      <div class="rname"><span class="swatch" style="background:${p.color}"></span>${p.name}${changed?' <em class="chg">cambia</em>':''}</div>
+      <div class="track2"><div class="fill" style="width:${s/maxSeats*100}%;background:${p.color}"></div></div>
+      <div class="rseats">${s}</div></div>`;
+  });
+  container.innerHTML = html;
+}
+const cmpParties = [
+  {name:"Azul", votes:46000, color:PARTY_COLORS[0], bloc:"Bloque azul"},
+  {name:"Verde", votes:29000, color:"#2E8B6F", bloc:"Bloque verde"},
+  {name:"Roble", votes:25000, color:"#3C9A3C", bloc:"Bloque verde"},
+];
+const cmpSeats = 5;
+const cmpMajority = Math.floor(cmpSeats/2) + 1; // 3
+const cmpDhondt = computeDhondt(cmpParties, cmpSeats).seatsByParty;
+const cmpResto = computeRestoMayor(cmpParties, cmpSeats).seatsByParty;
+const cmpChanged = new Set();
+cmpParties.forEach((_,i)=>{ if(cmpDhondt[i] !== cmpResto[i]) cmpChanged.add(i); });
+
+document.getElementById("cmpVotes").innerHTML = cmpParties.map(p=>
+  `<div class="frac"><div class="name"><span class="swatch" style="background:${p.color}"></span> ${p.name}</div>
+   <div class="votes">${fmt(p.votes)} votos · ${p.bloc.toLowerCase()}</div></div>`).join("");
+
+function govVerdict(sb){
+  const azul = sb[0], verde = sb[1] + sb[2];
+  if(azul >= cmpMajority)
+    return {color:PARTY_COLORS[0], html:`El <strong>bloque azul</strong> gobierna en solitario, aunque no tiene la mayoría absoluta de votos: <strong>${azul} de ${cmpSeats}</strong> escaños es mayoría absoluta.`};
+  if(verde >= cmpMajority)
+    return {color:"#2E8B6F", html:`La <strong>coalición Verde + Roble</strong> suma <strong>${verde}</strong> y puede gobernar. Esta coalición suma 54.000 votos. El azul se queda en ${azul}.`};
+  return {color:"var(--ink-soft)", html:`Ningún bloque llega a ${cmpMajority}: harían falta más pactos.`};
+}
+function showVerdict(el, sb){
+  const v = govVerdict(sb);
+  el.style.borderLeftColor = v.color;
+  el.innerHTML = `<span class="who">Gobierno posible</span>${v.html}`;
+}
+renderCmpResults(document.getElementById("cmpDhondt"), cmpParties, cmpDhondt);
+showVerdict(document.getElementById("cmpDhondtGov"), cmpDhondt);
+
+document.getElementById("cmpReveal").onclick = ()=>{
+  renderCmpResults(document.getElementById("cmpResto"), cmpParties, cmpResto, cmpChanged);
+  renderCmpResults(document.getElementById("cmpDhondt"), cmpParties, cmpDhondt, cmpChanged);
+  showVerdict(document.getElementById("cmpRestoGov"), cmpResto);
+  document.getElementById("cmpRevealBox").style.display = "none";
+  const tk = document.getElementById("cmpTakeaway");
+  tk.style.display = "block";
+  tk.innerHTML = `<p>Con los mismos votos, la fórmula d'Hondt da una <strong>mayoría absoluta al bloque azul</strong> aunque no tenga el 50% de los apoyos; en cambio la fórmula "Resto mayor" pierde esa mayoría y gobierna la <strong>coalición verde</strong>. La fórmula no reparte solo escaños sino que decide <strong>qué gobiernos son posibles</strong>.</p>`;
+};
+
+/* ---------------- Slide 6: simulator ---------------- */
+let simParties = [
+  {name:"Partido A", votes:50000},
+  {name:"Partido B", votes:30000},
+  {name:"Partido C", votes:20000},
+];
+const pdata = document.getElementById("pdata");
+function drawParties(){
+  pdata.innerHTML = "";
+  simParties.forEach((p,i)=>{
+    const color = PARTY_COLORS[i%PARTY_COLORS.length];
+    const row = document.createElement("div");
+    row.className = "prow";
+    row.innerHTML = `<span class="dot" style="background:${color}"></span>
+      <input type="text" value="${p.name.replace(/"/g,'&quot;')}" data-i="${i}" data-k="name" aria-label="Nombre del partido ${i+1}">
+      <input type="number" min="0" value="${p.votes}" data-i="${i}" data-k="votes" aria-label="Votos del partido ${i+1}">
+      <button class="iconbtn" data-del="${i}" aria-label="Eliminar partido ${i+1}" ${simParties.length<=1?'disabled':''}>×</button>`;
+    pdata.appendChild(row);
+  });
+  pdata.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const i = +e.target.dataset.i, k = e.target.dataset.k;
+      simParties[i][k] = k==="votes" ? Math.max(0, +e.target.value||0) : e.target.value;
+      runSim();
+    });
+  });
+  pdata.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.onclick = ()=>{ simParties.splice(+btn.dataset.del,1); drawParties(); runSim(); };
+  });
+}
+document.getElementById("addParty").onclick = ()=>{
+  const n = simParties.length;
+  simParties.push({name:"Partido "+String.fromCharCode(65+n), votes:0});
+  drawParties(); runSim();
+};
+let showQ = false;
+document.getElementById("toggleQ").onclick = (e)=>{
+  showQ = !showQ;
+  document.getElementById("simQWrap").style.display = showQ ? "block" : "none";
+  e.target.textContent = showQ ? "Ocultar tabla de cocientes" : "Ver tabla de cocientes";
+  runSim();
+};
+["seats","thr","blank","null"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", runSim);
+});
+function runSim(){
+  const seats = Math.max(1, Math.min(350, +document.getElementById("seats").value||1));
+  const thr = Math.max(0, +document.getElementById("thr").value||0);
+  const blank = Math.max(0, +document.getElementById("blank").value||0);
+  const nul = Math.max(0, +document.getElementById("null").value||0);
+  const parties = simParties.map((p,i)=>({name:p.name, votes:p.votes, color:PARTY_COLORS[i%PARTY_COLORS.length]}));
+  const totalCand = parties.reduce((s,p)=>s+p.votes,0);
+  const res = computeDhondt(parties, seats, {blank, thresholdPct:thr});
+
+  const note = document.getElementById("validNote");
+  const totalEmit = totalCand + blank + nul;
+  note.innerHTML = `Votos válidos: <strong>${fmt(totalCand+blank)}</strong> (candidaturas ${fmt(totalCand)} + blanco ${fmt(blank)}). `
+    + `Nulos descartados: ${fmt(nul)}. Total emitidos: ${fmt(totalEmit)}. `
+    + (thr>0 ? `Barrera (${thr}%): hay que superar <strong>${fmt(res.thresholdVotes)}</strong> votos.` : "Sin barrera.");
+
+  const out = document.getElementById("simResults");
+  if(totalCand===0){
+    document.getElementById("simHemi").innerHTML = "";
+    out.innerHTML = `<p class="empty-note">Introduce los votos de cada partido para ver el reparto.</p>`;
+    if(showQ) document.getElementById("simTable").innerHTML = "";
+    return;
+  }
+  renderHemicycle(document.getElementById("simHemi"), seats, res.seatsByParty, parties);
+  renderResults(out, parties, res.seatsByParty, seats);
+  if(showQ) renderQTable(document.getElementById("simTable"), parties, res);
+}
+drawParties();
+runSim();
+</script>
+</body>
+</html>
