@@ -227,7 +227,7 @@
         <h2>Contar votos es fácil.<br>Repartir escaños, no.</h2>
         <p>Contar las papeletas solo es sumar. Lo difícil viene después: hay que repartir un número <strong>fijo y entero</strong> de escaños entre los partidos. Y un escaño no se puede partir por la mitad.</p>
         <p>Por eso, antes de unas elecciones, la ley fija una <span class="hl">fórmula electoral</span>: una regla de reparto que todos conocen de antemano y que convierte los votos en puestos sin discusión.</p>
-        <div class="callout"><p>🍬 Imagina que hay que repartir <strong>5 chuches</strong> entre amigas y amigos según cuánto hayan ayudado y que las chuches no se puedan trocear. Entonces necesitas una regla clara y además justa para decidir cuántas darle a cada uno. Con los escaños pasa lo mismo.</p></div>
+        <div class="callout"><p>Imagina que hay que repartir <strong>5 premios indivisibles</strong> entre varias personas según la parte que ha aportado cada una. Como no se pueden trocear, hace falta una regla clara para decidir el reparto. Con los escaños ocurre algo parecido.</p></div>
       </div></section>
 
       <!-- SLIDE 2 · El problema de los decimales -->
@@ -244,7 +244,7 @@
         <div class="cards">
           <div class="card"><span class="tag no">Redondeo arriba</span><p>3 + 2 + 1 = <strong>6 escaños</strong>. Demasiados: solo hay 5.</p></div>
           <div class="card"><span class="tag no">Redondeo abajo</span><p>2 + 1 + 1 = <strong>4 escaños</strong>. Faltan: sobra 1 por repartir.</p></div>
-          <div class="card"><span class="tag ok">Una fórmula</span><p>Una regla decide a quién dar cada escaño sin sobrar ni faltar. La más usada en España: <strong>d'Hondt</strong>.</p></div>
+          <div class="card"><span class="tag ok">Una fórmula</span><p>Una regla decide a quién dar cada escaño sin sobrar ni faltar. En el <strong>Congreso español</strong>, la fórmula legal de reparto es <strong>d'Hondt</strong>.</p></div>
         </div>
       </div></section>
 
@@ -259,6 +259,15 @@
           <div class="step"><div class="num"></div><div class="body"><h3>Cada cociente alto = un escaño</h3><p>Reparte tantos cocientes como escaños haya. Cuando se acaban los escaños, paras.</p></div></div>
         </div>
         <div class="callout"><p>Dividir entre 2, 3, 4… es una forma de "penalizar" a quien ya va ganando escaños, para que los demás tengan su turno. Por eso d'Hondt da un reparto proporcional, aunque <strong>favorece un poco a los partidos grandes</strong>.</p></div>
+      </div></section>
+
+      <!-- SLIDE 3b · España -->
+      <section class="slide"><div class="slide-inner">
+        <span class="eyebrow">Matiz importante</span>
+        <h2>No es la única fórmula</h2>
+        <p>Para las elecciones al <strong>Congreso de los Diputados</strong>, la ley establece que el reparto de escaños en cada circunscripción se haga mediante la <strong>fórmula d'Hondt</strong>, después de aplicar la barrera electoral correspondiente.</p>
+        <p>Por eso conviene formularlo con precisión: la fórmula d'Hondt es la más frecuente en España, se usa para elegir concejales, diputados...</span>.</p>
+        <div class="callout"><p><strong>Matiz.</strong> Esto no significa que todas las elecciones españolas funcionen igual. El Senado, por ejemplo, no reparte escaños con d'Hondt, sino mediante un sistema mayoritario de voto limitado. Por eso la afirmación correcta depende de la elección de la que estemos hablando.</p></div>
       </div></section>
 
       <!-- SLIDE 4 · Ejemplo paso a paso -->
@@ -281,6 +290,7 @@
         <span class="eyebrow">La fórmula decide quién gobierna</span>
         <h2>Mismos votos, gobiernos distintos</h2>
         <p>d'Hondt no es la única fórmula posible. Otra muy conocida es el <strong>resto mayor</strong> (cuota Hare). Con exactamente los mismos votos puede cambiar no solo el reparto, sino <strong>qué alianza llega a gobernar</strong>.</p>
+        <p>Esto permite plantear una pregunta de fondo: <strong>¿qué significa que un sistema electoral sea justo?</strong> Puede significar máxima proporcionalidad, facilidad para formar mayorías, protección de minorías o estabilidad institucional. No todos esos criterios dan la misma respuesta.</p>
 
         <div class="card" style="margin-bottom:1.3rem">
           <span class="tag note">Resto mayor · cómo funciona</span>
@@ -292,6 +302,7 @@
         </div>
 
         <p>Un parlamento de <strong>5 escaños</strong> (mayoría: 3). Hay dos bloques que no pactan entre sí: el <strong>azul</strong>, con un solo partido grande, y el <strong>verde</strong>, con dos partidos que sí se alían entre ellos.</p>
+        <div class="callout"><p><strong>Antes de pulsar el botón:</strong> si el bloque verde suma más votos, ¿debería gobernar siempre? ¿O también importa que esos votos estén divididos entre dos candidaturas? La comparación sirve para discutir criterios de justicia electoral, no solo para hacer una cuenta.</p></div>
         <div class="frac-row" id="cmpVotes"></div>
 
         <div class="cmp-grid">
@@ -309,29 +320,34 @@
         <div class="callout" id="cmpTakeaway" style="display:none"></div>
       </div></section>
 
-      <!-- SLIDE 5 · Voto en blanco vs nulo -->
+      <!-- SLIDE 5 · Blanco, nulo y abstención -->
       <section class="slide"><div class="slide-inner">
         <span class="eyebrow">Dudas frecuentes</span>
-        <h2>Voto en blanco y voto nulo</h2>
-        <p>No son lo mismo, y su efecto sobre el reparto es muy distinto.</p>
+        <h2>Voto en blanco, voto nulo y abstención</h2>
+        <p>Los tres expresan cosas distintas y no tienen el mismo efecto sobre el reparto de escaños.</p>
         <div class="cards">
           <div class="card"><span class="tag note">Voto en blanco</span>
-            <p style="margin-bottom:.6rem"><strong>Es un voto válido</strong>, pero no va a ningún partido (sobre vacío o papeleta "en blanco").</p>
-            <p>Cuenta dentro del total de votos válidos, así que <strong>sube el listón</strong> que hay que superar para entrar (la barrera del 3%). No da escaños a nadie, pero pone las cosas un poco más difíciles a los partidos pequeños.</p>
+            <p style="margin-bottom:.6rem"><strong>Es un voto válido</strong>, pero no va a ningún partido: por ejemplo, un sobre vacío.</p>
+            <p>Cuenta dentro del total de votos válidos. Por eso <strong>sube ligeramente la barrera</strong> que deben superar las candidaturas para entrar en el reparto. No da escaños a nadie.</p>
           </div>
           <div class="card"><span class="tag no">Voto nulo</span>
-            <p style="margin-bottom:.6rem"><strong>No es válido</strong>: papeleta rota, tachada, con cosas escritas, dos papeletas en el sobre…</p>
-            <p>Como si no existiera: <strong>no cuenta para nada</strong>. No afecta al reparto ni a la barrera. Es solo un voto que se descarta.</p>
+            <p style="margin-bottom:.6rem"><strong>No es válido</strong>: papeleta alterada, dos papeletas distintas en el sobre, marcas no permitidas, etc.</p>
+            <p>Queda descartado. <strong>No cuenta para la barrera</strong>, no entra en los cocientes y no modifica el reparto de escaños.</p>
+          </div>
+          <div class="card"><span class="tag ok">Abstención</span>
+            <p style="margin-bottom:.6rem"><strong>Es no votar</strong>. No hay papeleta ni voto emitido.</p>
+            <p>No entra en el cálculo electoral: <strong>no cuenta como voto válido ni como voto nulo</strong>. Su efecto es político, porque reduce la participación y la base social que respalda el resultado.</p>
           </div>
         </div>
-        <div class="callout"><p><strong>La barrera electoral.</strong> En las elecciones al Congreso, un partido debe lograr al menos el <strong>3% de los votos válidos</strong> de su circunscripción para entrar en el reparto. Por debajo, queda fuera aunque tenga votos. Como el voto en blanco es válido, hace que ese 3% equivalga a un poco más de papeletas.</p></div>
+        <div class="callout"><p><strong>Resumen técnico.</strong> En el reparto entran las candidaturas que superan la barrera con sus votos. El voto en blanco cuenta para calcular los votos válidos y la barrera. El voto nulo y la abstención quedan fuera del cálculo.</p></div>
+        <div class="callout"><p><strong>La barrera electoral.</strong> En las elecciones al Congreso, una candidatura debe alcanzar al menos el <strong>3% de los votos válidos</strong> de su circunscripción para entrar en el reparto. Como el voto en blanco es válido, puede hacer que ese 3% equivalga a algunas papeletas más.</p></div>
       </div></section>
 
       <!-- SLIDE 6 · Simulador -->
       <section class="slide"><div class="slide-inner">
         <span class="eyebrow">Tu turno</span>
         <h2>Simulador d'Hondt</h2>
-        <p>Pon los partidos que quieras, sus votos y el número de escaños. El reparto se calcula al instante.</p>
+        <p>Pon los partidos que quieras, sus votos, los blancos, los nulos, las abstenciones y el número de escaños. El reparto se calcula al instante y distingue qué entra en la fórmula y qué queda fuera.</p>
 
         <div class="panel">
           <div class="field-row" style="margin-bottom:1rem">
@@ -339,12 +355,13 @@
             <div class="field"><label for="thr">Barrera (% válidos)</label><input type="number" id="thr" min="0" max="20" step="0.5" value="3"></div>
             <div class="field"><label for="blank">Votos en blanco</label><input type="number" id="blank" min="0" value="0"></div>
             <div class="field"><label for="null">Votos nulos</label><input type="number" id="null" min="0" value="0"></div>
+            <div class="field"><label for="abst">Abstenciones</label><input type="number" id="abst" min="0" value="0"></div>
           </div>
           <div class="prowhead"><span>Partido</span><span>Votos</span><span></span></div>
           <div class="pdata" id="pdata"></div>
           <div class="toolbar">
             <button class="btn small" id="addParty">+ Añadir partido</button>
-            <button class="btn small" id="toggleQ">Ver tabla de cocientes (puedes pasar a verlo en la página siguiente y luego volver aquí)</button>
+            <button class="btn small" id="toggleQ">Ver tabla de cocientes</button>
           </div>
           <p class="hint" id="validNote"></p>
         </div>
@@ -355,7 +372,7 @@
           <div class="results" id="simResults"></div>
           <div class="qwrap" id="simQWrap" style="display:none"><table class="q" id="simTable"></table></div>
         </div>
-        <p class="hint">Los empates entre cocientes se resuelven a favor del partido con más votos totales (y, si persisten, por sorteo).</p>
+        <p class="hint">Los empates entre cocientes se resuelven a favor de la candidatura con más votos totales y, si persisten, por sorteo. Las abstenciones no participan en este cálculo.</p>
       </div></section>
 
     </div>
@@ -616,7 +633,7 @@ document.getElementById("cmpReveal").onclick = ()=>{
   document.getElementById("cmpRevealBox").style.display = "none";
   const tk = document.getElementById("cmpTakeaway");
   tk.style.display = "block";
-  tk.innerHTML = `<p>Con los mismos votos, la fórmula d'Hondt da una <strong>mayoría absoluta al bloque azul</strong> aunque no tenga el 50% de los apoyos; en cambio la fórmula "Resto mayor" pierde esa mayoría y gobierna la <strong>coalición verde</strong>. La fórmula no reparte solo escaños sino que decide <strong>qué gobiernos son posibles</strong>.</p>`;
+  tk.innerHTML = `<p>Con los mismos votos, la fórmula d'Hondt da una <strong>mayoría absoluta al bloque azul</strong> aunque no tenga el 50% de los apoyos; en cambio, con "Resto mayor", esa mayoría desaparece y puede gobernar la <strong>coalición verde</strong>. La conclusión no es automática: resto mayor se acerca más a la proporcionalidad aritmética, mientras que d'Hondt tiende a concentrar algo más la representación. La fórmula no solo reparte escaños: condiciona <strong>qué gobiernos son posibles</strong>.</p>`;
 };
 
 /* ---------------- Slide 6: simulator ---------------- */
@@ -661,7 +678,7 @@ document.getElementById("toggleQ").onclick = (e)=>{
   e.target.textContent = showQ ? "Ocultar tabla de cocientes" : "Ver tabla de cocientes";
   runSim();
 };
-["seats","thr","blank","null"].forEach(id=>{
+["seats","thr","blank","null","abst"].forEach(id=>{
   document.getElementById(id).addEventListener("input", runSim);
 });
 function runSim(){
@@ -669,14 +686,18 @@ function runSim(){
   const thr = Math.max(0, +document.getElementById("thr").value||0);
   const blank = Math.max(0, +document.getElementById("blank").value||0);
   const nul = Math.max(0, +document.getElementById("null").value||0);
+  const abst = Math.max(0, +document.getElementById("abst").value||0);
   const parties = simParties.map((p,i)=>({name:p.name, votes:p.votes, color:PARTY_COLORS[i%PARTY_COLORS.length]}));
   const totalCand = parties.reduce((s,p)=>s+p.votes,0);
   const res = computeDhondt(parties, seats, {blank, thresholdPct:thr});
 
   const note = document.getElementById("validNote");
   const totalEmit = totalCand + blank + nul;
+  const totalCenso = totalEmit + abst;
+  const turnout = totalCenso ? (totalEmit / totalCenso * 100) : 0;
   note.innerHTML = `Votos válidos: <strong>${fmt(totalCand+blank)}</strong> (candidaturas ${fmt(totalCand)} + blanco ${fmt(blank)}). `
-    + `Nulos descartados: ${fmt(nul)}. Total emitidos: ${fmt(totalEmit)}. `
+    + `Nulos descartados: ${fmt(nul)}. Abstenciones: ${fmt(abst)}. `
+    + `Censo simulado: ${fmt(totalCenso)}. Participación: ${turnout.toLocaleString("es-ES", {maximumFractionDigits:1})}%. `
     + (thr>0 ? `Barrera (${thr}%): hay que superar <strong>${fmt(res.thresholdVotes)}</strong> votos.` : "Sin barrera.");
 
   const out = document.getElementById("simResults");
