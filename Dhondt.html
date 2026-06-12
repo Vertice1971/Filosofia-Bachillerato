@@ -114,7 +114,7 @@
   td.cell.win{background:var(--cobalt); color:#fff; font-weight:700; border-radius:6px;}
   td.cell .rank{position:absolute; top:-7px; left:6px; background:var(--coral); color:#fff; font-size:.6rem; width:17px; height:17px; border-radius:50%; display:grid; place-items:center; font-weight:800; border:1.5px solid var(--ink);}
   tr.out{opacity:.4;}
-  tr.out td.pname::after{content:"· no alcanza el umbral"; font-weight:500; font-size:.72rem; color:var(--coral); margin-left:4px;}
+  tr.out td.pname::after{content:"· no supera el umbral"; font-weight:500; font-size:.72rem; color:var(--coral); margin-left:4px;}
 
   /* ---------- Hemicycle ---------- */
   .hemi{width:100%; max-width:520px; margin:0 auto; display:block;}
@@ -140,16 +140,6 @@
   em.chg{font-style:normal; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; font-weight:800; color:#fff; background:var(--gold); color:var(--ink); padding:.1rem .35rem; border-radius:5px; border:1.5px solid var(--ink); margin-left:5px;}
   .verdict{margin-top:1rem; padding:11px 13px; border:2.5px solid var(--ink); border-left-width:8px; border-radius:9px; background:#fff; font-size:.9rem; line-height:1.4;}
   .verdict .who{display:block; font-family:ui-monospace,monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; font-weight:800; margin-bottom:.25rem; color:var(--ink-soft);}
-  .bloc-summary{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin:1rem 0 1.2rem;}
-  .mini-stat{background:#fff; border:2.5px solid var(--ink); border-radius:var(--r); padding:13px 16px; box-shadow:3px 3px 0 var(--ink);}
-  .mini-stat.major{border-left-width:8px;}
-  .mini-stat .label{font-family:ui-monospace,monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800; color:var(--ink-soft); display:block; margin-bottom:.25rem;}
-  .mini-stat .big{font-size:1.35rem; line-height:1.05; font-weight:800; color:var(--ink);}
-  .mini-stat p{font-size:.88rem; margin:.35rem 0 0; color:var(--ink-soft);}
-  .bloc-results{display:grid; gap:8px; margin-top:.9rem;}
-  .bloc-pill{border:2px solid var(--ink); border-radius:9px; padding:9px 11px; background:var(--paper); font-size:.9rem;}
-  .bloc-pill strong{font-family:ui-monospace,monospace;}
-  .bloc-pill.major{background:#fff; border-left-width:7px;}
 
   /* debate (¿cuál es más justa?) */
   .debate{margin-top:1.3rem;}
@@ -250,7 +240,7 @@
         <h2>Contar votos es fácil.<br>Repartir escaños, no.</h2>
         <p>Contar las papeletas solo es sumar. Lo difícil viene después: hay que repartir un número <strong>fijo y entero</strong> de escaños entre los partidos. Y un escaño no se puede partir por la mitad.</p>
         <p>Por eso, antes de unas elecciones, la ley fija una <span class="hl">fórmula electoral</span>: una regla de reparto que todos conocen de antemano y que convierte los votos en puestos sin discusión.</p>
-        <div class="callout"><p>Imagina que hay que repartir <strong>5 chuches</strong> entre varias personas según cuánto hayan contribuido, y que las chuches no se pueden partir. Hace falta una regla previa, clara y aplicable a todos. Con los escaños ocurre algo parecido: no basta con saber cuántos votos tiene cada partido; hay que decidir cómo convertir esos votos en puestos enteros.</p></div>
+        <div class="callout"><p>🍬 Imagina que hay que repartir <strong>5 monedas</strong> entre amigas y amigos según cuánto hayan ayudado y que las monedas no se puedan trocear. Entonces necesitas una regla clara y además justa para decidir cuántas darle a cada uno. Con los escaños pasa lo mismo.</p></div>
       </div></section>
 
       <!-- SLIDE 2 · El problema de los decimales -->
@@ -267,7 +257,7 @@
         <div class="cards">
           <div class="card"><span class="tag no">Redondeo arriba</span><p>3 + 2 + 1 = <strong>6 escaños</strong>. Demasiados: solo hay 5.</p></div>
           <div class="card"><span class="tag no">Redondeo abajo</span><p>2 + 1 + 1 = <strong>4 escaños</strong>. Faltan: sobra 1 por repartir.</p></div>
-          <div class="card"><span class="tag ok">Una fórmula</span><p>Una regla decide a quién dar cada escaño sin sobrar ni faltar. En las elecciones españolas de listas proporcionales, la fórmula legal de reparto es <strong>d'Hondt</strong>.</p></div>
+          <div class="card"><span class="tag ok">Una fórmula</span><p>Una regla decide a quién dar cada escaño sin sobrar ni faltar. La que se usa en España: <strong>d'Hondt</strong>.</p></div>
         </div>
       </div></section>
 
@@ -275,15 +265,15 @@
       <section class="slide"><div class="slide-inner">
         <span class="eyebrow">La fórmula</span>
         <h2>Así funciona d'Hondt</h2>
-        <p>La idea es sencilla: en lugar de redondear, se reparten los escaños <strong>de uno en uno</strong>, asignando cada puesto al partido que tiene el cociente más alto en ese momento.</p>
+        <p>La idea es sencilla: en lugar de redondear, se reparten los escaños <strong>de uno en uno</strong>, dándoselos siempre al partido que "más lo merece" en ese momento.</p>
         <div class="steps">
           <div class="step"><div class="num"></div><div class="body"><h3>Divide los votos de cada partido</h3><p>Entre 1, luego entre 2, entre 3… hasta el número de escaños. Sale una tabla de <strong>cocientes</strong>.</p></div></div>
           <div class="step"><div class="num"></div><div class="body"><h3>Busca los cocientes más altos</h3><p>De toda la tabla, marca el mayor, luego el siguiente, y así sucesivamente.</p></div></div>
           <div class="step"><div class="num"></div><div class="body"><h3>Cada cociente alto = un escaño</h3><p>Reparte tantos cocientes como escaños haya. Cuando se acaban los escaños, paras.</p></div></div>
         </div>
-        <div class="callout"><p>Dividir entre 2, 3, 4… reduce el siguiente cociente de quien ya ha recibido escaños. Así otros partidos pueden competir por los puestos siguientes. d'Hondt es una fórmula proporcional, pero no convierte los porcentajes de voto en porcentajes de escaños de manera exacta: <strong>tiende a favorecer a las candidaturas más votadas</strong>, sobre todo cuando se reparten pocos escaños.</p></div>
-        <div class="callout"><p><strong>En España no es simplemente “la más usada”.</strong> En las principales elecciones de listas proporcionales —Congreso, Parlamento Europeo, parlamentos autonómicos y elecciones municipales ordinarias— la fórmula legal de reparto es d'Hondt.</p>
-        <p>El <strong>Senado</strong> no usa d'Hondt porque no funciona como un reparto proporcional de listas. Se votan candidatos individuales mediante voto limitado; en las provincias peninsulares, por ejemplo, cada elector puede marcar hasta tres nombres.</p></div>
+        <div class="callout"><p>Dividir entre 2, 3, 4… es una forma de "penalizar" a quien ya va ganando escaños, para que los demás tengan su turno. Por eso d'Hondt da un reparto proporcional, aunque <strong>favorece un poco a los partidos grandes</strong>.</p></div>
+        <div class="callout"><p><strong>¿"La más usada" en España? En realidad es la única.</strong> Todas las elecciones españolas con reparto proporcional usan d'Hondt: Congreso de los Diputados, parlamentos autonómicos, ayuntamientos y Parlamento Europeo.</p>
+        <p>La única excepción es el <strong>Senado</strong>, y no porque use otra fórmula proporcional: allí no hay fórmula de reparto, sino un <strong>sistema mayoritario</strong> de voto limitado (cada elector marca hasta tres nombres y los candidatos más votados se llevan directamente el escaño).</p></div>
       </div></section>
 
       <!-- SLIDE 4 · Ejemplo paso a paso -->
@@ -305,32 +295,25 @@
       <section class="slide"><div class="slide-inner">
         <span class="eyebrow">La fórmula decide quién gobierna</span>
         <h2>Mismos votos, gobiernos distintos</h2>
-        <p>d'Hondt no es la única fórmula posible. Otra fórmula proporcional conocida es el <strong>resto mayor</strong> o <strong>cuota Hare</strong>. Con los mismos votos puede cambiar no solo el reparto de escaños, sino también qué mayoría política queda en condiciones de gobernar.</p>
+        <p>d'Hondt no es la única fórmula posible. Otra muy conocida es el <strong>resto mayor</strong> (cuota Hare). Con exactamente los mismos votos puede cambiar no solo el reparto, sino <strong>qué alianza llega a gobernar</strong>.</p>
 
         <div class="card" style="margin-bottom:1.3rem">
           <span class="tag note">Resto mayor · cómo funciona</span>
           <div class="steps" style="margin:.7rem 0 0">
-            <div class="step"><div class="num"></div><div class="body"><h3>Calcula la cuota</h3><p>Cuota = votos totales ÷ escaños. Es una referencia aproximada de cuántos votos “cuesta” cada escaño.</p></div></div>
-            <div class="step"><div class="num"></div><div class="body"><h3>Reparte las cuotas enteras</h3><p>Cada partido recibe tantos escaños como cuotas completas consiga.</p></div></div>
-            <div class="step"><div class="num"></div><div class="body"><h3>Los escaños sobrantes, al mayor resto</h3><p>Los puestos que quedan se asignan a los partidos con restos más altos.</p></div></div>
+            <div class="step"><div class="num"></div><div class="body"><h3>Calcula la cuota</h3><p>Cuota = votos totales ÷ escaños. Es "cuántos votos cuesta cada escaño".</p></div></div>
+            <div class="step"><div class="num"></div><div class="body"><h3>Reparte las cuotas enteras</h3><p>Cada partido recibe tantos escaños como veces completas le quepa la cuota.</p></div></div>
+            <div class="step"><div class="num"></div><div class="body"><h3>Los que sobran, al mayor resto</h3><p>Los escaños que quedan van a los partidos con el resto más alto.</p></div></div>
           </div>
         </div>
 
-        <p>Un parlamento de <strong>5 escaños</strong> necesita <strong>3</strong> para la mayoría absoluta. El partido <strong>Azul</strong> compite solo. <strong>Verde</strong> y <strong>Roble</strong> sí pactan entre ellos. Observa la diferencia entre tener mayoría de votos y tener mayoría de puestos electos.</p>
+        <p>Un parlamento de <strong>5 escaños</strong> (mayoría: 3). Hay dos bloques que no pactan entre sí: el <strong>azul</strong>, con un solo partido grande, y el <strong>verde</strong>, con dos partidos que sí se alían entre ellos.</p>
         <div class="frac-row" id="cmpVotes"></div>
-        <div class="bloc-summary" id="cmpBlocVotes"></div>
 
         <div class="cmp-grid">
-          <div class="card cmp">
-            <h3>Ley d'Hondt</h3>
-            <div class="results" id="cmpDhondt"></div>
-            <div class="bloc-results" id="cmpDhondtBloc"></div>
-            <div class="verdict" id="cmpDhondtGov"></div>
-          </div>
+          <div class="card cmp"><h3>Ley d'Hondt</h3><div class="results" id="cmpDhondt"></div><div class="verdict" id="cmpDhondtGov"></div></div>
           <div class="card cmp">
             <h3>Resto mayor</h3>
             <div class="results" id="cmpResto"></div>
-            <div class="bloc-results" id="cmpRestoBloc"></div>
             <div class="verdict" id="cmpRestoGov"></div>
             <div id="cmpRevealBox" style="text-align:center;padding:14px 0 4px">
               <button class="btn coral small" id="cmpReveal">Aplicar resto mayor →</button>
@@ -340,23 +323,24 @@
 
         <div class="callout" id="cmpTakeaway" style="display:none"></div>
 
+        <!-- Debate: ¿cuál es más justa? -->
         <div class="debate" id="fairBox" style="display:none">
           <span class="eyebrow">Para pensar</span>
           <h3>Entonces… ¿cuál de las dos fórmulas es más justa?</h3>
-          <p>La respuesta depende del criterio. Si se prioriza que los escaños se parezcan lo máximo posible a los votos, el resto mayor parece más justo. Si se prioriza que el sistema produzca mayorías más claras y gobiernos más estables, d'Hondt puede parecer preferible.</p>
+          <p>Quizá estés pensando que el resto mayor es más justo, porque se parece más al porcentaje de votos. Antes de decidirlo, piensa: <strong>¿justo según qué criterio?</strong> Coméntalo con tu pareja o grupo y luego compara con las claves.</p>
           <div style="margin:.6rem 0 1rem"><button class="btn small" id="fairReveal">Ver claves para el debate</button></div>
           <div id="fairAnswer" style="display:none">
             <div class="pro-con">
-              <div class="card"><span class="tag ok">Criterio proporcional</span>
-                <p>El resto mayor suele acercar más el porcentaje de escaños al porcentaje de votos. Favorece que el parlamento se parezca más a una fotografía del voto emitido.</p>
-                <p>Desde este criterio, lo importante es que cada corriente política obtenga una representación lo más equivalente posible a su apoyo electoral.</p>
+              <div class="card"><span class="tag ok">A favor del resto mayor</span>
+                <p>Es <strong>más proporcional</strong>: el reparto se acerca más al porcentaje de votos, y cada escaño "cuesta" un número de votos parecido a todos los partidos.</p>
+                <p>Si tu criterio de justicia es <strong>"que el parlamento sea una foto fiel de los votos"</strong>, el resto mayor gana.</p>
               </div>
-              <div class="card"><span class="tag note">Criterio de gobernabilidad</span>
-                <p>d'Hondt tiende a reforzar a las candidaturas más votadas, especialmente cuando se reparten pocos escaños. Eso puede facilitar mayorías más claras.</p>
-                <p>Desde este criterio, lo importante no es solo representar con precisión, sino permitir que después se formen gobiernos y se tomen decisiones.</p>
+              <div class="card"><span class="tag note">A favor de d'Hondt</span>
+                <p>Prima la <strong>gobernabilidad</strong>: al favorecer a los grandes, facilita mayorías estables y desincentiva que el voto se reparta entre muchísimos partidos pequeños.</p>
+                <p>Además evita rarezas del resto mayor, como la <strong>paradoja de Alabama</strong>: con esa fórmula, aumentar el número total de escaños puede hacer que un partido <em>pierda</em> uno, sin que cambie ni un solo voto.</p>
               </div>
             </div>
-            <div class="callout"><p><strong>La conclusión filosófica:</strong> “justo” no significa una sola cosa. Proporcionalidad, estabilidad, igualdad del valor del voto y capacidad de formar gobierno son criterios distintos. Una fórmula electoral no es un simple trámite matemático: expresa qué criterio se considera más importante.</p></div>
+            <div class="callout"><p><strong>La conclusión:</strong> "justa" no significa lo mismo para todos. Proporcionalidad fiel, gobiernos estables, igualdad del valor de cada voto… son criterios de justicia distintos y ninguna fórmula los satisface todos a la vez. Elegir una fórmula electoral no es un cálculo neutral: <strong>es ya una decisión política</strong> sobre qué valoramos más.</p></div>
           </div>
         </div>
       </div></section>
@@ -380,7 +364,7 @@
             <p>No es un voto: ni emitido ni válido. <strong>No cambia el reparto ni la barrera</strong>, que se calculan solo con los votos válidos. Pero sí cambia su lectura: con mucha abstención, cada escaño "cuesta" menos votos en números absolutos y el parlamento representa la opinión de menos gente.</p>
           </div>
         </div>
-        <div class="callout"><p><strong>La barrera electoral.</strong> En las elecciones al Congreso, un partido debe alcanzar al menos el <strong>3% de los votos válidos</strong> de su circunscripción para entrar en el reparto (en las municipales, el 5%). Por debajo, queda fuera del reparto aunque tenga votos. Como el voto en blanco es válido, hace que ese 3% equivalga a un poco más de papeletas. El nulo y la abstención, en cambio, no mueven la barrera: simplemente no cuentan.</p></div>
+        <div class="callout"><p><strong>La barrera electoral.</strong> En las elecciones al Congreso, un partido debe lograr al menos el <strong>3% de los votos válidos</strong> de su circunscripción para entrar en el reparto (en las municipales, el 5%). Por debajo, queda fuera aunque tenga votos. Como el voto en blanco es válido, hace que ese 3% equivalga a un poco más de papeletas. El nulo y la abstención, en cambio, no mueven la barrera: simplemente no cuentan.</p></div>
       </div></section>
 
       <!-- SLIDE 6 · Simulador -->
@@ -412,7 +396,7 @@
           <div class="results" id="simResults"></div>
           <div class="qwrap" id="simQWrap" style="display:none"><table class="q" id="simTable"></table></div>
         </div>
-        <p class="hint">Los porcentajes de voto se calculan sobre los votos válidos (candidaturas + blanco), la misma base que la barrera. Si hay voto en blanco, la suma de porcentajes de las candidaturas puede ser inferior al 100%. Los empates entre cocientes se resuelven a favor del partido con más votos totales y, si persisten, por sorteo.</p>
+        <p class="hint">Los porcentajes de voto se calculan sobre los votos válidos (candidaturas + blanco), la misma base que la barrera. Los empates entre cocientes se resuelven a favor del partido con más votos totales (y, si persisten, por sorteo).</p>
       </div></section>
 
     </div>
@@ -457,7 +441,6 @@ function computeDhondt(parties, seats, opts){
 }
 const fmt  = n => Math.round(n).toLocaleString("es-ES");
 const fmtQ = n => n.toLocaleString("es-ES", {maximumFractionDigits:1});
-const esc = v => String(v ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
 
 /* ---------------- Hemicycle layout ---------------- */
 function layoutHemicycle(n){
@@ -516,14 +499,14 @@ function renderResults(container, parties, seatsByParty, totalSeats, validVotes)
   parties.forEach((p,pi)=>{
     const s = seatsByParty[pi];
     const color = p.color || PARTY_COLORS[pi%PARTY_COLORS.length];
-    const seatPct = totalSeats ? (s/totalSeats*100) : 0;
-    let smalls = `${seatPct.toLocaleString("es-ES",{maximumFractionDigits:1})}% escaños`;
+    const pct = totalSeats ? Math.round(s/totalSeats*100) : 0;
+    let smalls = `${pct}%`;
     if(withVotes){
-      const votePct = (p.votes||0) / validVotes * 100;
-      smalls += `<br><span class="vp">${votePct.toLocaleString("es-ES",{maximumFractionDigits:1})}% votos</span>`;
+      const vpct = (p.votes||0) / validVotes * 100;
+      smalls = `${pct}% escaños<br><span class="vp">${vpct.toLocaleString("es-ES",{maximumFractionDigits:1})}% votos</span>`;
     }
     html += `<div class="rbar">
-      <div class="rname"><span class="swatch" style="background:${color}"></span>${esc(p.name)||("P"+(pi+1))}</div>
+      <div class="rname"><span class="swatch" style="background:${color}"></span>${p.name||("P"+(pi+1))}</div>
       <div class="track2"><div class="fill" style="width:${(s/maxSeats*100)}%;background:${color}"></div></div>
       <div class="rseats">${s}<br><small>${smalls}</small></div></div>`;
   });
@@ -538,7 +521,7 @@ function renderQTable(table, parties, res, maxRevealed){
   parties.forEach((p,pi)=>{
     const color = p.color || PARTY_COLORS[pi%PARTY_COLORS.length];
     const out = !res.elig[pi];
-    body += `<tr class="${out?'out':''}"><td class="pname"><span class="swatch" style="background:${color}"></span>${esc(p.name)||("P"+(pi+1))}</td>`;
+    body += `<tr class="${out?'out':''}"><td class="pname"><span class="swatch" style="background:${color}"></span>${p.name||("P"+(pi+1))}</td>`;
     for(let d=1; d<=seats; d++){
       if(out){ body += `<td class="cell">·</td>`; continue; }
       const rank = res.rankMap[pi+"-"+d];
@@ -636,7 +619,7 @@ function renderCmpResults(container, parties, seatsByParty, changedSet){
   parties.forEach((p,pi)=>{
     const s = seatsByParty[pi], changed = changedSet && changedSet.has(pi);
     html += `<div class="rbar ${changed?'changed':''}">
-      <div class="rname"><span class="swatch" style="background:${p.color}"></span>${esc(p.name)}${changed?' <em class="chg">cambia</em>':''}</div>
+      <div class="rname"><span class="swatch" style="background:${p.color}"></span>${p.name}${changed?' <em class="chg">cambia</em>':''}</div>
       <div class="track2"><div class="fill" style="width:${s/maxSeats*100}%;background:${p.color}"></div></div>
       <div class="rseats">${s}</div></div>`;
   });
@@ -644,62 +627,26 @@ function renderCmpResults(container, parties, seatsByParty, changedSet){
 }
 const cmpParties = [
   {name:"Azul", votes:46000, color:PARTY_COLORS[0], bloc:"Bloque azul"},
-  {name:"Verde", votes:29000, color:"#2E8B6F", bloc:"Bloque verde-roble"},
-  {name:"Roble", votes:25000, color:"#3C9A3C", bloc:"Bloque verde-roble"},
+  {name:"Verde", votes:29000, color:"#2E8B6F", bloc:"Bloque verde"},
+  {name:"Roble", votes:25000, color:"#3C9A3C", bloc:"Bloque verde"},
 ];
 const cmpSeats = 5;
 const cmpMajority = Math.floor(cmpSeats/2) + 1; // 3
-const cmpTotalVotes = cmpParties.reduce((s,p)=>s+p.votes,0);
-const cmpBlocVotes = {
-  azul: cmpParties[0].votes,
-  verdeRoble: cmpParties[1].votes + cmpParties[2].votes
-};
 const cmpDhondt = computeDhondt(cmpParties, cmpSeats).seatsByParty;
 const cmpResto = computeRestoMayor(cmpParties, cmpSeats).seatsByParty;
 const cmpChanged = new Set();
 cmpParties.forEach((_,i)=>{ if(cmpDhondt[i] !== cmpResto[i]) cmpChanged.add(i); });
 
 document.getElementById("cmpVotes").innerHTML = cmpParties.map(p=>
-  `<div class="frac"><div class="name"><span class="swatch" style="background:${p.color}"></span> ${esc(p.name)}</div>
-   <div class="votes">${fmt(p.votes)} votos · ${esc(p.bloc)}</div></div>`).join("");
+  `<div class="frac"><div class="name"><span class="swatch" style="background:${p.color}"></span> ${p.name}</div>
+   <div class="votes">${fmt(p.votes)} votos · ${p.bloc.toLowerCase()}</div></div>`).join("");
 
-function pct(n,d){ return d ? (n/d*100).toLocaleString("es-ES",{maximumFractionDigits:1}) : "0"; }
-function renderBlocVoteSummary(){
-  const azulPct = pct(cmpBlocVotes.azul, cmpTotalVotes);
-  const vrPct = pct(cmpBlocVotes.verdeRoble, cmpTotalVotes);
-  document.getElementById("cmpBlocVotes").innerHTML = `
-    <div class="mini-stat" style="border-left:8px solid ${PARTY_COLORS[0]}">
-      <span class="label">Bloque azul · votos</span>
-      <div class="big">${fmt(cmpBlocVotes.azul)} · ${azulPct}%</div>
-      <p>No alcanza mayoría absoluta de votos.</p>
-    </div>
-    <div class="mini-stat major" style="border-left-color:#2E8B6F">
-      <span class="label">Verde + Roble · votos</span>
-      <div class="big">${fmt(cmpBlocVotes.verdeRoble)} · ${vrPct}%</div>
-      <p><strong>Sí tiene mayoría de votos</strong>, porque supera el 50%.</p>
-    </div>`;
-}
-function blocSeats(sb){
-  return {azul:sb[0], verdeRoble:sb[1]+sb[2]};
-}
-function renderBlocSeatSummary(el, sb){
-  const b = blocSeats(sb);
-  const azulMajor = b.azul >= cmpMajority;
-  const vrMajor = b.verdeRoble >= cmpMajority;
-  el.innerHTML = `
-    <div class="bloc-pill ${azulMajor?'major':''}" style="${azulMajor?'border-left-color:'+PARTY_COLORS[0]:''}">
-      Bloque azul: <strong>${b.azul}/${cmpSeats}</strong> escaños · ${pct(b.azul, cmpSeats)}% de puestos ${azulMajor?'<strong>→ mayoría de escaños</strong>':''}
-    </div>
-    <div class="bloc-pill ${vrMajor?'major':''}" style="${vrMajor?'border-left-color:#2E8B6F':''}">
-      Verde + Roble: <strong>${b.verdeRoble}/${cmpSeats}</strong> escaños · ${pct(b.verdeRoble, cmpSeats)}% de puestos ${vrMajor?'<strong>→ mayoría de escaños</strong>':''}
-    </div>`;
-}
 function govVerdict(sb){
-  const b = blocSeats(sb);
-  if(b.azul >= cmpMajority)
-    return {color:PARTY_COLORS[0], html:`El <strong>bloque azul</strong> podría gobernar: obtiene <strong>${b.azul} de ${cmpSeats}</strong> puestos electos, aunque solo tenía <strong>${pct(cmpBlocVotes.azul, cmpTotalVotes)}%</strong> de los votos.`};
-  if(b.verdeRoble >= cmpMajority)
-    return {color:"#2E8B6F", html:`La alianza <strong>Verde + Roble</strong> podría gobernar: convierte su mayoría de votos (<strong>${pct(cmpBlocVotes.verdeRoble, cmpTotalVotes)}%</strong>) en mayoría de puestos electos: <strong>${b.verdeRoble} de ${cmpSeats}</strong>.`};
+  const azul = sb[0], verde = sb[1] + sb[2];
+  if(azul >= cmpMajority)
+    return {color:PARTY_COLORS[0], html:`El <strong>bloque azul</strong> gobierna en solitario, aunque no tiene la mayoría absoluta de votos: <strong>${azul} de ${cmpSeats}</strong> escaños es mayoría absoluta.`};
+  if(verde >= cmpMajority)
+    return {color:"#2E8B6F", html:`La <strong>coalición Verde + Roble</strong> suma <strong>${verde}</strong> y puede gobernar. Esta coalición suma 54.000 votos. El azul se queda en ${azul}.`};
   return {color:"var(--ink-soft)", html:`Ningún bloque llega a ${cmpMajority}: harían falta más pactos.`};
 }
 function showVerdict(el, sb){
@@ -707,21 +654,17 @@ function showVerdict(el, sb){
   el.style.borderLeftColor = v.color;
   el.innerHTML = `<span class="who">Gobierno posible</span>${v.html}`;
 }
-renderBlocVoteSummary();
 renderCmpResults(document.getElementById("cmpDhondt"), cmpParties, cmpDhondt);
-renderBlocSeatSummary(document.getElementById("cmpDhondtBloc"), cmpDhondt);
 showVerdict(document.getElementById("cmpDhondtGov"), cmpDhondt);
 
 document.getElementById("cmpReveal").onclick = ()=>{
   renderCmpResults(document.getElementById("cmpResto"), cmpParties, cmpResto, cmpChanged);
   renderCmpResults(document.getElementById("cmpDhondt"), cmpParties, cmpDhondt, cmpChanged);
-  renderBlocSeatSummary(document.getElementById("cmpRestoBloc"), cmpResto);
-  renderBlocSeatSummary(document.getElementById("cmpDhondtBloc"), cmpDhondt);
   showVerdict(document.getElementById("cmpRestoGov"), cmpResto);
   document.getElementById("cmpRevealBox").style.display = "none";
   const tk = document.getElementById("cmpTakeaway");
   tk.style.display = "block";
-  tk.innerHTML = `<p>Los votos no han cambiado: <strong>Verde + Roble tiene mayoría de votos</strong> con el ${pct(cmpBlocVotes.verdeRoble, cmpTotalVotes)}%. Lo que cambia es la conversión en puestos. Con <strong>d'Hondt</strong>, Azul obtiene ${blocSeats(cmpDhondt).azul} de ${cmpSeats} escaños y consigue mayoría de puestos; con <strong>resto mayor</strong>, Verde + Roble obtiene ${blocSeats(cmpResto).verdeRoble} de ${cmpSeats} y su mayoría de votos se convierte también en mayoría parlamentaria.</p>`;
+  tk.innerHTML = `<p>Con los mismos votos, la fórmula d'Hondt da una <strong>mayoría absoluta al bloque azul</strong> aunque no tenga el 50% de los apoyos; en cambio la fórmula "Resto mayor" pierde esa mayoría y gobierna la <strong>coalición verde</strong>. La fórmula no reparte solo escaños sino que decide <strong>qué gobiernos son posibles</strong>.</p>`;
   document.getElementById("fairBox").style.display = "block";
 };
 document.getElementById("fairReveal").onclick = (e)=>{
@@ -743,7 +686,7 @@ function drawParties(){
     const row = document.createElement("div");
     row.className = "prow";
     row.innerHTML = `<span class="dot" style="background:${color}"></span>
-      <input type="text" value="${esc(p.name)}" data-i="${i}" data-k="name" aria-label="Nombre del partido ${i+1}">
+      <input type="text" value="${p.name.replace(/"/g,'&quot;')}" data-i="${i}" data-k="name" aria-label="Nombre del partido ${i+1}">
       <input type="number" min="0" value="${p.votes}" data-i="${i}" data-k="votes" aria-label="Votos del partido ${i+1}">
       <button class="iconbtn" data-del="${i}" aria-label="Eliminar partido ${i+1}" ${simParties.length<=1?'disabled':''}>×</button>`;
     pdata.appendChild(row);
@@ -791,7 +734,7 @@ function runSim(){
   note.innerHTML = `Votos válidos: <strong>${fmt(totalCand+blank)}</strong> (candidaturas ${fmt(totalCand)} + blanco ${fmt(blank)}). `
     + `Nulos descartados: ${fmt(nul)}. Total emitidos: ${fmt(totalEmit)}. `
     + (abst>0 ? `Abstención: ${fmt(abst)} → participación del <strong>${partic.toLocaleString("es-ES",{maximumFractionDigits:1})}%</strong> (la abstención no entra en el reparto ni en la barrera). ` : "")
-    + (thr>0 ? `Barrera (${thr}%): hay que alcanzar al menos <strong>${fmt(res.thresholdVotes)}</strong> votos.` : "Sin barrera.");
+    + (thr>0 ? `Barrera (${thr}%): hay que superar <strong>${fmt(res.thresholdVotes)}</strong> votos.` : "Sin barrera.");
 
   const out = document.getElementById("simResults");
   if(totalCand===0){
